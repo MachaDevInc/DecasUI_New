@@ -1377,26 +1377,26 @@ class ProcessingThread(QThread):
 
         return result
 
-    # def pdf_to_text_ocr(self):
-    #     text = ''
-    #     with pdfplumber.open(self.file_path) as pdf:
-    #         for page in pdf.pages:
-    #             text += page.extract_text()
-    #     return text
-
     def pdf_to_text_ocr(self):
-        # Convert PDF to images
-        images = convert_from_path(self.file_path)
+        text = ''
+        with pdfplumber.open(self.file_path) as pdf:
+            for page in pdf.pages:
+                text += page.extract_text()
+        return text
 
-        # Initialize the OCR result string
-        result = ""
+    # def pdf_to_text_ocr(self):
+    #     # Convert PDF to images
+    #     images = convert_from_path(self.file_path)
 
-        # Loop through the images and perform OCR
-        for i, img in enumerate(images):
-            # Extract non-table text from the page
-            text = pytesseract.image_to_string(img, config="--psm 6 --oem 3")
-            result += text
-        return result
+    #     # Initialize the OCR result string
+    #     result = ""
+
+    #     # Loop through the images and perform OCR
+    #     for i, img in enumerate(images):
+    #         # Extract non-table text from the page
+    #         text = pytesseract.image_to_string(img, config="--psm 6 --oem 3")
+    #         result += text
+    #     return result
 
     def extract_items(self, text):
         lines = text.split("\n")
