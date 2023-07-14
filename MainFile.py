@@ -21,27 +21,39 @@ from Ui_Work import JobsMainWindow
 from Ui_Work import CustomWidget
 from w3 import Ui_MainWindow3
 
-import board
-import busio
-import serial
-from adafruit_pn532.i2c import PN532_I2C
-from escpos.printer import Serial
+from unittest.mock import Mock, patch
+
+# Mock the board and busio modules if they're not available
+try:
+    import board
+    import busio
+    import serial
+    from adafruit_pn532.i2c import PN532_I2C
+    from escpos.printer import Serial
+except (ModuleNotFoundError, NotImplementedError):
+    board = Mock()
+    busio = Mock()
+    serial = Mock()
+    PN532_I2C = Mock()
 
 import re
 import json
 import requests
 from datetime import datetime
+from dateutil.parser import parse
 
 import sys
-import pytesseract
 import pdfplumber
 from pdf2image import convert_from_path
 
 import uuid
 import socket
 
-import bluetooth
-
+# Mock the bluetooth module if it's not available
+try:
+    import bluetooth
+except ModuleNotFoundError:
+    bluetooth = Mock()
 from ntplib import NTPClient
 
 proc1 = subprocess.Popen(["python", "progress bar.py"])
@@ -447,19 +459,17 @@ class workWindow(JobsMainWindow):
             for key, value in jobs.items():
                 # Replace this with your actual data
                 if self.search_keyword == "":
-                    data = value["job_title"]
                     if value["data_sent"] is True:
-                        widget = CustomWidget(key, data, self.central_widget, False, self)
+                        widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
                     else:
-                        widget = CustomWidget(key, data, self.central_widget, True, self)
+                        widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
                     self.scroll_layout.addWidget(widget)
                 else:
                     if self.search_keyword in value["receiver"]:
-                        data = value["job_title"]
                         if value["data_sent"] is True:
-                            widget = CustomWidget(key, data, self.central_widget, False, self)
+                            widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
                         else:
-                            widget = CustomWidget(key, data, self.central_widget, True, self)
+                            widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
                         self.scroll_layout.addWidget(widget)
 
     def clear_layout(self, layout):
@@ -470,7 +480,8 @@ class workWindow(JobsMainWindow):
 
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
-        self.processingThread = ProcessingThread("", "", True, text)
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread("", "", date_time, True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -1156,15 +1167,16 @@ class ProcessingThread(QThread):
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
-    def __init__(self, file_path, userID, retry=False, retry_text=""):
+    def __init__(self, file_path, userID, date_time, retry=False, retry_text=""):
         super().__init__()
         self._isRunning = False
         self.file_path = file_path
         self.userID = userID
+        self.date_time = date_time
         self.retry = retry
         self.retry_text = retry_text
         self.data_sent = False
-        self.job_title = ""
+        self.job_title = {}
         self.receiver = ""
         self.company_name = ""
         self.company_address = ""
@@ -1186,10 +1198,43 @@ class ProcessingThread(QThread):
                 self.progress_signal.emit("Please wait!  Processing receipt...")
 
                 self.retrieval_code = ""
-                result = self.pdf_to_text_ocr()
+                result = self.pdf_to_table_data(self.file_path)
+
+                print("\n\n")
                 print(result)
+                print("\n\n")
+
+                receipt_text = ""
+                for i, row in enumerate(result):
+                    row['quantity'] = row['quantity'].replace(",", "")
+                    row['price'] = row['price'].replace(",", "")
+                    row['tax'] = row['tax'].replace(",", "")
+                    row['discount'] = row['discount'].replace(",", "")
+                    row['total'] = row['total'].replace(",", "")
+                    print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
+
+                    receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
+
+                receipt_info = self.pdf_to_text(self.file_path)
+                print("\n\n")
+                print(receipt_info)
+                print("\n\n")
+
+                info = self.extract_info(receipt_info)
+                if "Tax Number" in info:
+                    print(f"Tax Number: {info['Tax Number']}")
+                if "Phone Number" in info:
+                    print(f"Phone Number: {info['Phone Number']}")
+                if "Email" in info:
+                    print(f"Email: {info['Email']}")
+                if "Invoice Number" in info:
+                    print(f"Invoice Number: {info['Invoice Number']}")
+                if "Date" in info:
+                    print(f"Date: {info['Date']}")
+                print("\n\n")
+
                 address = re.findall(
-                    r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", result, re.MULTILINE
+                    r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", receipt_info, re.MULTILINE
                 )
                 if address:
                     address = address[0]
@@ -1197,27 +1242,7 @@ class ProcessingThread(QThread):
                     address = " "
                 print(address)
 
-                keywords = ["item", "Quantity", "qty", "items"]
-                keywords_info = ["Tax No", "Phone", "Email", "Invoice No", "Date"]
-
-                receipt_info = self.find_table(result, keywords_info)
-                info = self.extract_info(receipt_info)
-                print(f"Tax Number: {info['Tax Number']}")
-                print(f"Phone Number: {info['Phone Number']}")
-                print(f"Email: {info['Email']}")
-                print(f"Invoice Number: {info['Invoice Number']}")
-                print(f"Date: {info['Date']}")
-                print("\n\n")
-
-                receipt_text = self.find_table(result, keywords)
-                print(receipt_text)
-                print("\n\n")
-
-                receipt_text = receipt_text.replace("_", "0")
-                receipt_text = receipt_text.replace("-", "0")
-                receipt_text = receipt_text.replace("---", "0")
-                items = self.extract_items(receipt_text)
-                api_data = self.items_to_api_format(items)
+                api_data = self.items_to_api_format(result)
                 print(api_data)
                 print("\n\n")
 
@@ -1243,36 +1268,14 @@ class ProcessingThread(QThread):
                 self.decode_response(get_response)
 
                 if self.data_sent is True:
-                    self.job_title = (
-                        "Receiver: "
-                        + self.userID
-                        + "\n"
-                        + "Invoice No. "
-                        + info["Invoice Number"]
-                        + "\n"
-                        + "Email: "
-                        + info["Email"]
-                        + "\n"
-                        + "Receipt Data: \n"
-                        + receipt_text
-                    )
+                    status = "Success"
                 else:
-                    self.job_title = (
-                        "Error: "
-                        + self.parsed_data["response"]
-                        + "\n\n"
-                        + "Receiver: "
-                        + self.userID
-                        + "\n"
-                        + "Invoice No. "
-                        + info["Invoice Number"]
-                        + "\n"
-                        + "Email: "
-                        + info["Email"]
-                        + "\n"
-                        + "Receipt Data: \n"
-                        + receipt_text
-                    )
+                    status = "Failed. " + str(self.parsed_data["response"])
+
+                self.job_title["invoice"] = info["Invoice Number"]
+                self.job_title["user_id"] = self.userID
+                self.job_title["date_time"] = info["Invoice Number"]
+                self.job_title["status"] = status
 
                 self.update_jobs_dict()
 
@@ -1332,97 +1335,37 @@ class ProcessingThread(QThread):
         # mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
         # return mac
 
-        with open("/proc/cpuinfo", "r") as f:
-            for line in f:
-                if line[0:6] == "Serial":
-                    return line.split(":")[1].strip()
+        # with open("/proc/cpuinfo", "r") as f:
+        #     for line in f:
+        #         if line[0:6] == "Serial":
+        #             return line.split(":")[1].strip()
         return "Unknown"
 
-    def find_table(self, text, keywords, min_columns=4):
-        lines = text.split("\n")
-        table_data = []
-        header_found = False
-        headers = []
-
-        # Compile the regular expressions for case-insensitive keyword matching
-        keyword_patterns = [re.compile(re.escape(kw), re.IGNORECASE) for kw in keywords]
-
-        for line in lines:
-            # Check if any of the keywords are present in the current line
-            if any(pattern.search(line) for pattern in keyword_patterns):
-                header_found = True
-                headers.append(line)
-                continue
-
-            if header_found:
-                row = line.split()
-
-                # Stop processing when a row with fewer columns than min_columns is encountered
-                if len(row) < min_columns:
-                    break
-
-                # Add the row to the table data
-                table_data.append(line)
-
-        # Reformat the table data
-        formatted_table_data = []
-        for data in table_data:
-            formatted_data = " ".join(data.split())
-            formatted_table_data.append(formatted_data)
-
-        # Join the headers and table data into a single string
-        headers_string = "\n".join(headers)
-        table_string = "\n".join(formatted_table_data)
-        result = f"{headers_string}\n{table_string}"
-
-        return result
-
-    def pdf_to_text_ocr(self):
-        text = ''
-        with pdfplumber.open(self.file_path) as pdf:
+    def pdf_to_table_data(self, file_path):
+        data = []
+        with pdfplumber.open(file_path) as pdf:
             for page in pdf.pages:
-                text += page.extract_text()
-        return text
+                # Extract the tables from the page
+                tables = page.extract_tables()
 
-    # def pdf_to_text_ocr(self):
-    #     # Convert PDF to images
-    #     images = convert_from_path(self.file_path)
+                for table in tables:
+                    # convert headers to lowercase and replace headers containing "price" with "price"
+                    headers = ['price' if 'price' in header.lower() else header.lower() for header in table[0]]
+                    for row in table[1:]:
+                        if len(row) >= 4:  # check if the row has at least 4 columns
+                            row_data = {headers[i]: value.replace("---", "0") for i, value in enumerate(row)}
+                            data.append(row_data)
+            
+        return data
 
-    #     # Initialize the OCR result string
-    #     result = ""
+    def pdf_to_text(self, file_path):
+        data = ''
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                # Extract the text from the page
+                data += page.extract_text()
 
-    #     # Loop through the images and perform OCR
-    #     for i, img in enumerate(images):
-    #         # Extract non-table text from the page
-    #         text = pytesseract.image_to_string(img, config="--psm 6 --oem 3")
-    #         result += text
-    #     return result
-
-    def extract_items(self, text):
-        lines = text.split("\n")
-        items = []
-        for line in lines:
-            # Updated regex pattern to match item, quantity, unit price, tax, discount, and total
-            pattern = r"\d+\s+([\w\s]+)\s+(\d+)\s+([\d\.]+)\s+([_\d\.%]+)\s+([_\d\.%]+)\s+([\d\.]+)"
-            match = re.search(pattern, line)
-            if match:
-                item = match.group(1).strip()
-                quantity = int(match.group(2))
-                unit_price = float(match.group(3))
-                tax = match.group(4)
-                discount = match.group(5)
-                total = float(match.group(6))
-                items.append(
-                    {
-                        "item": item,
-                        "quantity": quantity,
-                        "unit_price": unit_price,
-                        "tax": tax,
-                        "discount": discount,
-                        "total": total,
-                    }
-                )
-        return items
+        return data
 
     def extract_info(self, text_info):
         # dictionary to hold the results
@@ -1432,7 +1375,7 @@ class ProcessingThread(QThread):
         tax_pattern = r"Tax No\.:\s(\d+)"
         phone_pattern = r"Phone:\s(\d+)"
         email_pattern = r"Email:\s(\S+)"
-        invoice_pattern = r"Bill to Invoice No\.:\s(\S+)"
+        invoice_pattern = r'Invoice No.:\s(.+)'
         date_pattern = r"\b(\d{1,2}[/-]\d{1,2}[/-]\d{4}|\d{1,2} \w{3}, \d{4}|\d{1,2},\w{3},\d{4}|\d{1,2} \w{3} \d{4})\b"
 
         # search for each pattern and add to dictionary
@@ -1453,48 +1396,33 @@ class ProcessingThread(QThread):
             info["Invoice Number"] = invoice_search.group(1)
 
             # Extract only numbers from the text
-            info["Invoice Number"] = "".join(
-                filter(str.isdigit, info["Invoice Number"])
-            )
+            info["Invoice Number"] = "".join(filter(str.isdigit, info["Invoice Number"]))
 
             # If the length of the numbers string is more than 9 characters
             if len(info["Invoice Number"]) > 9:
                 # Trim the numbers string to the first 9 characters
                 info["Invoice Number"] = info["Invoice Number"][:9]
-
+        
         match = re.search(date_pattern, str(text_info))
         if match:
-            if "/" in match.group():
-                info["Date"] = (
-                    datetime.strptime(match.group(), "%d/%m/%Y").date()
-                ).isoformat()
-            elif "-" in match.group():
-                info["Date"] = (
-                    datetime.strptime(match.group(), "%d-%m-%Y").date()
-                ).isoformat()
-            elif "," in match.group() and " " not in match.group():
-                info["Date"] = (
-                    datetime.strptime(match.group(), "%d,%b,%Y").date()
-                ).isoformat()
-            elif "," in match.group() and " " in match.group():
-                info["Date"] = (
-                    datetime.strptime(match.group(), "%d %b, %Y").date()
-                ).isoformat()
-            elif " " in match.group() and "," not in match.group():
-                info["Date"] = (
-                    datetime.strptime(match.group(), "%d %b %Y").date()
-                ).isoformat()
+            try:
+                date = parse(match.group())
+                info["Date"] = date.date().isoformat()
+            except ValueError:
+                print(f"Could not parse date: {match.group()}")
 
         return info
 
-    def items_to_api_format(self, items):
+
+    def items_to_api_format(self, result):
         api_data = {}
-        for i, item in enumerate(items):
-            api_data[f"products[{i}][product]"] = item["item"]
-            api_data[f"products[{i}][quantity]"] = str(item["quantity"])
-            api_data[f"products[{i}][price]"] = str(item["unit_price"])
-            api_data[f"products[{i}][tax]"] = item["tax"]
-            api_data[f"products[{i}][total]"] = str(item["total"])
+
+        for i, row in enumerate(result):
+            api_data[f"products[{i}][product]"] = row["item"]
+            api_data[f"products[{i}][quantity]"] = str(row["quantity"])
+            api_data[f"products[{i}][price]"] = str(row["price"])
+            api_data[f"products[{i}][tax]"] = row["tax"]
+            api_data[f"products[{i}][total]"] = str(row["total"])
         return api_data
 
     def send_api_data(
@@ -1663,7 +1591,8 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def update_user_id(self, user_id=""):
         if user_id != "":
             self.userID = user_id
-            self.processingThread = ProcessingThread(self.file_path, self.userID)
+            date_time = str(shared_data.date) + str(shared_data.time)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -1671,7 +1600,8 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def processUserID(self, scanned_data):
         self.userID = scanned_data
         print("Found a User ID:", scanned_data)
-        self.processingThread = ProcessingThread(self.file_path, self.userID)
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -1748,7 +1678,8 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.ser.write(self.stop_scan_command_bytes)
 
         self.userID = ""
-        self.processingThread = ProcessingThread(self.file_path, self.userID)
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
         self.processingThread.start()
@@ -1971,49 +1902,49 @@ class PrintRetrievalCode(QMainWindow):
         self.timer.start(5000)
 
     def thermal_print(self):
-        p = Serial(
-            devfile="/dev/ttySC1",
-            baudrate=9600,
-            bytesize=8,
-            parity="N",
-            stopbits=1,
-            timeout=1.00,
-            dsrdtr=True,
-        )
-        p.set(
-            align="center",
-            font="b",
-            width=1,
-            height=1,
-            density=2,
-            invert=0,
-            smooth=True,
-            flip=False,
-        )
-        # Printing the image
-        # here location can be your image path in “ ”
-        p.image("/home/decas/Logo.png", impl="bitImageColumn")
+        # p = Serial(
+        #     devfile="/dev/ttySC1",
+        #     baudrate=9600,
+        #     bytesize=8,
+        #     parity="N",
+        #     stopbits=1,
+        #     timeout=1.00,
+        #     dsrdtr=True,
+        # )
+        # p.set(
+        #     align="center",
+        #     font="b",
+        #     width=1,
+        #     height=1,
+        #     density=2,
+        #     invert=0,
+        #     smooth=True,
+        #     flip=False,
+        # )
+        # # Printing the image
+        # # here location can be your image path in “ ”
+        # p.image("/home/decas/Logo.png", impl="bitImageColumn")
 
-        p.set(
-            align="center",
-            font="a",
-            width=2,
-            height=2,
-            density=2,
-            invert=0,
-            smooth=False,
-            flip=False,
-        )
-        p.text(str("TOKEN: " + str(self.code) + "\n"))
+        # p.set(
+        #     align="center",
+        #     font="a",
+        #     width=2,
+        #     height=2,
+        #     density=2,
+        #     invert=0,
+        #     smooth=False,
+        #     flip=False,
+        # )
+        # p.text(str("TOKEN: " + str(self.code) + "\n"))
 
-        # printing the initial data
-        p.set(
-            align="left",
-        )
-        p.text("\n")
-        p.text(
-            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
-        )
+        # # printing the initial data
+        # p.set(
+        #     align="left",
+        # )
+        # p.text("\n")
+        # p.text(
+        #     """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
+        # )
         print("done")
 
     def go_home(self):
@@ -2031,9 +1962,9 @@ class DirectoryChecker(QObject):
         self.path_data = ""  # Initialize path_data with an empty string
 
     def check_directory(self):
-        # directory_path = '/home/decas/PDF/'
+        directory_path = "C:/Users/Bilal/Documents/Decas"
         # directory_path = "/var/spool/cups-pdf/ANONYMOUS/"
-        directory_path = "/home/decas/ui/DecasUI/Print/"
+        # directory_path = "/home/decas/ui/DecasUI/Print/"
         # directory_path = 'D:/DecasUI/DecasUI/ANONYMOUS/'
 
         contents = os.listdir(directory_path)
@@ -2089,4 +2020,4 @@ if __name__ == "__main__":
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pip3 install adafruit-circuitpython-pn532 pyserial escpos pytesseract cryptography==36.0.0 pdfplumber pdf2image ntplib
+# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber pdf2image ntplib requests python-dateutil

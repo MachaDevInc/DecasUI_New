@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QSize, QRect, QCoreApplication, Qt
 from PyQt5 import QtGui
-
+import json
 
 class CustomWidget(QWidget):
     def __init__(
@@ -51,8 +51,6 @@ class CustomWidget(QWidget):
         self.table.setRowCount(1)  # Added rows
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(['Invoice Number', 'User ID', 'Date and Time', 'Status'])
-        # Disable horizontal scrolling
-        self.table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         # Style the header
         font = QtGui.QFont()
@@ -72,10 +70,10 @@ class CustomWidget(QWidget):
         self.layout_obj.setStretchFactor(self.table, 1)
         self.table.setColumnWidth(0, 160)  # 800 / 5 = 160
         self.table.setColumnWidth(1, 160)
-        self.table.setColumnWidth(2, 160)
-        self.table.setColumnWidth(3, 320)
+        self.table.setColumnWidth(2, 200)
+        self.table.setColumnWidth(3, 280)
         # self.table.setColumnWidth(4, 160)
-        self.table.setFixedWidth(802)
+        self.setFixedWidth(810)
         self.setFixedHeight(100)
 
         self.table.horizontalHeader().setStyleSheet('::section { background-color: transparent }')
@@ -270,3 +268,59 @@ class JobsMainWindow(QMainWindow):
                 '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:22pt; font-weight:600;">Search</span></p></body></html>',
             )
         )
+        
+class workWindow(JobsMainWindow):
+    def __init__(self, stacked_widget):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self.search_keyword = ""
+        self.resize(1024, 600)
+        self.show_jobs()
+
+    def show_jobs(self):
+        self.clear_layout(self.scroll_layout)
+
+        jobs = {}
+
+        try:
+            with open("my_jobs.json", "r") as f:
+                jobs = json.load(f)
+                size = len(jobs)
+                print(f"The dictionary contains {size} key-value pairs.")
+        except json.JSONDecodeError:
+            print("File is not valid JSON")
+        except FileNotFoundError:
+            print("File 'my_jobs.json' not found.")
+
+        if jobs:
+            for key, value in jobs.items():
+                if self.search_keyword == "":
+                    data = value["job_title"]
+                    if value["data_sent"] is True:
+                        widget = CustomWidget(key, data, self.central_widget, False, self)
+                    else:
+                        widget = CustomWidget(key, data, self.central_widget, True, self)
+                    self.scroll_layout.addWidget(widget)
+                else:
+                    if self.search_keyword in value["receiver"]:
+                        data = value["job_title"]
+                        if value["data_sent"] is True:
+                            widget = CustomWidget(key, data, self.central_widget, False, self)
+                        else:
+                            widget = CustomWidget(key, data, self.central_widget, True, self)
+                        self.scroll_layout.addWidget(widget)
+
+    def clear_layout(self, layout):
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+if __name__ == "__main__":
+    import sys
+    from PyQt5.QtWidgets import QApplication
+
+    app = QApplication(sys.argv)
+    window = workWindow(None)
+    window.show()
+    sys.exit(app.exec_())
