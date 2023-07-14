@@ -25,7 +25,7 @@ class CustomWidget(QWidget):
     def __init__(
         self,
         job_id,
-        job_title,
+        data,
         central_widget,
         button_needed=False,
         work_window=None,
@@ -35,7 +35,6 @@ class CustomWidget(QWidget):
         self.central_widget = central_widget
 
         self.job_id = job_id
-        self.job_title = job_title
         self.setStyleSheet("background-color: rgba(255, 255, 255, 100);")
         self.work_window = work_window
 
@@ -79,10 +78,10 @@ class CustomWidget(QWidget):
         self.table.horizontalHeader().setStyleSheet('::section { background-color: transparent }')
         self.table.verticalHeader().setStyleSheet('::section { background-color: transparent }')
 
-        self.table.setItem(0, 0, QTableWidgetItem(job_title["invoice"]))
-        self.table.setItem(0, 1, QTableWidgetItem(job_title["user_id"]))
-        self.table.setItem(0, 2, QTableWidgetItem(job_title["date_time"]))
-        self.table.setItem(0, 3, QTableWidgetItem(job_title["status"]))
+        self.table.setItem(0, 0, QTableWidgetItem("123456789"))
+        self.table.setItem(0, 1, QTableWidgetItem("Bilal"))
+        self.table.setItem(0, 2, QTableWidgetItem("2023-07-10 16:42:31"))
+        self.table.setItem(0, 3, QTableWidgetItem("Success"))
         self.table.item(0, 3).setFont(font)
 
         self.layout_obj.addWidget(self.table)

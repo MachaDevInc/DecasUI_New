@@ -21,20 +21,11 @@ from Ui_Work import JobsMainWindow
 from Ui_Work import CustomWidget
 from w3 import Ui_MainWindow3
 
-from unittest.mock import Mock, patch
-
-# Mock the board and busio modules if they're not available
-try:
-    import board
-    import busio
-    import serial
-    from adafruit_pn532.i2c import PN532_I2C
-    from escpos.printer import Serial
-except (ModuleNotFoundError, NotImplementedError):
-    board = Mock()
-    busio = Mock()
-    serial = Mock()
-    PN532_I2C = Mock()
+import board
+import busio
+import serial
+from adafruit_pn532.i2c import PN532_I2C
+from escpos.printer import Serial
 
 import re
 import json
@@ -49,11 +40,8 @@ from pdf2image import convert_from_path
 import uuid
 import socket
 
-# Mock the bluetooth module if it's not available
-try:
-    import bluetooth
-except ModuleNotFoundError:
-    bluetooth = Mock()
+import bluetooth
+
 from ntplib import NTPClient
 
 proc1 = subprocess.Popen(["python", "progress bar.py"])
@@ -459,17 +447,19 @@ class workWindow(JobsMainWindow):
             for key, value in jobs.items():
                 # Replace this with your actual data
                 if self.search_keyword == "":
+                    data = value["job_title"]
                     if value["data_sent"] is True:
-                        widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
+                        widget = CustomWidget(key, data, self.central_widget, False, self)
                     else:
-                        widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
+                        widget = CustomWidget(key, data, self.central_widget, True, self)
                     self.scroll_layout.addWidget(widget)
                 else:
                     if self.search_keyword in value["receiver"]:
+                        data = value["job_title"]
                         if value["data_sent"] is True:
-                            widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
+                            widget = CustomWidget(key, data, self.central_widget, False, self)
                         else:
-                            widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
+                            widget = CustomWidget(key, data, self.central_widget, True, self)
                         self.scroll_layout.addWidget(widget)
 
     def clear_layout(self, layout):
@@ -480,8 +470,7 @@ class workWindow(JobsMainWindow):
 
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
-        date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread("", "", date_time, True, text)
+        self.processingThread = ProcessingThread("", "", True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -1167,16 +1156,15 @@ class ProcessingThread(QThread):
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
-    def __init__(self, file_path, userID, date_time, retry=False, retry_text=""):
+    def __init__(self, file_path, userID, retry=False, retry_text=""):
         super().__init__()
         self._isRunning = False
         self.file_path = file_path
         self.userID = userID
-        self.date_time = date_time
         self.retry = retry
         self.retry_text = retry_text
         self.data_sent = False
-        self.job_title = {}
+        self.job_title = ""
         self.receiver = ""
         self.company_name = ""
         self.company_address = ""
@@ -1268,14 +1256,36 @@ class ProcessingThread(QThread):
                 self.decode_response(get_response)
 
                 if self.data_sent is True:
-                    status = "Success"
+                    self.job_title = (
+                        "Receiver: "
+                        + self.userID
+                        + "\n"
+                        + "Invoice No. "
+                        + info["Invoice Number"]
+                        + "\n"
+                        + "Email: "
+                        + info["Email"]
+                        + "\n"
+                        + "Receipt Data: \n"
+                        + receipt_text
+                    )
                 else:
-                    status = "Failed. " + str(self.parsed_data["response"])
-
-                self.job_title["invoice"] = info["Invoice Number"]
-                self.job_title["user_id"] = self.userID
-                self.job_title["date_time"] = info["Invoice Number"]
-                self.job_title["status"] = status
+                    self.job_title = (
+                        "Error: "
+                        + self.parsed_data["response"]
+                        + "\n\n"
+                        + "Receiver: "
+                        + self.userID
+                        + "\n"
+                        + "Invoice No. "
+                        + info["Invoice Number"]
+                        + "\n"
+                        + "Email: "
+                        + info["Email"]
+                        + "\n"
+                        + "Receipt Data: \n"
+                        + receipt_text
+                    )
 
                 self.update_jobs_dict()
 
@@ -1335,10 +1345,10 @@ class ProcessingThread(QThread):
         # mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
         # return mac
 
-        # with open("/proc/cpuinfo", "r") as f:
-        #     for line in f:
-        #         if line[0:6] == "Serial":
-        #             return line.split(":")[1].strip()
+        with open("/proc/cpuinfo", "r") as f:
+            for line in f:
+                if line[0:6] == "Serial":
+                    return line.split(":")[1].strip()
         return "Unknown"
 
     def pdf_to_table_data(self, file_path):
@@ -1591,8 +1601,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def update_user_id(self, user_id=""):
         if user_id != "":
             self.userID = user_id
-            date_time = str(shared_data.date) + str(shared_data.time)
-            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+            self.processingThread = ProcessingThread(self.file_path, self.userID)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -1600,8 +1609,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def processUserID(self, scanned_data):
         self.userID = scanned_data
         print("Found a User ID:", scanned_data)
-        date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -1678,8 +1686,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.ser.write(self.stop_scan_command_bytes)
 
         self.userID = ""
-        date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
         self.processingThread.start()
@@ -1962,9 +1969,9 @@ class DirectoryChecker(QObject):
         self.path_data = ""  # Initialize path_data with an empty string
 
     def check_directory(self):
-        directory_path = "C:/Users/Bilal/Documents/Decas"
+        # directory_path = '/home/decas/PDF/'
         # directory_path = "/var/spool/cups-pdf/ANONYMOUS/"
-        # directory_path = "/home/decas/ui/DecasUI/Print/"
+        directory_path = "/home/decas/ui/DecasUI/Print/"
         # directory_path = 'D:/DecasUI/DecasUI/ANONYMOUS/'
 
         contents = os.listdir(directory_path)
@@ -2020,4 +2027,4 @@ if __name__ == "__main__":
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber pdf2image ntplib requests python-dateutil
+# pip3 install adafruit-circuitpython-pn532 pyserial escpos cryptography==36.0.0 pdfplumber pdf2image ntplib python-dateutil
