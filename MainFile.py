@@ -422,7 +422,7 @@ class workWindow(JobsMainWindow):
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
                 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
-                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:22pt; font-weight:600;">' + self.search_keyword + '</span></p></body></html>',
+                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:18pt; font-weight:600;">' + self.search_keyword + '</span></p></body></html>',
             )
         )
 
@@ -469,12 +469,17 @@ class workWindow(JobsMainWindow):
                         widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
                     self.scroll_layout.addWidget(widget)
                 else:
-                    if self.search_keyword in value["receiver"]:
+                    if (self.search_keyword in value["invoice"]) or (self.search_keyword in value["user_id"]) or (self.search_keyword in value["date_time"]) or (self.search_keyword in value["status"]):
                         if value["data_sent"] is True:
                             widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
                         else:
                             widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
                         self.scroll_layout.addWidget(widget)
+                
+                # self.job_title["invoice"] = info["Invoice Number"]
+                # self.job_title["user_id"] = self.userID
+                # self.job_title["date_time"] = info["Date"]
+                # self.job_title["status"] = status
 
     def clear_layout(self, layout):
         while layout.count():
