@@ -1227,14 +1227,24 @@ class ProcessingThread(QThread):
                 info = self.extract_info(receipt_info)
                 if "Tax Number" in info:
                     print(f"Tax Number: {info['Tax Number']}")
+                else:
+                    info['Tax Number'] = 'Nil'
                 if "Phone Number" in info:
                     print(f"Phone Number: {info['Phone Number']}")
+                else:
+                    info['Phone Number'] = 'Nil'
                 if "Email" in info:
                     print(f"Email: {info['Email']}")
+                else:
+                    info['Email'] = 'Nil'
                 if "Invoice Number" in info:
                     print(f"Invoice Number: {info['Invoice Number']}")
+                else:
+                    info['Invoice Number'] = 'Nil'
                 if "Date" in info:
                     print(f"Date: {info['Date']}")
+                else:
+                    info['Date'] = 'Nil'
                 print("\n\n")
 
                 address = re.findall(
