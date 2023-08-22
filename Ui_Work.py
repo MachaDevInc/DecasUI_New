@@ -19,13 +19,13 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QSize, QRect, QCoreApplication, Qt
 from PyQt5 import QtGui
-import json
+
 
 class CustomWidget(QWidget):
     def __init__(
         self,
         job_id,
-        data,
+        job_title,
         central_widget,
         button_needed=False,
         work_window=None,
@@ -35,6 +35,7 @@ class CustomWidget(QWidget):
         self.central_widget = central_widget
 
         self.job_id = job_id
+        self.job_title = job_title
         self.setStyleSheet("background-color: rgba(255, 255, 255, 100);")
         self.work_window = work_window
 
@@ -50,6 +51,8 @@ class CustomWidget(QWidget):
         self.table.setRowCount(1)  # Added rows
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(['Invoice Number', 'User ID', 'Date and Time', 'Status'])
+        # Disable horizontal scrolling
+        self.table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         # Style the header
         font = QtGui.QFont()
@@ -69,19 +72,19 @@ class CustomWidget(QWidget):
         self.layout_obj.setStretchFactor(self.table, 1)
         self.table.setColumnWidth(0, 160)  # 800 / 5 = 160
         self.table.setColumnWidth(1, 160)
-        self.table.setColumnWidth(2, 200)
-        self.table.setColumnWidth(3, 280)
+        self.table.setColumnWidth(2, 160)
+        self.table.setColumnWidth(3, 320)
         # self.table.setColumnWidth(4, 160)
-        self.setFixedWidth(810)
+        self.table.setFixedWidth(802)
         self.setFixedHeight(100)
 
-        self.table.horizontalHeader().setStyleSheet('::section { background-color: transparent }')
-        self.table.verticalHeader().setStyleSheet('::section { background-color: transparent }')
+        self.table.horizontalHeader().setStyleSheet('::section { background-color: #9decd4 }')
+        # self.table.verticalHeader().setStyleSheet('::section { background-color: transparent }')
 
-        self.table.setItem(0, 0, QTableWidgetItem("123456789"))
-        self.table.setItem(0, 1, QTableWidgetItem("Bilal"))
-        self.table.setItem(0, 2, QTableWidgetItem("2023-07-10 16:42:31"))
-        self.table.setItem(0, 3, QTableWidgetItem("Success"))
+        self.table.setItem(0, 0, QTableWidgetItem(job_title["invoice"]))
+        self.table.setItem(0, 1, QTableWidgetItem(job_title["user_id"]))
+        self.table.setItem(0, 2, QTableWidgetItem(job_title["date_time"]))
+        self.table.setItem(0, 3, QTableWidgetItem(job_title["status"]))
         self.table.item(0, 3).setFont(font)
 
         self.layout_obj.addWidget(self.table)

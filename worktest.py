@@ -75,8 +75,8 @@ class CustomWidget(QWidget):
         self.setFixedWidth(810)
         self.setFixedHeight(100)
 
-        self.table.horizontalHeader().setStyleSheet('::section { background-color: transparent }')
-        self.table.verticalHeader().setStyleSheet('::section { background-color: transparent }')
+        self.table.horizontalHeader().setStyleSheet('::section { background-color: #9decd4 }')
+        # self.table.verticalHeader().setStyleSheet('::section { background-color: transparent }')
 
         self.table.setItem(0, 0, QTableWidgetItem("123456789"))
         self.table.setItem(0, 1, QTableWidgetItem("Bilal"))
