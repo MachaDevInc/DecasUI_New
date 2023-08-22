@@ -1971,7 +1971,8 @@ class DirectoryChecker(QObject):
     def check_directory(self):
         # directory_path = "C:/Users/Bilal/Documents/Decas"
         # directory_path = "/var/spool/cups-pdf/ANONYMOUS/"
-        directory_path = "/home/decas/ui/DecasUI/Print/"
+        # directory_path = "/home/decas/ui/DecasUI/Print/"
+        directory_path = "/home/decas/output/"
         # directory_path = 'D:/DecasUI/DecasUI/ANONYMOUS/'
 
         contents = os.listdir(directory_path)
