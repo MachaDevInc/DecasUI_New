@@ -1288,7 +1288,7 @@ class ProcessingThread(QThread):
 
                 self.job_title["invoice"] = info["Invoice Number"]
                 self.job_title["user_id"] = self.userID
-                self.job_title["date_time"] = info["Invoice Number"]
+                self.job_title["date_time"] = info["Date"]
                 self.job_title["status"] = status
                 print("\n\n")
                 print(self.job_title)
