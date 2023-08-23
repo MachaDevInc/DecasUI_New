@@ -382,10 +382,10 @@ class connectionWindow(QMainWindow):
         self.resize(1024, 600)
         self.back.clicked.connect(self.go_back)
         # Connect radio buttons to a function
-        self.r1.toggled.connect(self.on_selected)
-        self.r2.toggled.connect(self.on_selected)
-        self.r3.toggled.connect(self.on_selected)
-        self.r4.toggled.connect(self.on_selected)
+        self.r1.clicked.connect(self.on_selected)
+        self.r2.clicked.connect(self.on_selected)
+        self.r3.clicked.connect(self.on_selected)
+        self.r4.clicked.connect(self.on_selected)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
