@@ -335,6 +335,8 @@ class ReadyWindow(QMainWindow):
     def __init__(self, stacked_widget):
         super().__init__()
         loadUi("Ready.ui", self)
+        # Create an instance of ProcessManager
+        self.process_manager = MonoDecasProcessManager()
 
         # Set the window size
         self.resize(1024, 600)
@@ -364,7 +366,12 @@ class ReadyWindow(QMainWindow):
 
     def open_settings_window1(self):
         file_path = self.directory_checker.path_data
-        self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path)
+        try:
+            self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path)
+        except (OSError, ValueError) as e:
+            print(f"Error: {e}")
+            self.process_manager.terminate_process()
+            
         self.stacked_widget.addWidget(self.SettingsWindow1_window)
         self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
         self.timer.stop()
@@ -2117,8 +2124,8 @@ class MyApp(QApplication):
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
             
-        except Exception as e:
-            print(f"Error occurred: {e}")
+        except (OSError, ValueError) as e:
+            print(f"Error: {e}")
             # Terminate the subprocess if an error occurs in the main process
             self.process_manager.terminate_process()
 
