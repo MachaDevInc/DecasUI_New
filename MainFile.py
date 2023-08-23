@@ -1644,8 +1644,6 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def __init__(self, stacked_widget, file_path):
         super().__init__()
         self.setupUi(self)
-        # Create an instance of ProcessManager
-        self.process_manager = MonoDecasProcessManager()
 
         # Set the window size
         self.resize(1024, 600)
@@ -1665,15 +1663,10 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         stop_scan_command = "7E 00 08 01 00 02 00 AB CD"
         self.stop_scan_command_bytes = bytes.fromhex(stop_scan_command.replace(" ", ""))
 
-        try:
-            # PN532
-            i2c = busio.I2C(board.SCL, board.SDA)
-            self.pn532 = PN532_I2C(i2c, debug=False)
-            self.pn532.SAM_configuration()
-        except ValueError as e:
-            self.process_manager.terminate_process()
-            # if "No I2C device at address" in str(e):
-                # raise e
+        # PN532
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self.pn532 = PN532_I2C(i2c, debug=False)
+        self.pn532.SAM_configuration()
 
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
 
@@ -2115,13 +2108,19 @@ class MyApp(QApplication):
         except Exception as e:
             print(f"Error: {e}")
 
-        self.stacked_widget = QStackedWidget()
+        try:
+            self.stacked_widget = QStackedWidget()
 
-        self.process_manager.start_process()
+            self.process_manager.start_process()
 
-        self.setting_window = ReadyWindow(self.stacked_widget)
-        self.stacked_widget.addWidget(self.setting_window)
-        self.stacked_widget.showFullScreen()
+            self.setting_window = ReadyWindow(self.stacked_widget)
+            self.stacked_widget.addWidget(self.setting_window)
+            self.stacked_widget.showFullScreen()
+            
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            # Terminate the subprocess if an error occurs in the main process
+            self.process_manager.terminate_process()
 
 
 if __name__ == "__main__":
