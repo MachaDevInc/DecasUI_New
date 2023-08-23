@@ -311,6 +311,26 @@ def update_shared_data_time():
 shared_data = SharedData()
 
 
+import subprocess
+
+class MonoDecasProcessManager:
+    def __init__(self):
+        self.process = None
+        
+    def start_process(self):
+        if self.process is None or self.process.poll() is not None:
+            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe"])
+        
+    def terminate_process(self):
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+            self.process.wait()
+        
+    def restart_process(self):
+        self.terminate_process()
+        self.start_process()
+
+
 class ReadyWindow(QMainWindow):
     def __init__(self, stacked_widget):
         super().__init__()
@@ -378,6 +398,9 @@ class connectionWindow(QMainWindow):
         self.stacked_widget = stacked_widget
         loadUi("connection.ui", self)
 
+        # Create an instance of ProcessManager
+        self.process_manager = MonoDecasProcessManager()
+
         # Set the window size
         self.resize(1024, 600)
         self.back.clicked.connect(self.go_back)
@@ -402,6 +425,7 @@ class connectionWindow(QMainWindow):
         self.hide()
 
     def on_selected(self):
+        self.process_manager.terminate_process()
         selected = ''
         if self.r1.isChecked():
             print("selected = 'WiFi'")
@@ -443,6 +467,8 @@ class connectionWindow(QMainWindow):
         # Write the final XML string to a file
         with open('/home/decas/config_modified.xml', 'w') as f:
             f.write(final_xml)
+        
+        self.process_manager.start_process()
 
 
 class workWindow(JobsMainWindow):
@@ -2055,6 +2081,9 @@ class MyApp(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
 
+        # Create an instance of ProcessManager
+        self.process_manager = MonoDecasProcessManager()
+
         # Configure the serial port and baud rate
         self.serial_port = "/dev/ttySC0"
         self.baud_rate = 9600
@@ -2080,6 +2109,8 @@ class MyApp(QApplication):
             print(f"Error: {e}")
 
         self.stacked_widget = QStackedWidget()
+
+        self.process_manager.start_process()
 
         self.setting_window = ReadyWindow(self.stacked_widget)
         self.stacked_widget.addWidget(self.setting_window)
