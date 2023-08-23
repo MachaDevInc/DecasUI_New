@@ -1644,6 +1644,8 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def __init__(self, stacked_widget, file_path):
         super().__init__()
         self.setupUi(self)
+        # Create an instance of ProcessManager
+        self.process_manager = MonoDecasProcessManager()
 
         # Set the window size
         self.resize(1024, 600)
@@ -1663,10 +1665,15 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         stop_scan_command = "7E 00 08 01 00 02 00 AB CD"
         self.stop_scan_command_bytes = bytes.fromhex(stop_scan_command.replace(" ", ""))
 
-        # PN532
-        i2c = busio.I2C(board.SCL, board.SDA)
-        self.pn532 = PN532_I2C(i2c, debug=False)
-        self.pn532.SAM_configuration()
+        try:
+            # PN532
+            i2c = busio.I2C(board.SCL, board.SDA)
+            self.pn532 = PN532_I2C(i2c, debug=False)
+            self.pn532.SAM_configuration()
+        except ValueError as e:
+            if "No I2C device at address" in str(e):
+                self.process_manager.terminate_process()
+                raise e
 
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
 
