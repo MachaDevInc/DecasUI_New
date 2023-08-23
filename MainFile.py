@@ -404,13 +404,45 @@ class connectionWindow(QMainWindow):
     def on_selected(self):
         selected = ''
         if self.r1.isChecked():
-            print("selected = 'Option 1'")
+            print("selected = 'WiFi'")
+            self.edit_config_xml("true", "(none)")
         elif self.r2.isChecked():
-            print("selected = 'Option 2'")
+            print("selected = 'RS232'")
+            self.edit_config_xml("false", "/dev/ttyS1")
         elif self.r3.isChecked():
-            print("selected = 'Option 3'")
+            print("selected = 'USB'")
+            self.edit_config_xml("false", "/dev/ttyS0")
         elif self.r4.isChecked():
-            print("selected = 'Option 4'")
+            print("selected = 'Bluetooth'")
+            self.edit_config_xml("false", "/dev/rfcomm0")
+    
+    def edit_config_xml(self, tcp, port):
+        self.tcp = tcp
+        self.port = port
+
+        # Load and parse the XML file
+        tree = ET.parse('/home/decas/config.xml')
+        root = tree.getroot()
+
+        # Find and modify the ListenTCP element
+        listen_tcp = root.find('ListenTCP')
+        if listen_tcp is not None:
+            listen_tcp.text = self.tcp
+
+        # Find and modify the ComPort element
+        com_port = root.find('ComPort')
+        if com_port is not None:
+            com_port.text = self.port
+
+        # Convert the tree to a string
+        xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
+
+        # Manually add the XML declaration and namespaces
+        final_xml = '<?xml version="1.0"?>\n<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' + xml_str.split('<Settings>', 1)[1]
+
+        # Write the final XML string to a file
+        with open('/home/decas/config_modified.xml', 'w') as f:
+            f.write(final_xml)
 
 
 class workWindow(JobsMainWindow):
