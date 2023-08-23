@@ -1673,7 +1673,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         except ValueError as e:
             if "No I2C device at address" in str(e):
                 self.process_manager.terminate_process()
-                raise e
+                # raise e
 
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
 
