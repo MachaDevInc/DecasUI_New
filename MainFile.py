@@ -377,6 +377,8 @@ class ReadyWindow(QMainWindow):
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
             self.process_manager.terminate_process()
+            time.sleep(1)
+            raise e
 
     def open_next(self):
         self.usb_window = SettingsWindow(self.stacked_widget)
