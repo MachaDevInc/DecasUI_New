@@ -56,6 +56,8 @@ import bluetooth
 #     bluetooth = Mock()
 from ntplib import NTPClient
 
+import xml.etree.ElementTree as ET
+
 proc1 = subprocess.Popen(["python", "progress bar.py"])
 time.sleep(1)
 proc1.terminate()
@@ -379,6 +381,11 @@ class connectionWindow(QMainWindow):
         # Set the window size
         self.resize(1024, 600)
         self.back.clicked.connect(self.go_back)
+        # Connect radio buttons to a function
+        self.r1.toggled.connect(self.on_selected)
+        self.r2.toggled.connect(self.on_selected)
+        self.r3.toggled.connect(self.on_selected)
+        self.r4.toggled.connect(self.on_selected)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
@@ -393,6 +400,17 @@ class connectionWindow(QMainWindow):
         self.setting_window = ReadyWindow(self.stacked_widget)
         self.setting_window.showFullScreen()
         self.hide()
+
+    def on_selected(self):
+        selected = ''
+        if self.r1.isChecked():
+            print("selected = 'Option 1'")
+        elif self.r2.isChecked():
+            print("selected = 'Option 2'")
+        elif self.r3.isChecked():
+            print("selected = 'Option 3'")
+        elif self.r4.isChecked():
+            print("selected = 'Option 4'")
 
 
 class workWindow(JobsMainWindow):
