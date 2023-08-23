@@ -465,7 +465,7 @@ class connectionWindow(QMainWindow):
         final_xml = '<?xml version="1.0"?>\n<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' + xml_str.split('<Settings>', 1)[1]
 
         # Write the final XML string to a file
-        with open('/home/decas/config_modified.xml', 'w') as f:
+        with open('/home/decas/config.xml', 'w') as f:
             f.write(final_xml)
         
         self.process_manager.start_process()
