@@ -349,7 +349,7 @@ class SettingWindow(QMainWindow):
         self.hide()
 
     def open_next(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -469,7 +469,7 @@ class workWindow(JobsMainWindow):
                         widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
                     self.scroll_layout.addWidget(widget)
                 else:
-                    if (self.search_keyword in value["invoice"]) or (self.search_keyword in value["user_id"]) or (self.search_keyword in value["date_time"]) or (self.search_keyword in value["status"]):
+                    if (self.search_keyword in value["job_title"]["invoice"]) or (self.search_keyword in value["job_title"]["user_id"]) or (self.search_keyword in value["job_title"]["date_time"]) or (self.search_keyword in value["job_title"]["status"]):
                         if value["data_sent"] is True:
                             widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
                         else:
@@ -514,10 +514,10 @@ class workWindow(JobsMainWindow):
         self.show_jobs()
 
 
-class USBWindow(QMainWindow):
+class SettingsWindow(QMainWindow):
     def __init__(self, stacked_widget):
         super().__init__()
-        loadUi("inset.ui", self)
+        loadUi("setting.ui", self)
 
         # Set the window size
         self.resize(1024, 600)
@@ -585,15 +585,15 @@ class USBWindow(QMainWindow):
         self.about_window.showFullScreen()
         self.hide()
 
-    def open_rs(self):
-        self.rs_window = RSWindow(self.stacked_widget)
-        self.rs_window.showFullScreen()
-        self.hide()
+    # def open_rs(self):
+    #     self.rs_window = RSWindow(self.stacked_widget)
+    #     self.rs_window.showFullScreen()
+    #     self.hide()
 
-    def open_usb(self):
-        self.usb_window = usbWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
+    # def open_usb(self):
+    #     self.usb_window = usbWindow(self.stacked_widget)
+    #     self.usb_window.showFullScreen()
+    #     self.hide()
 
     def open_bluetooth(self):
         self.usb_window = bluetoothWindow(self.stacked_widget)
@@ -831,7 +831,7 @@ class WifiWindow(QMainWindow):
                 print(f"Error: {error}")
 
     def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -845,92 +845,92 @@ class WifiWindow(QMainWindow):
         virtual_keyboard.mainloop()
 
 
-class RSWindow(QMainWindow):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        loadUi("RSset.ui", self)
+# class RSWindow(QMainWindow):
+#     def __init__(self, stacked_widget):
+#         super().__init__()
+#         self.stacked_widget = stacked_widget
+#         loadUi("RSset.ui", self)
 
-        # Set the window size
-        self.resize(1024, 600)
+#         # Set the window size
+#         self.resize(1024, 600)
 
-        self.back.clicked.connect(self.go_back)
-        self.address.clicked.connect(lambda: self.open_virtual_keyboard(self.textEdit))
-        self.baudrate.addItems(["9600", "19200", "38400", "115200"])
-        self.parity.addItems(["None", "Even", "Odd"])
-        # Connect the combo box's activated signal to a slot function
-        self.baudrate.activated[str].connect(self.on_combobox_activated)
+#         self.back.clicked.connect(self.go_back)
+#         self.address.clicked.connect(lambda: self.open_virtual_keyboard(self.textEdit))
+#         self.baudrate.addItems(["9600", "19200", "38400", "115200"])
+#         self.parity.addItems(["None", "Even", "Odd"])
+#         # Connect the combo box's activated signal to a slot function
+#         self.baudrate.activated[str].connect(self.on_combobox_activated)
 
-        self.parity.activated[str].connect(self.on_combobox_activated1)
+#         self.parity.activated[str].connect(self.on_combobox_activated1)
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_system_time)
-        self.timer.start(1000)
+#         self.timer = QTimer(self)
+#         self.timer.timeout.connect(self.update_system_time)
+#         self.timer.start(1000)
 
-    def update_system_time(self):
-        current_time = shared_data.time
-        self.time.setPlainText(f" {current_time}")
-        self.date.setPlainText(f" {shared_data.date}")
+#     def update_system_time(self):
+#         current_time = shared_data.time
+#         self.time.setPlainText(f" {current_time}")
+#         self.date.setPlainText(f" {shared_data.date}")
 
-    def on_combobox_activated(self, text):
-        print(f"Selected option: {text}")
+#     def on_combobox_activated(self, text):
+#         print(f"Selected option: {text}")
 
-    def on_combobox_activated1(self, text):
-        print(f"Selected option: {text}")
+#     def on_combobox_activated1(self, text):
+#         print(f"Selected option: {text}")
 
-    def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
+#     def go_back(self):
+#         self.usb_window = SettingsWindow(self.stacked_widget)
+#         self.usb_window.showFullScreen()
+#         self.hide()
 
-    def update_text_edit(self, text_edit, entered_text):
-        text_edit.setPlainText(entered_text)
+#     def update_text_edit(self, text_edit, entered_text):
+#         text_edit.setPlainText(entered_text)
 
-    def open_virtual_keyboard(self, text_edit):
-        virtual_keyboard = VirtualKeyboard(
-            lambda entered_text: self.update_text_edit(text_edit, entered_text)
-        )
-        virtual_keyboard.mainloop()
+#     def open_virtual_keyboard(self, text_edit):
+#         virtual_keyboard = VirtualKeyboard(
+#             lambda entered_text: self.update_text_edit(text_edit, entered_text)
+#         )
+#         virtual_keyboard.mainloop()
 
 
-class usbWindow(QMainWindow):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        loadUi("usbset.ui", self)
+# class usbWindow(QMainWindow):
+#     def __init__(self, stacked_widget):
+#         super().__init__()
+#         self.stacked_widget = stacked_widget
+#         loadUi("usbset.ui", self)
 
-        # Set the window size
-        self.resize(1024, 600)
+#         # Set the window size
+#         self.resize(1024, 600)
 
-        self.back.clicked.connect(self.go_back)
-        self.comport.addItems(["COM1", "COM2", "COM3", "COM4", "COM5", "COM6"])
+#         self.back.clicked.connect(self.go_back)
+#         self.comport.addItems(["COM1", "COM2", "COM3", "COM4", "COM5", "COM6"])
 
-        # Connect the combo box's activated signal to a slot function
-        self.comport.activated[str].connect(self.on_combobox_activated)
+#         # Connect the combo box's activated signal to a slot function
+#         self.comport.activated[str].connect(self.on_combobox_activated)
 
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_system_time)
-        self.timer.start(1000)
+#         self.timer = QTimer(self)
+#         self.timer.timeout.connect(self.update_system_time)
+#         self.timer.start(1000)
 
-    def update_system_time(self):
-        current_time = shared_data.time
-        self.time.setPlainText(f" {current_time}")
-        self.date.setPlainText(f" {shared_data.date}")
+#     def update_system_time(self):
+#         current_time = shared_data.time
+#         self.time.setPlainText(f" {current_time}")
+#         self.date.setPlainText(f" {shared_data.date}")
 
-    def on_combobox_activated(self, text):
-        print(f"Selected option: {text}")
+#     def on_combobox_activated(self, text):
+#         print(f"Selected option: {text}")
 
-    def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
+#     def go_back(self):
+#         self.usb_window = SettingsWindow(self.stacked_widget)
+#         self.usb_window.showFullScreen()
+#         self.hide()
 
-    def update_text_edit(self, entered_text):
-        self.textEdit.setPlainText(entered_text)
+#     def update_text_edit(self, entered_text):
+#         self.textEdit.setPlainText(entered_text)
 
-    def open_virtual_keyboard(self):
-        virtual_keyboard = VirtualKeyboard(self.update_text_edit)
-        virtual_keyboard.mainloop()
+#     def open_virtual_keyboard(self):
+#         virtual_keyboard = VirtualKeyboard(self.update_text_edit)
+#         virtual_keyboard.mainloop()
 
 
 class bluetoothWindow(QMainWindow):
@@ -994,7 +994,7 @@ class bluetoothWindow(QMainWindow):
         print(f"Selected option: {text}")
 
     def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget)
         self.usb_window.showFullScreen()
         self.hide()
 
