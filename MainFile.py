@@ -370,14 +370,13 @@ class ReadyWindow(QMainWindow):
         file_path = self.directory_checker.path_data
         try:
             self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path)
+            self.stacked_widget.addWidget(self.SettingsWindow1_window)
+            self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
+            self.timer.stop()
+            self.hide()
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
             self.process_manager.terminate_process()
-            
-        self.stacked_widget.addWidget(self.SettingsWindow1_window)
-        self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
-        self.timer.stop()
-        self.hide()
 
     def open_next(self):
         self.usb_window = SettingsWindow(self.stacked_widget)
