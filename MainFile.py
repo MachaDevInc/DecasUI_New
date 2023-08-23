@@ -338,6 +338,8 @@ class ReadyWindow(QMainWindow):
         # Create an instance of ProcessManager
         self.process_manager = MonoDecasProcessManager()
 
+        self.SettingsWindow1_window = None
+
         # Set the window size
         self.resize(1024, 600)
 
