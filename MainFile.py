@@ -309,7 +309,7 @@ def update_shared_data_time():
 shared_data = SharedData()
 
 
-class SettingWindow(QMainWindow):
+class ReadyWindow(QMainWindow):
     def __init__(self, stacked_widget):
         super().__init__()
         loadUi("Ready.ui", self)
@@ -390,7 +390,7 @@ class connectionWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -434,7 +434,7 @@ class workWindow(JobsMainWindow):
         virtual_keyboard.mainloop()
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -524,11 +524,11 @@ class SettingsWindow(QMainWindow):
         self.stacked_widget = stacked_widget
         self.wifi_window = WifiWindow(self.stacked_widget)
         self.back.clicked.connect(self.go_back)
-        self.usb.clicked.connect(self.open_usb)
+        # self.usb.clicked.connect(self.open_usb)
         self.bluetooth.clicked.connect(self.open_bluetooth)
         self.wifi.clicked.connect(self.open_wifi)
         self.about.clicked.connect(self.open_about)
-        self.rs.clicked.connect(self.open_rs)
+        # self.rs.clicked.connect(self.open_rs)
 
         self.shared_data = shared_data
         self.dateEdit.setDate(QDate(2023, 1, 1))
@@ -570,7 +570,7 @@ class SettingsWindow(QMainWindow):
         self.shared_data.time = time.toString("hh:mm:ss")
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -641,7 +641,7 @@ class aboutWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -1685,9 +1685,9 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                 None
             )  # optional: set its parent to None so it gets deleted
 
-        self.SettingWindow_window = SettingWindow(self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
     def open_keyboard(self):
         self.scanThread.stop()
@@ -1742,9 +1742,9 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                     None
                 )  # optional: set its parent to None so it gets deleted
 
-            self.SettingWindow_window = SettingWindow(self.stacked_widget)
-            self.stacked_widget.addWidget(self.SettingWindow_window)
-            self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+            self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+            self.stacked_widget.addWidget(self.ReadyWindow_window)
+            self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class NumericKeyboard(QMainWindow):
@@ -1901,9 +1901,9 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.SettingWindow_window = SettingWindow(self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class PrintRetrievalCode(QMainWindow):
@@ -1971,9 +1971,9 @@ class PrintRetrievalCode(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.SettingWindow_window = SettingWindow(self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class DirectoryChecker(QObject):
@@ -2031,7 +2031,7 @@ class MyApp(QApplication):
 
         self.stacked_widget = QStackedWidget()
 
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget)
         self.stacked_widget.addWidget(self.setting_window)
         self.stacked_widget.showFullScreen()
 
