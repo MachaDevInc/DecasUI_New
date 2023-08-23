@@ -1671,8 +1671,8 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
             self.pn532 = PN532_I2C(i2c, debug=False)
             self.pn532.SAM_configuration()
         except ValueError as e:
-            if "No I2C device at address" in str(e):
-                self.process_manager.terminate_process()
+            self.process_manager.terminate_process()
+            # if "No I2C device at address" in str(e):
                 # raise e
 
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
