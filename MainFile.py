@@ -2126,6 +2126,9 @@ class MyApp(QApplication):
             self.setting_window = ReadyWindow(self.stacked_widget)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
+
+            time.sleep(10)
+            self.process_manager.terminate_process()
             
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
