@@ -332,11 +332,11 @@ class MonoDecasProcessManager:
 
 
 class ReadyWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         loadUi("Ready.ui", self)
         # Create an instance of ProcessManager
-        self.process_manager = MonoDecasProcessManager()
+        self.process_manager = process_manager
 
         self.SettingsWindow1_window = None
 
@@ -2123,12 +2123,9 @@ class MyApp(QApplication):
 
             self.process_manager.start_process()
 
-            self.setting_window = ReadyWindow(self.stacked_widget)
+            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
-
-            time.sleep(10)
-            self.process_manager.terminate_process()
             
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
