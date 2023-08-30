@@ -381,7 +381,7 @@ class ReadyWindow(QMainWindow):
             raise e
 
     def open_next(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -688,7 +688,7 @@ class SettingsWindow(QMainWindow):
     #     self.hide()
 
     def open_bluetooth(self):
-        self.usb_window = bluetoothWindow(self.stacked_widget)
+        self.usb_window = bluetoothWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -764,9 +764,12 @@ class aboutWindow(QMainWindow):
 
 
 class WifiWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         loadUi("wifiset.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -926,7 +929,7 @@ class WifiWindow(QMainWindow):
                 print(f"Error: {error}")
 
     def go_back(self):
-        self.usb_window = SettingsWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -974,7 +977,7 @@ class WifiWindow(QMainWindow):
 #         print(f"Selected option: {text}")
 
 #     def go_back(self):
-#         self.usb_window = SettingsWindow(self.stacked_widget)
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
 #         self.usb_window.showFullScreen()
 #         self.hide()
 
@@ -1016,7 +1019,7 @@ class WifiWindow(QMainWindow):
 #         print(f"Selected option: {text}")
 
 #     def go_back(self):
-#         self.usb_window = SettingsWindow(self.stacked_widget)
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
 #         self.usb_window.showFullScreen()
 #         self.hide()
 
@@ -1029,11 +1032,14 @@ class WifiWindow(QMainWindow):
 
 
 class bluetoothWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
         loadUi("bluetooth.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -1089,7 +1095,7 @@ class bluetoothWindow(QMainWindow):
         print(f"Selected option: {text}")
 
     def go_back(self):
-        self.usb_window = SettingsWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
