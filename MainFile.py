@@ -1218,25 +1218,25 @@ class ScanThread(QThread):
 
         while self._isScanning:
             try:
+                # data = self.ser.readline().decode("utf-8").strip()
+                # print("\nSerial Data: " + data + "\n")
+                # if data != "31":
                 data = self.ser.readline().decode("utf-8").strip()
                 print("\nSerial Data: " + data + "\n")
-                if data != "31":
-                    data = self.ser.readline().decode("utf-8").strip()
+                if data and "31" not in data:
                     print("\nSerial Data: " + data + "\n")
-                    if data and "31" not in data:
-                        print("\nSerial Data: " + data + "\n")
-                        self.blink_and_sleep(self.qr_blinker)
-                        self.foundUserID.emit(data)
-                        self.scanned = True
-                        self.ser.write(self.stop_scan_command_bytes)
+                    self.blink_and_sleep(self.qr_blinker)
+                    self.foundUserID.emit(data)
+                    self.scanned = True
+                    self.ser.write(self.stop_scan_command_bytes)
 
-                    uid = self.pn532.read_passive_target(timeout=0.1)
-                    if uid is not None:
-                        self.blink_and_sleep(self.rfid_blinker)
-                        uid_string = "".join([hex(i)[2:].zfill(2) for i in uid])
-                        self.foundUserID.emit(uid_string)
-                        self.scanned = True
-                        self.ser.write(self.stop_scan_command_bytes)
+                uid = self.pn532.read_passive_target(timeout=0.1)
+                if uid is not None:
+                    self.blink_and_sleep(self.rfid_blinker)
+                    uid_string = "".join([hex(i)[2:].zfill(2) for i in uid])
+                    self.foundUserID.emit(uid_string)
+                    self.scanned = True
+                    self.ser.write(self.stop_scan_command_bytes)
 
             except Exception as e:
                 print(f"Error reading from serial port in run: {e}")
