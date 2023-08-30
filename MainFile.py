@@ -430,7 +430,7 @@ class connectionWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -523,7 +523,7 @@ class workWindow(JobsMainWindow):
         virtual_keyboard.mainloop()
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -662,7 +662,7 @@ class SettingsWindow(QMainWindow):
         self.shared_data.time = time.toString("hh:mm:ss")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -673,7 +673,7 @@ class SettingsWindow(QMainWindow):
         self.hide()
 
     def open_about(self):
-        self.about_window = aboutWindow(self.stacked_widget)
+        self.about_window = aboutWindow(self.stacked_widget, self.process_manager)
         self.about_window.showFullScreen()
         self.hide()
 
@@ -694,11 +694,14 @@ class SettingsWindow(QMainWindow):
 
 
 class aboutWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
         loadUi("About.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -733,7 +736,7 @@ class aboutWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
