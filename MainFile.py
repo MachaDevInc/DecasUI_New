@@ -614,7 +614,7 @@ class SettingsWindow(QMainWindow):
         # Set the window size
         self.resize(1024, 600)
         self.stacked_widget = stacked_widget
-        self.wifi_window = WifiWindow(self.stacked_widget)
+        self.wifi_window = WifiWindow(self.stacked_widget, self.process_manager)
         self.back.clicked.connect(self.go_back)
         # self.usb.clicked.connect(self.open_usb)
         self.bluetooth.clicked.connect(self.open_bluetooth)
@@ -668,7 +668,7 @@ class SettingsWindow(QMainWindow):
 
     def open_wifi(self):
         # Pass 'self.stacked_widget' as an argument when creating a new WifiWindow instance
-        self.usb_window = WifiWindow(self.stacked_widget)
+        self.usb_window = WifiWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -1308,7 +1308,12 @@ class ProcessingThread(QThread):
                 self.progress_signal.emit("Please wait!  Processing receipt...")
 
                 self.retrieval_code = ""
-                result = self.pdf_to_table_data(self.file_path)
+
+                try:
+                    result = self.pdf_to_table_data(self.file_path)
+                except Exception as e:
+                    print("Error! Unsupported PDF")
+                    self.progress_signal.emit("Error! Unsupported PDF")
 
                 print("\n\n")
                 print(result)
