@@ -1316,7 +1316,7 @@ class ProcessingThread(QThread):
                     self.progress_signal.emit("Error! Unsupported PDF")
                     # Emit signal when processing is done
                     self.finished_signal.emit(
-                        "", "", "error_PDF"
+                        "", self.data_sent, "error_PDF"
                     )
 
                 print("\n\n")
