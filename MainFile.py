@@ -369,7 +369,7 @@ class ReadyWindow(QMainWindow):
     def open_settings_window1(self):
         file_path = self.directory_checker.path_data
         try:
-            self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path)
+            self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path, self.process_manager)
             self.stacked_widget.addWidget(self.SettingsWindow1_window)
             self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
             self.timer.stop()
@@ -1675,9 +1675,12 @@ class ProcessingThread(QThread):
 
 
 class SettingsWindow1(QMainWindow, Ui_MainWindow3):
-    def __init__(self, stacked_widget, file_path):
+    def __init__(self, stacked_widget, file_path, process_manager):
         super().__init__()
         self.setupUi(self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -1764,7 +1767,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
 
         if self.data_sent and error != "error_PDF":
             self.DataSentWindow_window = DataSentWindow(
-                self.file_path, self.stacked_widget
+                self.file_path, self.stacked_widget, self.process_manager
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
@@ -1795,7 +1798,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                 None
             )  # optional: set its parent to None so it gets deleted
 
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
@@ -1838,7 +1841,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
             print(self.code)
 
             self.PrintRetrievalCode_window = PrintRetrievalCode(
-                self.file_path, self.stacked_widget, self.code
+                self.file_path, self.stacked_widget, self.code, self.process_manager
             )
             self.stacked_widget.addWidget(self.PrintRetrievalCode_window)
             self.stacked_widget.setCurrentWidget(self.PrintRetrievalCode_window)
@@ -1852,7 +1855,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                     None
                 )  # optional: set its parent to None so it gets deleted
 
-            self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+            self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
             self.stacked_widget.addWidget(self.ReadyWindow_window)
             self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
@@ -1995,9 +1998,12 @@ class NumericKeyboard(QMainWindow):
 
 
 class DataSentWindow(QMainWindow):
-    def __init__(self, file_path, stacked_widget):
+    def __init__(self, file_path, stacked_widget, process_manager):
         super().__init__()
         loadUi("w6.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -2011,15 +2017,18 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class PrintRetrievalCode(QMainWindow):
-    def __init__(self, file_path, stacked_widget, code):
+    def __init__(self, file_path, stacked_widget, code, process_manager):
         super().__init__()
         loadUi("w5.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -2081,7 +2090,7 @@ class PrintRetrievalCode(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
