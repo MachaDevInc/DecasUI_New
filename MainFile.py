@@ -407,6 +407,7 @@ class connectionWindow(QMainWindow):
         super().__init__()
         self.stacked_widget = stacked_widget
         loadUi("connection.ui", self)
+        self._translate = QtCore.QCoreApplication.translate
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -468,12 +469,31 @@ class connectionWindow(QMainWindow):
 
         if listen_tcp.text == "true" and com_port.text == "(none)":
             self.r1.setChecked(True)
+            self.wifi.setText(
+            self._translate(
+                "MainWindow",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + self.get_current_network().decode("utf-8").strip()
+                + "</span></p></body></html>",
+            )
+        )
         elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
             self.r2.setChecked(True)
         elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS0":
             self.r3.setChecked(True)
         elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
             self.r4.setChecked(True)
+    
+    def get_current_network(self):
+        cmd = ["iwgetid", "-r"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+            return None
+
+        return output.strip()
     
     def edit_config_xml(self, tcp, port):
         self.tcp = tcp
