@@ -464,12 +464,16 @@ class connectionWindow(QMainWindow):
         com_port = root.find('ComPort')
 
         print(listen_tcp.text)
-        print("\n")
         print(com_port.text)
 
-        # if listen_tcp 
-
-        # self.r1.setChecked(True)
+        if listen_tcp.text == "true" and com_port.text == "(none)":
+            self.r1.setChecked(True)
+        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
+            self.r2.setChecked(True)
+        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS0":
+            self.r3.setChecked(True)
+        elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
+            self.r4.setChecked(True)
     
     def edit_config_xml(self, tcp, port):
         self.tcp = tcp
