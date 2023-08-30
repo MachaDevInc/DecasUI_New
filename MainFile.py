@@ -1314,6 +1314,10 @@ class ProcessingThread(QThread):
                 except Exception as e:
                     print("Error! Unsupported PDF")
                     self.progress_signal.emit("Error! Unsupported PDF")
+                    # Emit signal when processing is done
+                    self.finished_signal.emit(
+                        "", "", "error_PDF"
+                    )
 
                 print("\n\n")
                 print(result)
@@ -1758,7 +1762,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         print("Processing finished!")
         print(retrieval_code)
 
-        if self.data_sent:
+        if self.data_sent and error != "error_PDF":
             self.DataSentWindow_window = DataSentWindow(
                 self.file_path, self.stacked_widget
             )
