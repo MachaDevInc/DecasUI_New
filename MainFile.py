@@ -463,9 +463,9 @@ class connectionWindow(QMainWindow):
         # Find the ComPort element
         com_port = root.find('ComPort')
 
-        print(listen_tcp)
+        print(listen_tcp.text)
         print("\n")
-        print(com_port)
+        print(com_port.text)
 
         # if listen_tcp 
 
