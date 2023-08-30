@@ -1311,6 +1311,9 @@ class ProcessingThread(QThread):
 
                 try:
                     result = self.pdf_to_table_data(self.file_path)
+                    print("\n\n")
+                    print(result)
+                    print("\n\n")
                 except Exception as e:
                     print("Error! Unsupported PDF")
                     self.progress_signal.emit("Error! Unsupported PDF")
@@ -1318,10 +1321,6 @@ class ProcessingThread(QThread):
                     self.finished_signal.emit(
                         "", self.data_sent, "error_PDF"
                     )
-
-                print("\n\n")
-                print(result)
-                print("\n\n")
 
                 receipt_text = ""
                 for i, row in enumerate(result):
