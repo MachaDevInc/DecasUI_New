@@ -420,6 +420,8 @@ class connectionWindow(QMainWindow):
         self.r3.clicked.connect(self.on_selected)
         self.r4.clicked.connect(self.on_selected)
 
+        self.read_config_xml()
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
         self.timer.start(1000)
@@ -436,7 +438,6 @@ class connectionWindow(QMainWindow):
 
     def on_selected(self):
         self.process_manager.terminate_process()
-        selected = ''
         if self.r1.isChecked():
             print("selected = 'WiFi'")
             self.edit_config_xml("true", "(none)")
@@ -449,6 +450,26 @@ class connectionWindow(QMainWindow):
         elif self.r4.isChecked():
             print("selected = 'Bluetooth'")
             self.edit_config_xml("false", "/dev/rfcomm0")
+
+    def read_config_xml(self):
+
+        # Load and parse the XML file
+        tree = ET.parse('/home/decas/config.xml')
+        root = tree.getroot()
+
+        # Find the ListenTCP element
+        listen_tcp = root.find('ListenTCP')
+
+        # Find the ComPort element
+        com_port = root.find('ComPort')
+
+        print(listen_tcp)
+        print("\n")
+        print(com_port)
+
+        # if listen_tcp 
+
+        # self.r1.setChecked(True)
     
     def edit_config_xml(self, tcp, port):
         self.tcp = tcp
