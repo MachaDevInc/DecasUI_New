@@ -1314,6 +1314,99 @@ class ProcessingThread(QThread):
                     print("\n\n")
                     print(result)
                     print("\n\n")
+
+                    receipt_text = ""
+                    for i, row in enumerate(result):
+                        row['quantity'] = row['quantity'].replace(",", "")
+                        row['price'] = row['price'].replace(",", "")
+                        row['tax'] = row['tax'].replace(",", "")
+                        row['discount'] = row['discount'].replace(",", "")
+                        row['total'] = row['total'].replace(",", "")
+                        print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
+
+                        receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
+
+                    receipt_info = self.pdf_to_text(self.file_path)
+                    print("\n\n")
+                    print(receipt_info)
+                    print("\n\n")
+
+                    info = self.extract_info(receipt_info)
+                    if "Tax Number" in info:
+                        print(f"Tax Number: {info['Tax Number']}")
+                    else:
+                        info['Tax Number'] = 'Nil'
+                    if "Phone Number" in info:
+                        print(f"Phone Number: {info['Phone Number']}")
+                    else:
+                        info['Phone Number'] = 'Nil'
+                    if "Email" in info:
+                        print(f"Email: {info['Email']}")
+                    else:
+                        info['Email'] = 'Nil'
+                    if "Invoice Number" in info:
+                        print(f"Invoice Number: {info['Invoice Number']}")
+                    else:
+                        info['Invoice Number'] = 'Nil'
+                    if "Date" in info:
+                        print(f"Date: {info['Date']}")
+                    else:
+                        info['Date'] = 'Nil'
+                    print("\n\n")
+
+                    address = re.findall(
+                        r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", receipt_info, re.MULTILINE
+                    )
+                    if address:
+                        address = address[0]
+                    else:
+                        address = " "
+                    print(address)
+
+                    api_data = self.items_to_api_format(result)
+                    print(api_data)
+                    print("\n\n")
+
+                    print(self.userID)
+                    print("\n\n")
+
+                    print(self.deviceID)
+                    print("\n\n")
+
+                    self.progress_signal.emit("Sending data to REPSLIPS server...")
+
+                    # (data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number)
+                    get_response = self.send_api_data(
+                        api_data,
+                        self.userID,
+                        "N2R Technologies3",
+                        address,
+                        info["Phone Number"],
+                        info["Date"],
+                        self.deviceID,
+                        info["Invoice Number"],
+                    )
+                    self.decode_response(get_response)
+
+                    if self.data_sent is True:
+                        status = "Success"
+                    else:
+                        status = "Failed. " + str(self.parsed_data["response"])
+
+                    self.job_title["invoice"] = info["Invoice Number"]
+                    self.job_title["user_id"] = self.userID
+                    self.job_title["date_time"] = info["Date"]
+                    self.job_title["status"] = status
+                    print("\n\n")
+                    print(self.job_title)
+                    print("\n\n")
+
+                    self.update_jobs_dict()
+
+                    # Emit signal when processing is done
+                    self.finished_signal.emit(
+                        self.retrieval_code, self.data_sent, self.response_message
+                    )
                 except Exception as e:
                     print("Error! Unsupported PDF")
                     self.progress_signal.emit("Error! Unsupported PDF")
@@ -1322,98 +1415,6 @@ class ProcessingThread(QThread):
                         "", self.data_sent, "error_PDF"
                     )
 
-                receipt_text = ""
-                for i, row in enumerate(result):
-                    row['quantity'] = row['quantity'].replace(",", "")
-                    row['price'] = row['price'].replace(",", "")
-                    row['tax'] = row['tax'].replace(",", "")
-                    row['discount'] = row['discount'].replace(",", "")
-                    row['total'] = row['total'].replace(",", "")
-                    print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
-
-                    receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
-
-                receipt_info = self.pdf_to_text(self.file_path)
-                print("\n\n")
-                print(receipt_info)
-                print("\n\n")
-
-                info = self.extract_info(receipt_info)
-                if "Tax Number" in info:
-                    print(f"Tax Number: {info['Tax Number']}")
-                else:
-                    info['Tax Number'] = 'Nil'
-                if "Phone Number" in info:
-                    print(f"Phone Number: {info['Phone Number']}")
-                else:
-                    info['Phone Number'] = 'Nil'
-                if "Email" in info:
-                    print(f"Email: {info['Email']}")
-                else:
-                    info['Email'] = 'Nil'
-                if "Invoice Number" in info:
-                    print(f"Invoice Number: {info['Invoice Number']}")
-                else:
-                    info['Invoice Number'] = 'Nil'
-                if "Date" in info:
-                    print(f"Date: {info['Date']}")
-                else:
-                    info['Date'] = 'Nil'
-                print("\n\n")
-
-                address = re.findall(
-                    r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", receipt_info, re.MULTILINE
-                )
-                if address:
-                    address = address[0]
-                else:
-                    address = " "
-                print(address)
-
-                api_data = self.items_to_api_format(result)
-                print(api_data)
-                print("\n\n")
-
-                print(self.userID)
-                print("\n\n")
-
-                print(self.deviceID)
-                print("\n\n")
-
-                self.progress_signal.emit("Sending data to REPSLIPS server...")
-
-                # (data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number)
-                get_response = self.send_api_data(
-                    api_data,
-                    self.userID,
-                    "N2R Technologies3",
-                    address,
-                    info["Phone Number"],
-                    info["Date"],
-                    self.deviceID,
-                    info["Invoice Number"],
-                )
-                self.decode_response(get_response)
-
-                if self.data_sent is True:
-                    status = "Success"
-                else:
-                    status = "Failed. " + str(self.parsed_data["response"])
-
-                self.job_title["invoice"] = info["Invoice Number"]
-                self.job_title["user_id"] = self.userID
-                self.job_title["date_time"] = info["Date"]
-                self.job_title["status"] = status
-                print("\n\n")
-                print(self.job_title)
-                print("\n\n")
-
-                self.update_jobs_dict()
-
-                # Emit signal when processing is done
-                self.finished_signal.emit(
-                    self.retrieval_code, self.data_sent, self.response_message
-                )
             else:
                 try:
                     # Read the file
