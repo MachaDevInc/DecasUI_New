@@ -442,14 +442,14 @@ class connectionWindow(QMainWindow):
             print("selected = 'WiFi'")
             self.edit_config_xml("true", "(none)")
         elif self.r2.isChecked():
-            print("selected = 'RS232'")
-            self.edit_config_xml("false", "/dev/ttyS1")
+            print("selected = 'Bluetooth'")
+            self.edit_config_xml("false", "/dev/rfcomm0")
         elif self.r3.isChecked():
             print("selected = 'USB'")
             self.edit_config_xml("false", "/dev/ttyS0")
         elif self.r4.isChecked():
-            print("selected = 'Bluetooth'")
-            self.edit_config_xml("false", "/dev/rfcomm0")
+            print("selected = 'RS232'")
+            self.edit_config_xml("false", "/dev/ttyS1")
 
     def read_config_xml(self):
 
@@ -468,11 +468,11 @@ class connectionWindow(QMainWindow):
 
         if listen_tcp.text == "true" and com_port.text == "(none)":
             self.r1.setChecked(True)
-        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
+        elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
             self.r2.setChecked(True)
         elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS0":
             self.r3.setChecked(True)
-        elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
+        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
             self.r4.setChecked(True)
     
     def edit_config_xml(self, tcp, port):
