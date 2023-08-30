@@ -381,17 +381,17 @@ class ReadyWindow(QMainWindow):
             raise e
 
     def open_next(self):
-        self.usb_window = SettingsWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
     def open_connection(self):
-        self.connection_window = connectionWindow(self.stacked_widget)
+        self.connection_window = connectionWindow(self.stacked_widget, self.process_manager)
         self.connection_window.showFullScreen()
         self.hide()
 
     def open_work(self):
-        self.work_window = workWindow(self.stacked_widget)
+        self.work_window = workWindow(self.stacked_widget, self.process_manager)
         self.work_window.showFullScreen()
         self.hide()
 
@@ -403,13 +403,13 @@ class ReadyWindow(QMainWindow):
 
 
 class connectionWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
         loadUi("connection.ui", self)
 
         # Create an instance of ProcessManager
-        self.process_manager = MonoDecasProcessManager()
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -482,11 +482,14 @@ class connectionWindow(QMainWindow):
 
 
 class workWindow(JobsMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.search_keyword = ""
         self._translate = QtCore.QCoreApplication.translate
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -601,9 +604,12 @@ class workWindow(JobsMainWindow):
 
 
 class SettingsWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         loadUi("setting.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
