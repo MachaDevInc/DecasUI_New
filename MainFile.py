@@ -381,7 +381,7 @@ class ReadyWindow(QMainWindow):
             raise e
 
     def open_next(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -929,7 +929,7 @@ class WifiWindow(QMainWindow):
                 print(f"Error: {error}")
 
     def go_back(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
