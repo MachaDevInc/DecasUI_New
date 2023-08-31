@@ -67,11 +67,8 @@ class VirtualKeyboard(tk.Tk):
     def __init__(self, on_enter_callback):
         super().__init__()
 
-        # Set the window flag for a frameless window
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
         self.title("Virtual Keyboard")
-        self.configure(bg="skyblue")
+        self.configure(bg="#92EAD1")
 
         self.input_var = tk.StringVar()
         self.input_label = tk.Entry(
@@ -168,7 +165,7 @@ class VirtualKeyboard(tk.Tk):
     def create_keyboard(self):
         for row_index, row in enumerate(self.keys, start=1):
             # Set the background color same as the parent
-            frame = tk.Frame(self, bg="skyblue")
+            frame = tk.Frame(self, bg="#92EAD1")
             button_row = []
             for col_index, key in enumerate(row):
                 if key in ("Backspace", "Tab"):
