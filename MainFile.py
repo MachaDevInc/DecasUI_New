@@ -186,6 +186,7 @@ class VirtualKeyboard(tk.Tk):
                     height=2,
                     bg="black",  # background color
                     fg="white",   # text color
+                    font=("Helvetica", 12, "bold"),  # Set the font size and style here
                     command=lambda k=key: self.press_key(k),
                 )
                 button.grid(
