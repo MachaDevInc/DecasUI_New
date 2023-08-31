@@ -920,6 +920,9 @@ class WifiWindow(QMainWindow):
             new_config = current_config
             new_config = new_config.replace(current_ssid, new_network_ssid)
             new_config = new_config.replace(current_psk, new_network_password)
+            print(current_config)
+            print("\n")
+            print(new_config)
 
         # Write the new network configuration to wpa_supplicant.conf
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifi_config:
