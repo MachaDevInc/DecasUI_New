@@ -67,6 +67,8 @@ class VirtualKeyboard(tk.Tk):
     def __init__(self, on_enter_callback):
         super().__init__()
 
+        self.overrideredirect(True)
+
         self.title("Virtual Keyboard")
         self.configure(bg="#92EAD1")
 
