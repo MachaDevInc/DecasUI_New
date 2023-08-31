@@ -225,9 +225,10 @@ class VirtualKeyboard(tk.Tk):
             self.update_keys()
 
     def update_keys(self):
+        non_alpha_keys = ["Enter", "Backspace", "Ctrl", "Alt", "Shift", "Caps Lock", "Tab"]
         for row_keys, row_buttons in zip(self.keys, self.buttons):
             for key, button in zip(row_keys, row_buttons):
-                if key.isalpha():
+                if key.isalpha() and key not in non_alpha_keys:
                     if self.caps_lock_on or self.shift_on:
                         button.config(text=key.upper())
                     else:
