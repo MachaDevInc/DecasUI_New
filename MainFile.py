@@ -920,8 +920,9 @@ class WifiWindow(QMainWindow):
             new_config = current_config
             new_config = new_config.replace(current_ssid, new_network_ssid)
             new_config = new_config.replace(current_psk, new_network_password)
+
             print(current_config)
-            print("\n")
+            print
             print(new_config)
 
         # Write the new network configuration to wpa_supplicant.conf
@@ -930,42 +931,20 @@ class WifiWindow(QMainWindow):
             wifi_config.write(new_config)
             wifi_config.close()
 
-        # Stop network interface
-        cmd = ["sudo", "systemctl", "stop", "dhcpcd"]
+        # Restart the wpa_supplicant service to connect to the new network
+        cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
 
         if error is not None:
             print(f"Error: {error}")
 
-        cmd = ["sudo", "dhclient", "-r", "wlan0"]
+        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
 
         if error is not None:
             print(f"Error: {error}")
-
-        cmd = ["sudo", "dhclient", "wlan0"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-
-        if error is not None:
-            print(f"Error: {error}")
-
-        # Start network interface
-        cmd = ["sudo", "systemctl", "start", "dhcpcd"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-
-        if error is not None:
-            print(f"Error: {error}")
-
-        # cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
-        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        # output, error = process.communicate()
-
-        # if error is not None:
-        #     print(f"Error: {error}")
 
         # Check if the connection was successful
         time.sleep(10)  # Wait for the connection to establish
