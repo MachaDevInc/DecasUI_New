@@ -184,8 +184,8 @@ class VirtualKeyboard(tk.Tk):
                     text=key,
                     width=width,
                     height=2,
-                    bg="black",  # background color
-                    fg="white",   # text color
+                    # bg="black",  # background color
+                    # fg="white",   # text color
                     command=lambda k=key: self.press_key(k),
                 )
                 button.grid(
