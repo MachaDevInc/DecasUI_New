@@ -930,18 +930,8 @@ class WifiWindow(QMainWindow):
             wifi_config.write(new_config)
             wifi_config.close()
 
-        # network interface down
-        cmd = ["sudo", "ifconfig", "wlan0", "down"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-
-        if error is not None:
-            print(f"Error: {error}")
-
-        time.sleep(1)
-
-        # network interface up
-        cmd = ["sudo", "ifconfig", "wlan0", "up"]
+        # Restart network interface
+        cmd = ["sudo", "systemctl", "restart", "dhcpcd"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
 
