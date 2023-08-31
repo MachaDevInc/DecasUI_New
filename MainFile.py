@@ -927,8 +927,18 @@ class WifiWindow(QMainWindow):
             wifi_config.write(new_config)
             wifi_config.close()
 
-        # Restart the wpa_supplicant service to connect to the new network
-        cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
+        # network interface down
+        cmd = ["sudo", "ifconfig", "wlan0", "down"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+
+        time.sleep(1)
+
+        # network interface up
+        cmd = ["sudo", "ifconfig", "wlan0", "up"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
 
