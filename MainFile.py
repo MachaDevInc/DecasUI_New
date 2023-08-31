@@ -70,7 +70,7 @@ class VirtualKeyboard(tk.Tk):
         self.overrideredirect(True)
 
         self.title("Virtual Keyboard")
-        self.configure(bg="#92EAD1", borderwidth=2, highlightbackground="black")
+        self.configure(bg="#92EAD1")
 
         self.input_var = tk.StringVar()
         self.input_label = tk.Entry(
@@ -184,6 +184,8 @@ class VirtualKeyboard(tk.Tk):
                     text=key,
                     width=width,
                     height=2,
+                    bg="black",  # background color
+                    fg="white",   # text color
                     command=lambda k=key: self.press_key(k),
                 )
                 button.grid(
