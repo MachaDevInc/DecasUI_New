@@ -177,7 +177,7 @@ class VirtualKeyboard(tk.Tk):
                 elif key in (" ",):
                     width = 80
                 else:
-                    width = 3
+                    width = 2
 
                 button = tk.Button(
                     frame,
