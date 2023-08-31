@@ -935,12 +935,12 @@ class WifiWindow(QMainWindow):
         if error is not None:
             print(f"Error: {error}")
 
-        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
+        # cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        # output, error = process.communicate()
 
-        if error is not None:
-            print(f"Error: {error}")
+        # if error is not None:
+        #     print(f"Error: {error}")
 
         # Check if the connection was successful
         time.sleep(10)  # Wait for the connection to establish
