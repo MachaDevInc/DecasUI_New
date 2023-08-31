@@ -930,8 +930,30 @@ class WifiWindow(QMainWindow):
             wifi_config.write(new_config)
             wifi_config.close()
 
-        # Restart network interface
-        cmd = ["sudo", "systemctl", "restart", "dhcpcd"]
+        # Stop network interface
+        cmd = ["sudo", "systemctl", "stop", "dhcpcd"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+
+        cmd = ["sudo", "dhclient", "-r", "wlan0"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+
+        cmd = ["sudo", "dhclient", "wlan0"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+
+        # Start network interface
+        cmd = ["sudo", "systemctl", "start", "dhcpcd"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
 
