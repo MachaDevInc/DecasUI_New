@@ -922,7 +922,7 @@ class WifiWindow(QMainWindow):
             new_config = new_config.replace(current_psk, new_network_password)
 
             print(current_config)
-            print
+            print("\n")
             print(new_config)
 
         # Write the new network configuration to wpa_supplicant.conf
