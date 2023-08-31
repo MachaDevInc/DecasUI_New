@@ -67,6 +67,9 @@ class VirtualKeyboard(tk.Tk):
     def __init__(self, on_enter_callback):
         super().__init__()
 
+        # Set the window flag for a frameless window
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
         self.title("Virtual Keyboard")
         self.configure(bg="skyblue")
 
