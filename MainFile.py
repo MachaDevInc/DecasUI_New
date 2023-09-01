@@ -21,20 +21,20 @@ from Ui_Work import JobsMainWindow
 from Ui_Work import CustomWidget
 from w3 import Ui_MainWindow3
 
-# from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch
 
 # Mock the board and busio modules if they're not available
-# try:
-import board
-import busio
-import serial
-from adafruit_pn532.i2c import PN532_I2C
-from escpos.printer import Serial
-# except (ModuleNotFoundError, NotImplementedError):
-#     board = Mock()
-#     busio = Mock()
-#     serial = Mock()
-#     PN532_I2C = Mock()
+try:
+    import board
+    import busio
+    import serial
+    from adafruit_pn532.i2c import PN532_I2C
+    from escpos.printer import Serial
+except (ModuleNotFoundError, NotImplementedError):
+    board = Mock()
+    busio = Mock()
+    serial = Mock()
+    PN532_I2C = Mock()
 
 import re
 import json
@@ -50,10 +50,10 @@ import uuid
 import socket
 
 # Mock the bluetooth module if it's not available
-# try:
-import bluetooth
-# except ModuleNotFoundError:
-#     bluetooth = Mock()
+try:
+    import bluetooth
+except ModuleNotFoundError:
+    bluetooth = Mock()
 from ntplib import NTPClient
 
 import xml.etree.ElementTree as ET
@@ -74,7 +74,7 @@ class VirtualKeyboard(tk.Tk):
 
         self.input_var = tk.StringVar()
         self.input_label = tk.Entry(
-            self, textvariable=self.input_var, width=60, font=("Helvetica", "20")
+            self, textvariable=self.input_var, width=80, font=("Helvetica", "20")
         )
         self.input_label.pack(padx=5, pady=5)
 
@@ -162,7 +162,7 @@ class VirtualKeyboard(tk.Tk):
         # Set the keyboard window to fullscreen
         # self.attributes("-fullscreen", True)
         # Set the keyboard window position
-        self.geometry(f"+{50}+{y-20}")
+        self.geometry(f"+{20}+{y-20}")
 
     def create_keyboard(self):
         for row_index, row in enumerate(self.keys, start=1):
@@ -1523,11 +1523,11 @@ class ProcessingThread(QThread):
         # mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
         # return mac
 
-        # with open("/proc/cpuinfo", "r") as f:
-        #     for line in f:
-        #         if line[0:6] == "Serial":
-        #             return line.split(":")[1].strip()
-        return "Unknown"
+        with open("/proc/cpuinfo", "r") as f:
+            for line in f:
+                if line[0:6] == "Serial":
+                    return line.split(":")[1].strip()
+        # return "Unknown"
 
     def pdf_to_table_data(self, file_path):
         data = []
