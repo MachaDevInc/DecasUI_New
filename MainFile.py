@@ -340,7 +340,7 @@ class MonoDecasProcessManager:
 class ReadyWindow(QMainWindow):
     def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi("Ready.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
         # Create an instance of ProcessManager
         self.process_manager = process_manager
 
@@ -412,7 +412,7 @@ class connectionWindow(QMainWindow):
     def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
-        loadUi("connection.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/connection.ui", self)
         self._translate = QtCore.QCoreApplication.translate
 
         # Create an instance of ProcessManager
@@ -657,7 +657,7 @@ class workWindow(JobsMainWindow):
 class SettingsWindow(QMainWindow):
     def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi("setting.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/setting.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -749,7 +749,7 @@ class aboutWindow(QMainWindow):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
-        loadUi("About.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/About.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -817,7 +817,7 @@ class aboutWindow(QMainWindow):
 class WifiWindow(QMainWindow):
     def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi("wifiset.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/wifiset.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -1091,7 +1091,7 @@ class bluetoothWindow(QMainWindow):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
-        loadUi("bluetooth.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/bluetooth.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -1921,7 +1921,7 @@ class NumericKeyboard(QMainWindow):
 
     def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path):
         super(NumericKeyboard, self).__init__()
-        loadUi("W4.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/W4.ui", self)
 
         # Set the window size
         self.resize(1024, 600)
@@ -2056,7 +2056,7 @@ class NumericKeyboard(QMainWindow):
 class DataSentWindow(QMainWindow):
     def __init__(self, file_path, stacked_widget, process_manager):
         super().__init__()
-        loadUi("w6.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/w6.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
@@ -2081,7 +2081,7 @@ class DataSentWindow(QMainWindow):
 class PrintRetrievalCode(QMainWindow):
     def __init__(self, file_path, stacked_widget, code, process_manager):
         super().__init__()
-        loadUi("w5.ui", self)
+        loadUi("/home/decas/ui/DecasUI_New/w5.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
