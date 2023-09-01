@@ -58,7 +58,7 @@ from ntplib import NTPClient
 
 import xml.etree.ElementTree as ET
 
-proc1 = subprocess.Popen(["python", "progress bar.py"])
+proc1 = subprocess.Popen(["python", "/home/decas/ui/DecasUI_New/progress bar.py"])
 time.sleep(1)
 proc1.terminate()
 
