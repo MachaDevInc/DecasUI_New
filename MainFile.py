@@ -2176,56 +2176,56 @@ class DirectoryChecker(QObject):
             self.open_settings_window1_signal.emit()
 
 
-class MyApp(QApplication):
-    def __init__(self):
-        super().__init__(sys.argv)
-
-        # Create an instance of ProcessManager
-        self.process_manager = MonoDecasProcessManager()
-
-        # Configure the serial port and baud rate
-        self.serial_port = "/dev/ttySC0"
-        self.baud_rate = 9600
-
+class SerialManager:
+    def __init__(self, port="/dev/ttySC0", baud_rate=9600):
+        self.serial_port = port
+        self.baud_rate = baud_rate
+        
         # Barcode Commands to be sent
         self.uart_output_command = "7E000801000D00ABCD"
         self.single_scanning_time_command = "7E000801000600ABCD"
         self.command_mode_command = "7E0008010000D5ABCD"
         self.reset_command = "7E00080100D950ABCD"
 
+    def connect(self):
         try:
-            # Open the serial port
             with serial.Serial(self.serial_port, self.baud_rate, timeout=1) as ser:
                 print(f"Connected to {self.serial_port} at {self.baud_rate} baud rate.")
-
-                # Send the commands
                 ser.write(bytes.fromhex(self.uart_output_command))
                 ser.write(bytes.fromhex(self.single_scanning_time_command))
                 ser.write(bytes.fromhex(self.command_mode_command))
                 ser.close()
-
         except Exception as e:
             print(f"Error: {e}")
 
+class MyApp(QApplication):
+    def __init__(self):
+        super().__init__(sys.argv)
+        self.process_manager = MonoDecasProcessManager()
+        self.serial_manager = SerialManager()
+
+        # Initialize serial and UI components
+        self.init_serial()
+        self.init_ui()
+
+    def init_serial(self):
+        self.serial_manager.connect()
+
+    def init_ui(self):
         try:
             self.stacked_widget = QStackedWidget()
-
             self.process_manager.start_process()
-
             self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
             
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
-            # Terminate the subprocess if an error occurs in the main process
             self.process_manager.terminate_process()
-
 
 if __name__ == "__main__":
     app = MyApp()
     sys.exit(app.exec_())
-
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
