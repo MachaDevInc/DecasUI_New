@@ -74,7 +74,7 @@ class VirtualKeyboard(tk.Tk):
 
         self.input_var = tk.StringVar()
         self.input_label = tk.Entry(
-            self, textvariable=self.input_var, width=80, font=("Helvetica", "20")
+            self, textvariable=self.input_var, width=64, font=("Helvetica", "20")
         )
         self.input_label.pack(padx=5, pady=5)
 
