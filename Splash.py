@@ -32,7 +32,7 @@ progressBar.setObjectName("progressBar")
 label_2 = QLabel(centralwidget)
 label_2.setGeometry(QRect(310, 170, 400, 271))
 label_2.setText("")
-label_2.setPixmap(QPixmap("d:\\DecasUI\\DecasUI_V2\\pics/Decas_Logo.png"))
+label_2.setPixmap(QPixmap("/home/decas/ui/DecasUI_New/pics/Decas_Logo.png"))
 label_2.setObjectName("label_2")
 
 # Menu Bar setup
