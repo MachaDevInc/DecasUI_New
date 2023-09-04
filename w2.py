@@ -65,7 +65,7 @@ class Ui_MainWindow2(object):
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(380, 70, 250, 250))
         self.label_3.setText("")
-        self.label_3.setPixmap(QtGui.QPixmap("pics/1 (400 × 400 px) (400 × 400 px).png"))
+        self.label_3.setPixmap(QtGui.QPixmap("pics/Decas_Logo.png"))
         self.label_3.setScaledContents(True)
         self.label_3.setObjectName("label_3")
         MainWindow2.setCentralWidget(self.centralwidget)

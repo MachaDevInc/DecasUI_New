@@ -147,7 +147,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>pics/1 (400 × 400 px) (400 × 400 px).png</pixmap>
+     <pixmap>pics/Decas_Logo.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
