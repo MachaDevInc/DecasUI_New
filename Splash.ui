@@ -30,7 +30,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>pics/Standby.jpg</pixmap>
+     <pixmap>pics/Standby.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -45,8 +45,27 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
     <property name="value">
      <number>50</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>170</y>
+      <width>400</width>
+      <height>271</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>pics/Decas_Logo.png</pixmap>
     </property>
    </widget>
   </widget>
