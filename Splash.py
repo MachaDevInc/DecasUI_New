@@ -34,13 +34,14 @@ progressBar.setStyleSheet("""
         border: 2px solid grey;
         border-radius: 5px;
         text-align: center;
-        color: white;  # Text color is set to white
+        color: white;
     }
     
     QProgressBar::chunk {
         background-color: green;
     }
 """)
+progressBar.update()
 
 # Second Label setup
 label_2 = QLabel(centralwidget)
