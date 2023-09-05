@@ -28,6 +28,19 @@ progressBar.setGeometry(QRect(270, 480, 521, 41))
 progressBar.setProperty("value", 50)
 progressBar.setObjectName("progressBar")
 
+# Change the color of the progress bar to green
+progressBar.setStyleSheet("""
+    QProgressBar {
+        border: 2px solid grey;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    QProgressBar::chunk {
+        background-color: green;
+    }
+""")
+
 # Second Label setup
 label_2 = QLabel(centralwidget)
 label_2.setGeometry(QRect(310, 170, 400, 271))
