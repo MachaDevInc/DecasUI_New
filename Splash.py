@@ -18,7 +18,7 @@ centralwidget.setObjectName("centralwidget")
 label = QLabel(centralwidget)
 label.setGeometry(QRect(0, 0, 1024, 600))
 label.setText("")
-label.setPixmap(QPixmap("d:\\DecasUI\\DecasUI_V2\\pics/Standby.png"))
+label.setPixmap(QPixmap("/home/decas/ui/DecasUI_New/pics/Standby.png"))
 label.setScaledContents(True)
 label.setObjectName("label")
 
