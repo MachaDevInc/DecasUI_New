@@ -34,6 +34,7 @@ progressBar.setStyleSheet("""
         border: 2px solid grey;
         border-radius: 5px;
         text-align: center;
+        color: white;  # Text color is set to white
     }
     
     QProgressBar::chunk {
