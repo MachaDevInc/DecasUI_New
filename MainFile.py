@@ -325,7 +325,7 @@ class MonoDecasProcessManager:
         
     def start_process(self):
         if self.process is None or self.process.poll() is not None:
-            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe"])
+            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe", "-c"])
         
     def terminate_process(self):
         if self.process and self.process.poll() is None:
@@ -2203,25 +2203,37 @@ class MyApp(QApplication):
         super().__init__(sys.argv)
         self.process_manager = MonoDecasProcessManager()
         self.serial_manager = SerialManager()
+        self.stacked_widget = QStackedWidget()
 
-        # Initialize serial and UI components
-        self.init_serial()
-        self.init_ui()
+        # Initialize serial and UI components asynchronously
+        self.initialization_thread = InitializationThread(self)
+        self.initialization_thread.initialized.connect(self.on_initialized)
+        self.initialization_thread.start()
 
-    def init_serial(self):
-        self.serial_manager.connect()
+    def on_initialized(self):
+        # Do something after initialization is complete
+        # For example, show the main UI screen
+        self.stacked_widget.showFullScreen()
 
-    def init_ui(self):
+
+class InitializationThread(QThread):
+    initialized = pyqtSignal()
+    
+    def __init__(self, app):
+        super(InitializationThread, self).__init__()
+        self.app = app
+
+    def run(self):
         try:
-            self.stacked_widget = QStackedWidget()
-            self.process_manager.start_process()
-            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
-            self.stacked_widget.addWidget(self.setting_window)
-            self.stacked_widget.showFullScreen()
-            
+            self.app.serial_manager.connect()
+            self.app.process_manager.start_process()
+            self.app.setting_window = ReadyWindow(self.app.stacked_widget, self.app.process_manager)
+            self.app.stacked_widget.addWidget(self.app.setting_window)
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
-            self.process_manager.terminate_process()
+            self.app.process_manager.terminate_process()
+
+        self.initialized.emit()
 
 if __name__ == "__main__":
     app = MyApp()
