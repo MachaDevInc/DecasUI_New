@@ -68,6 +68,7 @@ window.setStatusBar(statusbar)
 # Timer function to update progress
 def update_progress():
     current_value = progressBar.value()
+    # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
     if current_value >= 100:
         # window.close()
         os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
