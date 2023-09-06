@@ -30,7 +30,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>pics/Standby.png</pixmap>
+     <pixmap>/home/decas/ui/DecasUI_New/pics/Standby.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -65,7 +65,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>pics/Decas_Logo.png</pixmap>
+     <pixmap>/home/decas/ui/DecasUI_New/pics/Decas_Logo.png</pixmap>
     </property>
    </widget>
   </widget>

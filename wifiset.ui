@@ -27,7 +27,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>pics/Standby.png</pixmap>
+     <pixmap>/home/decas/ui/DecasUI_New/pics/Standby.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -47,7 +47,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>pics/2234.png</normaloff>pics/2234.png</iconset>
+      <normaloff>/home/decas/ui/DecasUI_New/pics/2234.png</normaloff>/home/decas/ui/DecasUI_New/pics/2234.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -76,7 +76,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>pics/1 (400 × 400 px).png</normaloff>pics/1 (400 × 400 px).png</iconset>
+      <normaloff>/home/decas/ui/DecasUI_New/pics/1 (400 × 400 px).png</normaloff>/home/decas/ui/DecasUI_New/pics/1 (400 × 400 px).png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -347,7 +347,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>pics/1 (94 × 89 px) (2).png</normaloff>pics/1 (94 × 89 px) (2).png</iconset>
+      <normaloff>/home/decas/ui/DecasUI_New/pics/1 (94 × 89 px) (2).png</normaloff>/home/decas/ui/DecasUI_New/pics/1 (94 × 89 px) (2).png</iconset>
     </property>
     <property name="iconSize">
      <size>
