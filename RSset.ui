@@ -67,7 +67,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>/home/decas/ui/DecasUI_New/pics/Standby.png</pixmap>
+     <pixmap>pics/Standby.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -148,7 +148,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>/home/decas/ui/DecasUI_New/pics/2234.png</normaloff>/home/decas/ui/DecasUI_New/pics/2234.png</iconset>
+      <normaloff>pics/2234.png</normaloff>pics/2234.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -177,7 +177,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>/home/decas/ui/DecasUI_New/pics/1 (400 × 400 px).png</normaloff>/home/decas/ui/DecasUI_New/pics/1 (400 × 400 px).png</iconset>
+      <normaloff>pics/1 (400 × 400 px).png</normaloff>pics/1 (400 × 400 px).png</iconset>
     </property>
     <property name="iconSize">
      <size>
