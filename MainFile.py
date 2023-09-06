@@ -2201,12 +2201,13 @@ class SerialManager:
 class MyApp(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
-        self.process_manager = MonoDecasProcessManager()
-        self.serial_manager = SerialManager()
-
+        
         # Initialize serial and UI components
         self.init_serial()
         self.init_ui()
+
+        self.process_manager = MonoDecasProcessManager()
+        self.serial_manager = SerialManager()
 
     def init_serial(self):
         self.serial_manager.connect()
