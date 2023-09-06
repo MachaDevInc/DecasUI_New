@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal, QThread, QEventLoop, QRect, QDateTime, QMetaObject, Q_ARG, Qt, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, QThread, QEventLoop, QDateTime, QMetaObject, Q_ARG, Qt, pyqtSlot
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap
 import sys
@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QStackedWidget,
     QLabel,
-    QProgressBar, QLabel, QMenuBar, QStatusBar, QVBoxLayout,
 )
 from PyQt5.uic import loadUi
 import time
