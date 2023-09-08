@@ -44,7 +44,6 @@ from dateutil.parser import parse
 
 import sys
 import pdfplumber
-from pdf2image import convert_from_path
 
 import uuid
 import socket
@@ -2229,4 +2228,9 @@ if __name__ == "__main__":
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber pdf2image ntplib requests python-dateutil
+# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil
+
+# sudo apt-get update
+# sudo apt-get upgrade
+# sudo apt-get install python3-pyqt5 python3-tk python3-requests 
+# sudo pip3 install adafruit-circuitpython-pn532 board pyserial escpos pdfplumber ntplib python-dateutil
