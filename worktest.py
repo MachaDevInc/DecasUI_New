@@ -115,7 +115,7 @@ class JobsMainWindow(QMainWindow):
         self.setStyleSheet(
             """
             QMainWindow {
-                background-image: url(/home/decas/ui/DecasUI_New/pics/Standby.png);
+                background-image: url(pics/Standby.png);
                 background-repeat: no-repeat
             }
         """
@@ -128,7 +128,7 @@ class JobsMainWindow(QMainWindow):
         self.label = QLabel(self.centralwidget)
         self.label.setGeometry(QRect(0, 0, 1024, 600))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("/home/decas/ui/DecasUI_New/pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("pics/Standby.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.label_2 = QLabel(self.centralwidget)

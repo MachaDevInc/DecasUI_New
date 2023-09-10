@@ -20,7 +20,7 @@ class Ui_MainWindow3(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(0, 0, 1024, 600))
         self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap("/home/decas/ui/DecasUI_New/pics/Standby.png"))
+        self.label_2.setPixmap(QtGui.QPixmap("pics/Standby.png"))
         self.label_2.setScaledContents(True)
         self.label_2.setObjectName("label_2")
         self.RFID_Icon = QtWidgets.QLabel(self.centralwidget)

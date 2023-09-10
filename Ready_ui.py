@@ -25,7 +25,7 @@ class Ui_MainWindow2(object):
         font.setWeight(75)
         self.label.setFont(font)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\/home/decas/ui/DecasUI_New/pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\pics/Standby.png"))
         self.label.setScaledContents(True)
         self.label.setWordWrap(False)
         self.label.setObjectName("label")

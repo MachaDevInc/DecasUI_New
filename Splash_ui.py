@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.label.setEnabled(True)
         self.label.setGeometry(QtCore.QRect(0, 0, 1024, 600))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\/home/decas/ui/DecasUI_New/pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\pics/Standby.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
