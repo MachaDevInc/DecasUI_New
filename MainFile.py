@@ -24,17 +24,17 @@ from w3 import Ui_MainWindow3
 from unittest.mock import Mock, patch
 
 # Mock the board and busio modules if they're not available
-try:
-    import board
-    import busio
-    import serial
-    from adafruit_pn532.i2c import PN532_I2C
-    from escpos.printer import Serial
-except (ModuleNotFoundError, NotImplementedError):
-    board = Mock()
-    busio = Mock()
-    serial = Mock()
-    PN532_I2C = Mock()
+# try:
+import board
+import busio
+import serial
+from adafruit_pn532.i2c import PN532_I2C
+from escpos.printer import Serial
+# except (ModuleNotFoundError, NotImplementedError):
+#     board = Mock()
+#     busio = Mock()
+#     serial = Mock()
+#     PN532_I2C = Mock()
 
 import re
 import json
