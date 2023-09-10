@@ -20,7 +20,7 @@ class Ui_MainWindow6(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(0, 0, 1024, 571))
         self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap("pics/Loading Page.png"))
+        self.label_2.setPixmap(QtGui.QPixmap("/home/decas/ui/DecasUI_New/pics/Loading Page.png"))
         self.label_2.setScaledContents(True)
         self.label_2.setOpenExternalLinks(False)
         self.label_2.setObjectName("label_2")
