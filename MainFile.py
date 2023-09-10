@@ -2232,6 +2232,6 @@ if __name__ == "__main__":
 
 # sudo apt-get update
 # sudo apt-get upgrade
-# sudo apt-get install python3-pyqt5 python3-tk python3-requests mono-complete
+# sudo apt-get install python3-pyqt5 python3-tk python3-requests python3-bluez mono-complete
 # sudo pip3 install adafruit-circuitpython-pn532 board pyserial escpos pdfplumber ntplib python-dateutil
 # sudo mkdir ui
