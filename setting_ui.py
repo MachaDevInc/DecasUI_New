@@ -22,7 +22,7 @@ class Ui_MainWindow7(object):
         self.label.setGeometry(QtCore.QRect(0, 0, 1024, 600))
         self.label.setAutoFillBackground(False)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI_V2\\/home/decas/ui/DecasUI_New/pics/Standby.png"))
         self.label.setObjectName("label")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(240, 300, 200, 50))

@@ -24,7 +24,7 @@ class Ui_MainWindow2(object):
         font.setBold(True)
         self.label.setFont(font)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI\\pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("d:\\DecasUI\\DecasUI\\/home/decas/ui/DecasUI_New/pics/Standby.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)

@@ -20,7 +20,7 @@ class Ui_wifisetting(object):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(0, 0, 1024, 600))
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("pics/Standby.png"))
+        self.label.setPixmap(QtGui.QPixmap("/home/decas/ui/DecasUI_New/pics/Standby.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.done = QtWidgets.QPushButton(self.centralwidget)
