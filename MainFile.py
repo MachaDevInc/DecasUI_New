@@ -2222,9 +2222,11 @@ class MyApp(QApplication):
             print(f"Error: {e}")
             self.process_manager.terminate_process()
 
-if __name__ == "__main__":
-    app = MyApp()
-    sys.exit(app.exec_())
+def create_main_app():
+    return MyApp()
+
+def run_main_app(app):
+    return app.exec_()
 
 # Instructions/Commands
 # sudo chmod 777 /tmp

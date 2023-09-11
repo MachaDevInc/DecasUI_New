@@ -2,7 +2,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QProgressBar, QL
 from PyQt5.QtCore import Qt, QTimer, QRect
 from PyQt5.QtGui import QPixmap
 import sys
-import os
+
+from MainFile import create_main_app, run_main_app
+
+# Initialize MyApp early, but don't run exec_()
+main_app = create_main_app()
 
 app = QApplication([])
 
@@ -71,7 +75,9 @@ def update_progress():
     # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
     if current_value >= 100:
         # window.close()
-        os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
+        # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
+        window.close()
+        sys.exit(run_main_app(main_app))  # Run the already-initialized MyApp instance
     progressBar.setValue(current_value + 1)
 
 # Timer setup
