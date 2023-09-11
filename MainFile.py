@@ -1462,6 +1462,8 @@ class ProcessingThread(QThread):
                         self.retrieval_code, self.data_sent, self.response_message
                     )
                 except Exception as e:
+                    print(f"Error: {e}")
+                    print("\n")
                     print("Error! Unsupported PDF")
                     self.progress_signal.emit("Error! Unsupported PDF")
                     time.sleep(3)
