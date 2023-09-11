@@ -109,7 +109,7 @@ progressBar.setStyleSheet("""
         border: 2px solid grey;
         border-radius: 5px;
         text-align: center;
-        color: white;
+        # color: white;
     }
     
     QProgressBar::chunk {
