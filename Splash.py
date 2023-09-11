@@ -28,7 +28,7 @@ label.setObjectName("label")
 # Progress Bar setup
 progressBar = QProgressBar(centralwidget)
 progressBar.setGeometry(QRect(270, 480, 521, 41))
-progressBar.setProperty("value", 50)
+progressBar.setProperty("value", 0)
 progressBar.setObjectName("progressBar")
 
 # Change the color of the progress bar to green
