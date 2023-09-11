@@ -2198,7 +2198,7 @@ class SerialManager:
             print(f"Error: {e}")
 
 class MyApp(QApplication):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__(sys.argv)
         self.process_manager = MonoDecasProcessManager()
         self.serial_manager = SerialManager()
@@ -2222,8 +2222,8 @@ class MyApp(QApplication):
             print(f"Error: {e}")
             self.process_manager.terminate_process()
 
-def create_main_app():
-    return MyApp()
+def create_main_app(app):
+    return MyApp(app)
 
 def run_main_app(app):
     return app.exec_()

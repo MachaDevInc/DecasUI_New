@@ -5,10 +5,8 @@ import sys
 
 from MainFile import create_main_app, run_main_app
 
-# Initialize MyApp early, but don't run exec_()
-main_app = create_main_app()
-
-app = QApplication([])
+app = QApplication([])  # Initialize just one QApplication instance
+main_app = create_main_app(app)  # Pass the QApplication instance to MyApp
 
 # Main window setup
 window = QMainWindow()
@@ -76,8 +74,9 @@ def update_progress():
     if current_value >= 100:
         # window.close()
         # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
+        timer.stop()
         window.close()
-        sys.exit(run_main_app(main_app))  # Run the already-initialized MyApp instance
+        # sys.exit(run_main_app(main_app))  # Run the already-initialized MyApp instance
     progressBar.setValue(current_value + 1)
 
 # Timer setup
