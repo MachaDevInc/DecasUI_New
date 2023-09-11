@@ -4,7 +4,13 @@ from PyQt5.QtGui import QPixmap
 import sys
 import os
 
+# Import your main window function here
+from MainFile import MyApp
+
 app = QApplication([])
+
+# Initialize your main window but don't show it yet
+MyApp()
 
 # Main window setup
 window = QMainWindow()
@@ -71,7 +77,9 @@ def update_progress():
     # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
     if current_value >= 100:
         # window.close()
-        os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
+        # os.system("/usr/bin/python3 /home/decas/ui/DecasUI_New/MainFile.py")  # Launch main application here
+        window.hide()  # Hide splash
+        # Show the main window here, which is already initialized and just needs to be shown
     progressBar.setValue(current_value + 1)
 
 # Timer setup
