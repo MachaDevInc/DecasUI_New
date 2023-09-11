@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>650</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,22 +36,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>480</y>
-      <width>521</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="value">
-     <number>50</number>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
@@ -69,7 +53,6 @@
     </property>
    </widget>
   </widget>
-  
  </widget>
  <resources/>
  <connections/>
