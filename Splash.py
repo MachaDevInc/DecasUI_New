@@ -53,6 +53,9 @@ label_2.setText("")
 label_2.setPixmap(QPixmap("/home/decas/ui/DecasUI_New/pics/Decas_Logo.png"))
 label_2.setObjectName("label_2")
 
+# Set centralwidget, menubar and statusbar to window
+window.setCentralWidget(centralwidget)
+
 # Timer function to update progress
 def update_progress():
     current_value = progressBar.value()
