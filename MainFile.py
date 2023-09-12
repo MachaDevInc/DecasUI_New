@@ -1817,8 +1817,10 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.code = retrieval_code
         self.data_sent = data_sent
 
-        # use the remove() function to delete the file
-        os.remove(self.file_path)
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
         print("Processing finished!")
         print(retrieval_code)
 
@@ -1890,8 +1892,10 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
         self.code = retrieval_code
         self.data_sent = data_sent
-        # use the remove() function to delete the file
-        os.remove(self.file_path)
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
 
         if self.data_sent:
             print("Processing finished!")
