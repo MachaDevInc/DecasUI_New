@@ -88,13 +88,6 @@ class Ui_MainWindow3(object):
         self.next.raise_()
         self.next1.raise_()
         MainWindow3.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow3)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1024, 21))
-        self.menubar.setObjectName("menubar")
-        MainWindow3.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow3)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow3.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow3)
