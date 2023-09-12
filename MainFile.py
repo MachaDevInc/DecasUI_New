@@ -584,7 +584,7 @@ class workWindow(JobsMainWindow):
 
         try:
             # Read the file
-            with open("my_jobs.json", "r") as f:
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
@@ -592,7 +592,7 @@ class workWindow(JobsMainWindow):
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
-            print("File 'my_jobs.json' not found.")
+            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
         if jobs:
             for key, value in jobs.items():
@@ -1476,7 +1476,7 @@ class ProcessingThread(QThread):
             else:
                 try:
                     # Read the file
-                    with open("my_jobs.json", "r") as f:
+                    with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
                         jobs = json.load(f)  # This will give you a dictionary
                         # Get the size of the dictionary
                         size = len(jobs)
@@ -1516,7 +1516,7 @@ class ProcessingThread(QThread):
                 except json.JSONDecodeError:
                     print("File is not valid JSON")
                 except FileNotFoundError:
-                    print("File 'my_jobs.json' not found.")
+                    print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
             self._isRunning = False
 
@@ -1690,7 +1690,7 @@ class ProcessingThread(QThread):
 
         try:
             # Read the file
-            with open("my_jobs.json", "r") as f:
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
@@ -1698,7 +1698,7 @@ class ProcessingThread(QThread):
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
-            print("File 'my_jobs.json' not found.")
+            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
         if jobs:
             # Get the last key-value pair added
@@ -1728,7 +1728,7 @@ class ProcessingThread(QThread):
 
         # print(jobs)
         # Write the updated dictionary back to the file
-        with open("my_jobs.json", "w") as f:
+        with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
             json.dump(jobs, f)
 
 
