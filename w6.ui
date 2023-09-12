@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>1024</width>
-      <height>571</height>
+      <height>600</height>
      </rect>
     </property>
     <property name="text">
@@ -92,7 +92,6 @@
     </property>
    </widget>
   </widget>
-  
  </widget>
  <resources/>
  <connections/>
