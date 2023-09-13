@@ -163,6 +163,9 @@ class VirtualKeyboard(tk.Tk):
         # Set the keyboard window position
         self.geometry(f"+{20}+{y+50}")
 
+    def stop_mainloop(self):
+        self.quit()
+    
     def create_keyboard(self):
         for row_index, row in enumerate(self.keys, start=1):
             # Set the background color same as the parent
@@ -208,8 +211,9 @@ class VirtualKeyboard(tk.Tk):
             entered_text = self.input_var.get()
             print(f"Input: {entered_text}")
             self.input_var.set("")
-            self.destroy()
+            self.stop_mainloop()  # This line replaces self.destroy()
             self.on_enter_callback(entered_text)
+            self.close_virtual_keyboard()  # Close the Tkinter loop
         elif key == "Caps Lock":
             self.caps_lock_on = not self.caps_lock_on
             self.update_keys()
@@ -920,15 +924,16 @@ class WifiWindow(QMainWindow):
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
+            print(current_config)
+            print("\n")
             current_ssid, current_psk = self.get_ssid_psk(current_config)
 
             new_config = current_config
             new_config = new_config.replace(current_ssid, new_network_ssid)
             new_config = new_config.replace(current_psk, new_network_password)
 
-            print(current_config)
-            print("\n")
             print(new_config)
+            print("\n")
 
         # Write the new network configuration to wpa_supplicant.conf
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifi_config:
@@ -2204,11 +2209,33 @@ class SerialManager:
         except Exception as e:
             print(f"Error: {e}")
 
+class TkinterThread(QThread):
+    def __init__(self, tkinter_object):
+        super(TkinterThread, self).__init__()
+        self.tkinter_object = tkinter_object
+        self.running = True
+
+    def run(self):
+        while self.running:
+            self.tkinter_object.update_idletasks()
+            self.tkinter_object.update()
+
+    def stop(self):
+        self.running = False
+        self.tkinter_object.stop_mainloop()
+
+
 class MyApp(QApplication):
     def __init__(self, app):
         super().__init__(sys.argv)
         self.process_manager = MonoDecasProcessManager()
         self.serial_manager = SerialManager()
+
+        self.keyboard_text = ""
+        self.virtual_keyboard = VirtualKeyboard(self.keyboard_text)
+        
+        # Initialize the TkinterThread
+        self.tkinter_thread = TkinterThread(self.virtual_keyboard)
 
         # Initialize serial and UI components
         self.init_serial()
