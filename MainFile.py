@@ -926,26 +926,24 @@ class WifiWindow(QMainWindow):
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
-            print(current_config)
-            print("\n")
+
             current_ssid, current_psk = self.get_ssid_psk(current_config)
-            print("Current SSID: ")
-            print(current_ssid)
-            print("\nCurrent PSK ")
-            print(current_psk)
-            print("\n")
 
             new_config = current_config
-            new_config = new_config.replace(current_ssid, new_network_ssid)
-            new_config = new_config.replace(current_psk, new_network_password)
 
-            print(new_config)
-            print("\n")
-            print("New SSID: ")
-            print(new_network_ssid)
-            print("\nNew PSK ")
-            print(new_network_password)
-            print("\n")
+            # Check if the current PSK is enclosed by quotes, and remove them for replacement
+            if current_psk.startswith('"') and current_psk.endswith('"'):
+                current_psk = current_psk[1:-1]
+
+            new_config = new_config.replace(current_ssid, new_network_ssid)
+            
+            # Check if new_network_password is ASCII
+            if is_ascii(new_network_password):
+                new_network_password_quoted = f'"{new_network_password}"'
+            else:
+                new_network_password_quoted = new_network_password
+
+            new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
 
         # Write the new network configuration to wpa_supplicant.conf
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifi_config:
@@ -963,6 +961,15 @@ class WifiWindow(QMainWindow):
 
         # cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
         cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        print("\n ")
+        print(output)
+
+        if error is not None:
+            print(f"Error: {error}")
+
+        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
         print("\n ")
@@ -1001,6 +1008,9 @@ class WifiWindow(QMainWindow):
 
             if error is not None:
                 print(f"Error: {error}")
+    
+    def is_ascii(s):
+        return all(ord(c) < 128 for c in s)
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
