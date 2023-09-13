@@ -43,10 +43,6 @@ class CustomWidget(QWidget):
         self.layout_obj.setAlignment(Qt.AlignLeft)
         self.setLayout(self.layout_obj)
 
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setWeight(60)
-
         self.table = QTableWidget(self)
         self.table.setRowCount(1)  # Added rows
         self.table.setColumnCount(4)
@@ -56,6 +52,8 @@ class CustomWidget(QWidget):
 
         # Style the header
         font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setWeight(60)
         font.setBold(True)
         self.table.horizontalHeader().setFont(font)
 
@@ -85,6 +83,9 @@ class CustomWidget(QWidget):
         self.table.setItem(0, 1, QTableWidgetItem(job_title["user_id"]))
         self.table.setItem(0, 2, QTableWidgetItem(job_title["date_time"]))
         self.table.setItem(0, 3, QTableWidgetItem(job_title["status"]))
+        self.table.item(0, 0).setFont(font)
+        self.table.item(0, 1).setFont(font)
+        self.table.item(0, 2).setFont(font)
         self.table.item(0, 3).setFont(font)
 
         self.layout_obj.addWidget(self.table)
