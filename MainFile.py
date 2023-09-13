@@ -911,9 +911,9 @@ class WifiWindow(QMainWindow):
         ssid = re.search(ssid_pattern, config)
         psk = re.search(psk_pattern, config)
 
-        print("Serached from wpa_supplicant SSID: ")
+        print("Searched from wpa_supplicant SSID: ")
         print(ssid)
-        print("\nSerached from wpa_supplicant PSK ")
+        print("\nSearched from wpa_supplicant PSK ")
         print(psk)
         print("\n")
 
