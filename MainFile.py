@@ -978,8 +978,8 @@ class WifiWindow(QMainWindow):
         print("\n ")
         print(output)
 
-        if error is not None:
-            print(f"Error: {error}")
+        if process.returncode != 0:
+            print(f"Error: {error.decode('utf-8')}")
 
         # Check if the connection was successful
         time.sleep(10)  # Wait for the connection to establish
