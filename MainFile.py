@@ -958,7 +958,7 @@ class WifiWindow(QMainWindow):
             #     current_psk = current_psk[1:-1]
 
             new_config = new_config.replace(current_ssid, new_network_ssid)
-            # new_network_password_quoted = f'"{new_network_password}"'
+            new_network_password = f'"{new_network_password}"'
             new_config = new_config.replace(current_psk, new_network_password)
             
             # # Check if new_network_password is ASCII
