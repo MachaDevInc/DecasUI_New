@@ -922,7 +922,7 @@ class WifiWindow(QMainWindow):
         else:
             return None, None
 
-    def is_ascii(s):
+    def is_ascii(self, s):
         return all(ord(c) < 128 for c in s)
     
     def connect_wifi(self, new_network_ssid, new_network_password):
