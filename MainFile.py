@@ -905,11 +905,17 @@ class WifiWindow(QMainWindow):
         return output.strip()
 
     def get_ssid_psk(self, config):
-        ssid_pattern = 'ssid="(.+?)"'
-        psk_pattern = 'psk="(.+?)"'
+        ssid_pattern = r'ssid="(.+?)"'
+        psk_pattern = r'psk=([^\s]+)'
 
         ssid = re.search(ssid_pattern, config)
         psk = re.search(psk_pattern, config)
+
+        print("Serached from wpa_supplicant SSID: ")
+        print(ssid)
+        print("\nSerached from wpa_supplicant PSK ")
+        print(psk)
+        print("\n")
 
         if ssid and psk:
             return ssid.group(1), psk.group(1)
@@ -937,7 +943,7 @@ class WifiWindow(QMainWindow):
             print("\n")
             print("New SSID: ")
             print(new_network_ssid)
-            print("\nNewt PSK ")
+            print("\nNew PSK ")
             print(new_network_password)
             print("\n")
 
