@@ -922,6 +922,9 @@ class WifiWindow(QMainWindow):
         else:
             return None, None
 
+    def is_ascii(s):
+        return all(ord(c) < 128 for c in s)
+    
     def connect_wifi(self, new_network_ssid, new_network_password):
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
@@ -938,7 +941,7 @@ class WifiWindow(QMainWindow):
             new_config = new_config.replace(current_ssid, new_network_ssid)
             
             # Check if new_network_password is ASCII
-            if is_ascii(new_network_password):
+            if self.is_ascii(new_network_password):
                 new_network_password_quoted = f'"{new_network_password}"'
             else:
                 new_network_password_quoted = new_network_password
@@ -1008,9 +1011,6 @@ class WifiWindow(QMainWindow):
 
             if error is not None:
                 print(f"Error: {error}")
-    
-    def is_ascii(s):
-        return all(ord(c) < 128 for c in s)
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
