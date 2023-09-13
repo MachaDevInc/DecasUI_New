@@ -971,8 +971,8 @@ class WifiWindow(QMainWindow):
             print("\n")
 
         # Write the new network configuration to wpa_supplicant.conf
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
-            wifi_config.truncate(0)
+        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
+            # wifi_config.truncate(0)
             wifi_config.write(new_config)
             wifi_config.close()
 
