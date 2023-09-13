@@ -1,9 +1,26 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QProgressBar, QLabel, QMenuBar, QStatusBar, QVBoxLayout
-from PyQt5.QtCore import Qt, QTimer, QRect
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QProgressBar, QLabel, QMenuBar, QStatusBar, QVBoxLayout, QStylePainter, QStyleOptionProgressBar
+from PyQt5.QtCore import Qt, QTimer, QRect, QPoint
+from PyQt5.QtGui import QPixmap, QFont, QPainter, QColor
 import sys
 import serial
 import time
+
+# Subclass QProgressBar to control text rendering
+class CustomProgressBar(QProgressBar):
+    def paintEvent(self, event):
+        painter = QPainter(self)
+
+        # Draw the progress bar as usual
+        opt = QStyleOptionProgressBar()
+        self.initStyleOption(opt)
+        self.style().drawControl(self.style().CE_ProgressBar, opt, painter, self)
+
+        # Customize the text font size and position
+        painter.setFont(QFont("Arial", 16, QFont.Bold))
+        painter.setPen(QColor(Qt.black))  # Set text color to black
+        rect = self.rect()
+        pos = QPoint(rect.width() // 2 - 20, rect.height() // 2 + 8)
+        painter.drawText(pos, f"{self.value()}%")
 
 from MainFile import create_main_app, run_main_app
 
@@ -97,20 +114,18 @@ label.setPixmap(QPixmap("/home/decas/ui/DecasUI_New/pics/Standby.png"))
 label.setScaledContents(True)
 label.setObjectName("label")
 
-# Progress Bar setup
-progressBar = QProgressBar(centralwidget)
+# Custom Progress Bar setup
+progressBar = CustomProgressBar(centralwidget)
 progressBar.setGeometry(QRect(270, 480, 521, 41))
 progressBar.setProperty("value", 0)
+progressBar.setTextVisible(False)  # This line removes the text
 progressBar.setObjectName("progressBar")
-
-# Change the color of the progress bar to green
 progressBar.setStyleSheet("""
     QProgressBar {
         border: 2px solid grey;
         border-radius: 5px;
         text-align: center;
     }
-    
     QProgressBar::chunk {
         background-color: green;
     }
