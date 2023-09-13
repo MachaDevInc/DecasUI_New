@@ -958,9 +958,6 @@ class WifiWindow(QMainWindow):
                 current_psk = current_psk[1:-1]
 
             new_config = new_config.replace(current_ssid, new_network_ssid)
-            print("new_config: ")
-            print(new_config)
-            print("\n")
             
             # Check if new_network_password is ASCII
             if self.is_ascii(new_network_password):
@@ -973,12 +970,6 @@ class WifiWindow(QMainWindow):
             print(new_config)
             print("\n")
 
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
-            current_config = wifi_config.read()
-            print("current_config: ")
-            print(current_config)
-            print("\n")
-            
         # Write the new network configuration to wpa_supplicant.conf
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             wifi_config.truncate(0)
@@ -1004,9 +995,6 @@ class WifiWindow(QMainWindow):
         #     print(f"Error: {error}")
 
         #wpa_cli reconfigure -i wlan0
-
-        while True:
-            pass
         
         cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
