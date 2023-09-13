@@ -953,13 +953,13 @@ class WifiWindow(QMainWindow):
 
             new_config = current_config
 
-            # Check if the current PSK is enclosed by quotes, and remove them for replacement
-            if current_psk.startswith('"') and current_psk.endswith('"'):
-                current_psk = current_psk[1:-1]
+            # # Check if the current PSK is enclosed by quotes, and remove them for replacement
+            # if current_psk.startswith('"') and current_psk.endswith('"'):
+            #     current_psk = current_psk[1:-1]
 
             new_config = new_config.replace(current_ssid, new_network_ssid)
-            new_network_password_quoted = f'"{new_network_password}"'
-            new_config = new_config.replace(current_psk, new_network_password_quoted)
+            # new_network_password_quoted = f'"{new_network_password}"'
+            new_config = new_config.replace(current_psk, new_network_password)
             
             # # Check if new_network_password is ASCII
             # if self.is_ascii(new_network_password):
@@ -971,7 +971,7 @@ class WifiWindow(QMainWindow):
             print(new_network_ssid)
             print("\n")
             print("new_network_password: ")
-            print(new_network_password_quoted)
+            print(new_network_password)
             print("\n")
 
             # new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
