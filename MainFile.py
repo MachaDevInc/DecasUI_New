@@ -964,6 +964,13 @@ class WifiWindow(QMainWindow):
                 new_network_password_quoted = f'"{new_network_password}"'
             else:
                 new_network_password_quoted = new_network_password
+            
+            print("new_network_ssid: ")
+            print(new_network_ssid)
+            print("\n")
+            print("new_network_password: ")
+            print(new_network_password)
+            print("\n")
 
             new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
             print("new_config: ")
