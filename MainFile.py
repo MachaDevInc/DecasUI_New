@@ -828,6 +828,7 @@ class WifiWindow(QMainWindow):
         self.network_password = ""
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
+        self.refresh_wifi_scan()
         self.confirm.clicked.connect(self.done)
         self.back.clicked.connect(self.go_back)
 
@@ -856,15 +857,24 @@ class WifiWindow(QMainWindow):
 
     def refresh_wifi_scan(self):
         self.ssid.clear()
-        self.status.setText(
-            self._translate(
-                "wifisetting",
-                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
-            )
-        )
+        self.update_wifi_status("Scanning...Please wait!")
+        # self.status.setText(
+        #     self._translate(
+        #         "wifisetting",
+        #         '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
+        #     )
+        # )
         self.discovery_thread = WiFiDiscoveryThread(self)
         self.discovery_thread.device_discovered.connect(self.add_wifi_item)
         self.discovery_thread.start()
+    
+    def update_wifi_status(self, update):
+        self.status.setText(
+            self._translate(
+                "wifisetting",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">' + update '</span></p></body></html>',
+            )
+        )
 
     def add_wifi_item(self, name, devices):
         self.status.setText(
