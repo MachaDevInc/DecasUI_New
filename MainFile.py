@@ -939,8 +939,17 @@ class WifiWindow(QMainWindow):
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
+            print("current_config: ")
+            print(current_config)
+            print("\n")
 
             current_ssid, current_psk = self.get_ssid_psk(current_config)
+            print("current_ssid: ")
+            print(current_ssid)
+            print("\n")
+            print("current_psk: ")
+            print(current_psk)
+            print("\n")
 
             new_config = current_config
 
@@ -949,6 +958,9 @@ class WifiWindow(QMainWindow):
                 current_psk = current_psk[1:-1]
 
             new_config = new_config.replace(current_ssid, new_network_ssid)
+            print("new_config: ")
+            print(new_config)
+            print("\n")
             
             # Check if new_network_password is ASCII
             if self.is_ascii(new_network_password):
@@ -957,9 +969,18 @@ class WifiWindow(QMainWindow):
                 new_network_password_quoted = new_network_password
 
             new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
+            print("new_config: ")
+            print(new_config)
+            print("\n")
 
+        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
+            current_config = wifi_config.read()
+            print("current_config: ")
+            print(current_config)
+            print("\n")
+            
         # Write the new network configuration to wpa_supplicant.conf
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifi_config:
+        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             wifi_config.truncate(0)
             wifi_config.write(new_config)
             wifi_config.close()
@@ -986,7 +1007,7 @@ class WifiWindow(QMainWindow):
 
         while True:
             pass
-
+        
         cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
