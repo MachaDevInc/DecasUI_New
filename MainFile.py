@@ -872,7 +872,7 @@ class WifiWindow(QMainWindow):
         self.status.setText(
             self._translate(
                 "wifisetting",
-                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">' + update '</span></p></body></html>',
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">' + update + '</span></p></body></html>',
             )
         )
 
