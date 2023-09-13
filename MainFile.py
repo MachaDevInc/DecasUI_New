@@ -993,15 +993,15 @@ class WifiWindow(QMainWindow):
         # if error is not None:
         #     print(f"Error: {error}")
 
-        # cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
-        # cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
-        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        # output, error = process.communicate()
-        # print("\n ")
-        # print(output)
+        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+        cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        print("\n ")
+        print(output)
 
-        # if error is not None:
-        #     print(f"Error: {error}")
+        if error is not None:
+            print(f"Error: {error}")
 
         #wpa_cli reconfigure -i wlan0
         
