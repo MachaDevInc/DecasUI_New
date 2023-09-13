@@ -982,12 +982,12 @@ class WifiWindow(QMainWindow):
         # if error is not None:
         #     print(f"Error: {error}")
 
-        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+        #wpa_cli reconfigure -i wlan0
+        cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
         print("\n ")
         print(output)
-        self.update_wifi_status(output)
 
         if process.returncode != 0:
             print(f"Error: {error.decode('utf-8')}")
