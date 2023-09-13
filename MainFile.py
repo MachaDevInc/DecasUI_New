@@ -983,6 +983,10 @@ class WifiWindow(QMainWindow):
         #     print(f"Error: {error}")
 
         #wpa_cli reconfigure -i wlan0
+
+        while True:
+            pass
+
         cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
