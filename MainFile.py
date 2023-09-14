@@ -936,6 +936,7 @@ class WifiWindow(QMainWindow):
         return all(ord(c) < 128 for c in s)
     
     def connect_wifi(self, new_network_ssid, new_network_password):
+        self.update_wifi_status("Connecting to: " + new_network_ssid)
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
@@ -1020,6 +1021,7 @@ class WifiWindow(QMainWindow):
         new_ssid = self.get_current_network().decode("utf-8").strip()
 
         if new_network_ssid != new_ssid:
+            self.update_wifi_status("Connection failed!!!")
             print(
                 "Failed to connect to the new network. Reverting to the previous network configuration."
             )
@@ -1044,6 +1046,10 @@ class WifiWindow(QMainWindow):
 
             if error is not None:
                 print(f"Error: {error}")
+        else:
+            self.update_wifi_status("Connection Succesful!!!")
+            time.sleep(3)
+            self.update_wifi_status("Connected to: " + new_network_ssid)
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
