@@ -839,6 +839,10 @@ class WifiWindow(QMainWindow):
         self.timer.timeout.connect(self.update_system_time)
         self.timer.start(1000)
 
+        self.timer_wifi_status = QTimer()
+        self.timer_wifi_status.timeout.connect(self.on_timeout)
+        self.timeout_wifi_status_count = 0
+
         self.status.setText(
             self._translate(
                 "wifisetting",
@@ -897,6 +901,8 @@ class WifiWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def done(self):
+        self.discovery_thread.stop()
+        self.discovery_thread.wait()
         self.network_password = str(self.textEdit1.toPlainText())
         print(self.network_password)
 
@@ -936,18 +942,18 @@ class WifiWindow(QMainWindow):
         return all(ord(c) < 128 for c in s)
     
     def on_timeout(self):
-        self.timeout_count += 1
+        self.timeout_wifi_status_count += 1
 
-        if self.timeout_count == 1:
+        if self.timeout_wifi_status_count == 1:
             self.update_wifi_status("Connected to: " + self.new_network_ssid)
-            self.timer.stop()
+            self.timer_wifi_status.stop()
 
-    def connect_wifi(self, new_network_ssid):
+    def connect_wifi_status_update(self, new_network_ssid):
         self.new_network_ssid = new_network_ssid  # Store the SSID for use in the timeout event
         self.update_wifi_status("Connection Successful!!!")
 
-        self.timeout_count = 0  # Reset the counter
-        self.timer.start(3000)  # Start the timer with a 3-second interval
+        self.timeout_wifi_status_count = 0  # Reset the counter
+        self.timer_wifi_status.start(3000)  # Start the timer with a 3-second interval
     
     def connect_wifi(self, new_network_ssid, new_network_password):
         self.update_wifi_status("Connecting to: " + new_network_ssid)
@@ -1061,9 +1067,7 @@ class WifiWindow(QMainWindow):
             if error is not None:
                 print(f"Error: {error}")
         else:
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.on_timeout)
-            self.timeout_count = 0
+            self.connect_wifi_status_update(new_network_ssid)
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
@@ -1247,22 +1251,30 @@ class bluetoothWindow(QMainWindow):
 class WiFiDiscoveryThread(QThread):
     device_discovered = pyqtSignal(str, str)
 
+    def __init__(self, *args, **kwargs):
+        super(WiFiDiscoveryThread, self).__init__(*args, **kwargs)
+        self.is_running = True  # flag to control the running of the thread
+
     def run(self):
-        interface = "wlan0"  # The default interface for Raspberry Pi's WiFi
-        cmd = f"iwlist {interface} scan"
-        output = subprocess.check_output(cmd, shell=True).decode("utf-8")
-        lines = output.split("\n")
-        networks = []
+        while self.is_running:
+            interface = "wlan0"  # The default interface for Raspberry Pi's WiFi
+            cmd = f"iwlist {interface} scan"
+            output = subprocess.check_output(cmd, shell=True).decode("utf-8")
+            lines = output.split("\n")
+            networks = []
 
-        for line in lines:
-            line = line.strip()
-            if "ESSID" in line:
-                networks.append(line.split(":")[1].strip('"'))
-        devices = str(len(networks))
+            for line in lines:
+                line = line.strip()
+                if "ESSID" in line:
+                    networks.append(line.split(":")[1].strip('"'))
 
-        for network in networks:
-            ssid = network
-            self.device_discovered.emit(ssid, devices)
+            devices = str(len(networks))
+            for network in networks:
+                ssid = network
+                self.device_discovered.emit(ssid, devices)
+
+    def stop(self):
+        self.is_running = False
 
 
 class BluetoothDiscoveryThread(QThread):
