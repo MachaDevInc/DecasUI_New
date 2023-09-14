@@ -456,6 +456,7 @@ class connectionWindow(QMainWindow):
         elif self.r4.isChecked():
             print("selected = 'RS232'")
             self.edit_config_xml("false", "/dev/ttyS1")
+########################need to change###############################
 
     def read_config_xml(self):
 
