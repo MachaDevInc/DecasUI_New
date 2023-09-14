@@ -935,6 +935,20 @@ class WifiWindow(QMainWindow):
     def is_ascii(self, s):
         return all(ord(c) < 128 for c in s)
     
+    def on_timeout(self):
+        self.timeout_count += 1
+
+        if self.timeout_count == 1:
+            self.update_wifi_status("Connected to: " + self.new_network_ssid)
+            self.timer.stop()
+
+    def connect_wifi(self, new_network_ssid):
+        self.new_network_ssid = new_network_ssid  # Store the SSID for use in the timeout event
+        self.update_wifi_status("Connection Successful!!!")
+
+        self.timeout_count = 0  # Reset the counter
+        self.timer.start(3000)  # Start the timer with a 3-second interval
+    
     def connect_wifi(self, new_network_ssid, new_network_password):
         self.update_wifi_status("Connecting to: " + new_network_ssid)
         # Save the current network configuration
@@ -1047,9 +1061,9 @@ class WifiWindow(QMainWindow):
             if error is not None:
                 print(f"Error: {error}")
         else:
-            self.update_wifi_status("Connection Succesful!!!")
-            time.sleep(3)
-            self.update_wifi_status("Connected to: " + new_network_ssid)
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.on_timeout)
+            self.timeout_count = 0
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
