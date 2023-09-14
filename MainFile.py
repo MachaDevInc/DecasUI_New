@@ -2168,49 +2168,49 @@ class PrintRetrievalCode(QMainWindow):
         self.timer.start(5000)
 
     def thermal_print(self):
-        # p = Serial(
-        #     devfile="/dev/ttySC1",
-        #     baudrate=9600,
-        #     bytesize=8,
-        #     parity="N",
-        #     stopbits=1,
-        #     timeout=1.00,
-        #     dsrdtr=True,
-        # )
-        # p.set(
-        #     align="center",
-        #     font="b",
-        #     width=1,
-        #     height=1,
-        #     density=2,
-        #     invert=0,
-        #     smooth=True,
-        #     flip=False,
-        # )
-        # # Printing the image
-        # # here location can be your image path in “ ”
-        # p.image("/home/decas/Logo.png", impl="bitImageColumn")
+        p = Serial(
+            devfile="/dev/ttySC1",
+            baudrate=9600,
+            bytesize=8,
+            parity="N",
+            stopbits=1,
+            timeout=1.00,
+            dsrdtr=True,
+        )
+        p.set(
+            align="center",
+            font="b",
+            width=1,
+            height=1,
+            density=2,
+            invert=0,
+            smooth=True,
+            flip=False,
+        )
+        # Printing the image
+        # here location can be your image path in “ ”
+        p.image("/home/decas/ui/DecasUI_New/pics/Logo.png", impl="bitImageColumn")
 
-        # p.set(
-        #     align="center",
-        #     font="a",
-        #     width=2,
-        #     height=2,
-        #     density=2,
-        #     invert=0,
-        #     smooth=False,
-        #     flip=False,
-        # )
-        # p.text(str("TOKEN: " + str(self.code) + "\n"))
+        p.set(
+            align="center",
+            font="a",
+            width=2,
+            height=2,
+            density=2,
+            invert=0,
+            smooth=False,
+            flip=False,
+        )
+        p.text(str("TOKEN: " + str(self.code) + "\n"))
 
-        # # printing the initial data
-        # p.set(
-        #     align="left",
-        # )
-        # p.text("\n")
-        # p.text(
-        #     """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
-        # )
+        # printing the initial data
+        p.set(
+            align="left",
+        )
+        p.text("\n")
+        p.text(
+            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
+        )
         print("done")
 
     def go_home(self):
