@@ -829,7 +829,6 @@ class WifiWindow(QMainWindow):
         self.network_password = ""
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
-        self.refresh_wifi_scan()
         self.confirm.clicked.connect(self.done)
         self.back.clicked.connect(self.go_back)
 
