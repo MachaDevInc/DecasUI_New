@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap, QFont, QPainter, QColor
 import sys
 import serial
 import time
+import subprocess
 
 # Subclass QProgressBar to control text rendering
 class CustomProgressBar(QProgressBar):
@@ -96,6 +97,14 @@ def Setup_barcode():
         print(f"Error: {e}")
 
 Setup_barcode()
+
+def Clean_Output_Folder():
+    try:
+        subprocess.run(["sudo", "rm", "-r", "/home/decas/output/*"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+
+Clean_Output_Folder()
 
 # Main window setup
 window = QMainWindow()
