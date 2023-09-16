@@ -15,7 +15,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.uic import loadUi
 import time
 from PyQt5.QtCore import QTimer, QTime, QDate
-import subprocess
 
 from Ui_Work import JobsMainWindow
 from Ui_Work import CustomWidget
