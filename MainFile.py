@@ -1355,17 +1355,24 @@ class ScanThread(QThread):
 
         while self._isScanning:
             try:
-                data = self.ser.readline().decode("utf-8").strip()
-                print("\nSerial Data: " + data + "\n")
-                if data != "31":
-                    data = self.ser.readline().decode("utf-8").strip()
+                data_bytes = self.ser.readline()
+                data_hex = data_bytes.hex()
+                print("Data in Hex:", data_hex)
+
+                if data_hex.endswith("3331"):  # checks if the hex string ends with "31" (hex '3331')
+                    print("Skipped 31")  # For debugging
+                    continue
+
+                data = data_bytes.decode("utf-8").strip()
+                print("\nSerial Data: '{}' Type: {} Length: {}".format(data, type(data), len(data)))
+
+                if data:  # Check if data is not empty
+                    print(f"Received data: {data}")
                     print("\nSerial Data: " + data + "\n")
-                    if data and "31" not in data:
-                        print("\nSerial Data: " + data + "\n")
-                        self.blink_and_sleep(self.qr_blinker)
-                        self.foundUserID.emit(data)
-                        self.scanned = True
-                        self.ser.write(self.stop_scan_command_bytes)
+                    self.blink_and_sleep(self.qr_blinker)
+                    self.foundUserID.emit(data)
+                    self.scanned = True
+                    self.ser.write(self.stop_scan_command_bytes)
 
                 uid = self.pn532.read_passive_target(timeout=0.1)
                 if uid is not None:
