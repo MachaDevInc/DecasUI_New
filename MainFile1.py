@@ -55,7 +55,7 @@ except ModuleNotFoundError:
     bluetooth = Mock()
 from ntplib import NTPClient
 
-import xml.etree.ElementTree as ETb
+import xml.etree.ElementTree as ET
 
 # proc1 = subprocess.Popen(["python", "/home/decas/ui/DecasUI_New/progress bar.py"])
 # time.sleep(1)
@@ -369,6 +369,8 @@ class ReadyWindow(QMainWindow):
 
     def update_system_time(self):
         current_time = shared_data.time
+        print(current_time)
+        print(shared_data.date)
         self.time.setPlainText(f" {current_time}")
         self.date.setPlainText(f" {shared_data.date}")
 
