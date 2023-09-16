@@ -267,9 +267,11 @@ class SharedData(QObject):
         i2c = board.I2C()
         self.rtc = adafruit_ds3231.DS3231(i2c)
 
+        # Initialize attributes
         self._time = ""
         self._date = ""
 
+        # Initialize timer to update the date and time
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time_from_rtc)
         self.timer.start(1000)
@@ -282,8 +284,7 @@ class SharedData(QObject):
     def time(self, value):
         self._time = value
         self.time_updated.emit(value)
-        self.set_rtc_time(value)
-
+        
     @property
     def date(self):
         return self._date
@@ -292,29 +293,24 @@ class SharedData(QObject):
     def date(self, value):
         self._date = value
         self.date_updated.emit(value)
-        self.set_rtc_date(value)
 
-    def set_rtc_time(self, time_str):
-        t = time.strptime(f"{self.date} {time_str}", "%d-%m-%Y %H:%M:%S")
-        self.rtc.datetime = t
-
-    def set_rtc_date(self, date_str):
-        t = time.strptime(f"{date_str} {self.time}", "%d-%m-%Y %H:%M:%S")
+    def set_rtc_datetime(self, date_str, time_str):
+        t = time.strptime(f"{date_str} {time_str}", "%d-%m-%Y %H:%M:%S")
         self.rtc.datetime = t
 
     def read_rtc_time(self):
         t = self.rtc.datetime
         date_str = "{:02d}-{:02d}-{:04d}".format(t.tm_mday, t.tm_mon, t.tm_year)
         time_str = "{:02d}:{:02d}:{:02d}".format(t.tm_hour, t.tm_min, t.tm_sec)
+
         return date_str, time_str
 
     def update_system_time_from_rtc(self):
         date_str, time_str = self.read_rtc_time()
-        self.date = date_str
-        self.time = time_str
-
-
-shared_data = SharedData()
+        self._date = date_str  # Update the internal attribute
+        self._time = time_str  # Update the internal attribute
+        self.date_updated.emit(date_str)
+        self.time_updated.emit(time_str)
 
 
 import subprocess
@@ -338,9 +334,10 @@ class MonoDecasProcessManager:
 
 
 class ReadyWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, shared_data):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
+        self.shared_data = shared_data
         # Create an instance of ProcessManager
         self.process_manager = process_manager
 
@@ -368,11 +365,9 @@ class ReadyWindow(QMainWindow):
         self.timer1.start(1000)
 
     def update_system_time(self):
-        current_time = shared_data.time
-        print(current_time)
-        print(shared_data.date)
+        current_time = self.shared_data.time
         self.time.setPlainText(f" {current_time}")
-        self.date.setPlainText(f" {shared_data.date}")
+        self.date.setPlainText(f" {self.shared_data.date}")
 
     def open_settings_window1(self):
         file_path = self.directory_checker.path_data
@@ -2300,6 +2295,7 @@ class SerialManager:
 class MyApp(QApplication):
     def __init__(self, app):
         super().__init__(sys.argv)
+        self.shared_data = SharedData()
         self.process_manager = MonoDecasProcessManager()
         self.serial_manager = SerialManager()
 
@@ -2314,7 +2310,7 @@ class MyApp(QApplication):
         try:
             self.stacked_widget = QStackedWidget()
             self.process_manager.start_process()
-            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.shared_data)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
             
