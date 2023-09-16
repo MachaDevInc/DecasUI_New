@@ -1,129 +1,222 @@
-from PyQt5.QtCore import QObject, pyqtSignal, QThread, QMetaObject, Q_ARG, Qt, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, QThread, QEventLoop, QDateTime, QMetaObject, Q_ARG, Qt, pyqtSlot
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap
 import sys
 import os
 import subprocess
 import tkinter as tk
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QPushButton,
+    QStackedWidget,
+    QLabel,
+)
 from PyQt5.uic import loadUi
 import time
 from PyQt5.QtCore import QTimer, QTime, QDate
-import subprocess
 
 from Ui_Work import JobsMainWindow
 from Ui_Work import CustomWidget
 from w3 import Ui_MainWindow3
 
+from unittest.mock import Mock, patch
+
+# Mock the board and busio modules if they're not available
+# try:
 import board
 import busio
 import serial
 from adafruit_pn532.i2c import PN532_I2C
 from escpos.printer import Serial
+# except (ModuleNotFoundError, NotImplementedError):
+#     board = Mock()
+#     busio = Mock()
+#     serial = Mock()
+#     PN532_I2C = Mock()
 
 import re
 import json
 import requests
 from datetime import datetime
+from dateutil.parser import parse
 
 import sys
-import pytesseract
 import pdfplumber
-from pdf2image import convert_from_path
 
 import uuid
 import socket
 
-import bluetooth
+# Mock the bluetooth module if it's not available
+try:
+    import bluetooth
+except ModuleNotFoundError:
+    bluetooth = Mock()
+from ntplib import NTPClient
 
-proc1 = subprocess.Popen(["python", "progress bar.py"])
-time.sleep(1)
-proc1.terminate()
+import xml.etree.ElementTree as ETb
+
+# proc1 = subprocess.Popen(["python", "/home/decas/ui/DecasUI_New/progress bar.py"])
+# time.sleep(1)
+# proc1.terminate()
 
 
 class VirtualKeyboard(tk.Tk):
-
     def __init__(self, on_enter_callback):
         super().__init__()
 
+        self.overrideredirect(True)
+
         self.title("Virtual Keyboard")
-        self.configure(bg='skyblue')
+        self.configure(bg="#92EAD1")
 
         self.input_var = tk.StringVar()
         self.input_label = tk.Entry(
-            self, textvariable=self.input_var, width=60, font=('Helvetica', '20'))
+            self, textvariable=self.input_var, width=64, font=("Helvetica", "20")
+        )
         self.input_label.pack(padx=5, pady=5)
 
         self.keys = [
-            ['`', '1', '2', '3', '4', '5', '6', '7',
-                '8', '9', '0', '-', '=', 'Backspace'],
-            ['Tab', 'q', 'w', 'e', 'r', 't', 'y',
-                'u', 'i', 'o', 'p', '[', ']', '\\'],
-            ['Caps Lock', 'a', 's', 'd', 'f', 'g', 'h',
-                'j', 'k', 'l', ';', '\'', 'Enter'],
-            ['Shift', 'z', 'x', 'c', 'v', 'b', 'n',
-                'm', ',', ':', '.', '/', 'Shift'],
-            ['Ctrl', 'Alt', ' ', 'Alt', 'Ctrl']
+            [
+                "`",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "0",
+                "-",
+                "=",
+                "Backspace",
+            ],
+            ["Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
+            [
+                "Caps Lock",
+                "a",
+                "s",
+                "d",
+                "f",
+                "g",
+                "h",
+                "j",
+                "k",
+                "l",
+                ";",
+                "'",
+                "Enter",
+            ],
+            ["Shift", "z", "x", "c", "v", "b", "n", "m", ",", ":", ".", "/", "Shift"],
+            ["Ctrl", "Alt", " ", "Alt", "Ctrl"],
         ]
 
         self.shift_mappings = {
-            '`': '~', '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*', '9': '(', '0': ')',
-            '-': '_', '=': '+', '[': '{', ']': '}', '\\': '|', ';': ':', '\'': '"', ',': '<', '.': '>', '/': '?'
+            "`": "~",
+            "1": "!",
+            "2": "@",
+            "3": "#",
+            "4": "$",
+            "5": "%",
+            "6": "^",
+            "7": "&",
+            "8": "*",
+            "9": "(",
+            "0": ")",
+            "-": "_",
+            "=": "+",
+            "[": "{",
+            "]": "}",
+            "\\": "|",
+            ";": ":",
+            "'": '"',
+            ",": "<",
+            ".": ">",
+            "/": "?",
         }
 
         self.caps_lock_on = False
         self.shift_on = False
         self.buttons = []  # to keep track of all the buttons
+        
+        self.on_enter_callback = on_enter_callback
+
         self.create_keyboard()
 
-        self.on_enter_callback = on_enter_callback
+        # Calculate the screen width and height
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Calculate the keyboard window width and height
+        keyboard_width = self.winfo_reqwidth()
+        keyboard_height = self.winfo_reqheight()
+
+        # Calculate the x and y coordinates to center the keyboard window
+        x = (screen_width // 2) - keyboard_width
+        y = (screen_height // 2) - keyboard_height
+
+        # Set the keyboard window to fullscreen
+        # self.attributes("-fullscreen", True)
+        # Set the keyboard window position
+        self.geometry(f"+{20}+{y+50}")
 
     def create_keyboard(self):
         for row_index, row in enumerate(self.keys, start=1):
             # Set the background color same as the parent
-            frame = tk.Frame(self, bg='skyblue')
+            frame = tk.Frame(self, bg="#92EAD1")
             button_row = []
             for col_index, key in enumerate(row):
-                if key in ('Backspace', 'Tab'):
+                if key in ("Backspace", "Tab"):
                     width = 16
-                elif key in ('Enter', 'Shift', 'Caps Lock'):
+                elif key in ("Enter", "Shift", "Caps Lock"):
                     width = 14
-                elif key in (' ',):
+                elif key in (" ",):
                     width = 80
                 else:
-                    width = 3
+                    width = 2
 
-                button = tk.Button(frame, text=key, width=width,
-                                   height=2, command=lambda k=key: self.press_key(k))
-                button.grid(row=0, column=col_index, padx=1,
-                            pady=1)  # Use grid instead of pack
+                button = tk.Button(
+                    frame,
+                    text=key,
+                    width=width,
+                    height=2,
+                    bg="black",  # background color
+                    fg="white",   # text color
+                    font=("Helvetica", 12, "bold"),  # Set the font size and style here
+                    command=lambda k=key: self.press_key(k),
+                )
+                button.grid(
+                    row=0, column=col_index, padx=1, pady=1
+                )  # Use grid instead of pack
                 button_row.append(button)
 
                 # Distribute extra space evenly among columns
                 frame.columnconfigure(col_index, weight=1)
 
             # fill both directions and expand within available space
-            frame.pack(side='top', fill='both', padx=1, pady=1, expand=True)
+            frame.pack(side="top", fill="both", padx=1, pady=1, expand=True)
             self.buttons.append(button_row)
         self.buttons.append(button_row)
 
     def press_key(self, key):
-        if key == 'Backspace':
+        if key == "Backspace":
             self.input_var.set(self.input_var.get()[:-1])
-        elif key == 'Enter':
+        elif key == "Enter":
             entered_text = self.input_var.get()
             print(f"Input: {entered_text}")
-            self.input_var.set('')
+            self.input_var.set("")
             self.destroy()
             self.on_enter_callback(entered_text)
-        elif key == 'Caps Lock':
+        elif key == "Caps Lock":
             self.caps_lock_on = not self.caps_lock_on
             self.update_keys()
-        elif key == 'Shift':
+        elif key == "Shift":
             self.shift_on = not self.shift_on
             self.update_keys()
             return
-        elif key not in ('Ctrl', 'Alt', 'Tab'):
+        elif key not in ("Ctrl", "Alt", "Tab"):
             if self.shift_on:
                 key = self.shift_mappings.get(key, key.upper())
                 self.shift_on = False
@@ -133,33 +226,52 @@ class VirtualKeyboard(tk.Tk):
             self.update_keys()
 
     def update_keys(self):
+        non_alpha_keys = ["Enter", "Backspace", "Ctrl", "Alt", "Shift", "Caps Lock", "Tab"]
         for row_keys, row_buttons in zip(self.keys, self.buttons):
             for key, button in zip(row_keys, row_buttons):
-                if key.isalpha():
+                if key.isalpha() and key not in non_alpha_keys:
                     if self.caps_lock_on or self.shift_on:
                         button.config(text=key.upper())
                     else:
                         button.config(text=key.lower())
+
     pass
 
 
-class SharedData(QObject):
+class TimerThread(QThread):
+    signal_time_to_update = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        self._date = None
-        self._time = None
-        self._date = QDate.currentDate().toString("yyyy-MM-dd")
-        self._time = QTime.currentTime().toString()
+        self.timer = None
 
-    @property
-    def date(self):
-        return self._date
+    def run(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.signal_time_to_update)
+        self.timer.start(1000)
 
-    @date.setter
-    def date(self, value):
-        self._date = value
-        self.date_updated.emit(value)
+        # Event loop needed for QThread.
+        loop = QEventLoop()
+        loop.exec_()
+
+
+class SharedData(QObject):
+    date_updated = pyqtSignal(str)
+    time_updated = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+
+        # Initialize RTC
+        i2c = board.I2C()
+        self.rtc = adafruit_ds3231.DS3231(i2c)
+
+        self._time = ""
+        self._date = ""
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_system_time_from_rtc)
+        self.timer.start(1000)
 
     @property
     def time(self):
@@ -169,28 +281,69 @@ class SharedData(QObject):
     def time(self, value):
         self._time = value
         self.time_updated.emit(value)
+        self.set_rtc_time(value)
 
-    def set_system_time(self, date, time):
-        self.date = date.toString()
-        self.time = time.toString()
+    @property
+    def date(self):
+        return self._date
 
-    def update_time(self):
-        current_time = QTime.fromString(self.time)
-        current_time = current_time.addSecs(1)
-        self.time = current_time.toString()
+    @date.setter
+    def date(self, value):
+        self._date = value
+        self.date_updated.emit(value)
+        self.set_rtc_date(value)
 
+    def set_rtc_time(self, time_str):
+        t = time.strptime(f"{self.date} {time_str}", "%d-%m-%Y %H:%M:%S")
+        self.rtc.datetime = t
 
-def update_shared_data_time():
-    shared_data.update_time()
+    def set_rtc_date(self, date_str):
+        t = time.strptime(f"{date_str} {self.time}", "%d-%m-%Y %H:%M:%S")
+        self.rtc.datetime = t
+
+    def read_rtc_time(self):
+        t = self.rtc.datetime
+        date_str = "{:02d}-{:02d}-{:04d}".format(t.tm_mday, t.tm_mon, t.tm_year)
+        time_str = "{:02d}:{:02d}:{:02d}".format(t.tm_hour, t.tm_min, t.tm_sec)
+        return date_str, time_str
+
+    def update_system_time_from_rtc(self):
+        date_str, time_str = self.read_rtc_time()
+        self.date = date_str
+        self.time = time_str
 
 
 shared_data = SharedData()
 
 
-class SettingWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+import subprocess
+
+class MonoDecasProcessManager:
+    def __init__(self):
+        self.process = None
+        
+    def start_process(self):
+        if self.process is None or self.process.poll() is not None:
+            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe", "-c"])
+        
+    def terminate_process(self):
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+            self.process.wait()
+        
+    def restart_process(self):
+        self.terminate_process()
+        self.start_process()
+
+
+class ReadyWindow(QMainWindow):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi('Ready.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
+
+        self.SettingsWindow1_window = None
 
         # Set the window size
         self.resize(1024, 600)
@@ -202,71 +355,226 @@ class SettingWindow(QMainWindow):
 
         self.directory_checker = DirectoryChecker()
         self.directory_checker.open_settings_window1_signal.connect(
-            self.open_settings_window1)
+            self.open_settings_window1
+        )
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.directory_checker.check_directory)
         self.timer.start(500)
 
+        self.timer1 = QTimer(self)
+        self.timer1.timeout.connect(self.update_system_time)
+        self.timer1.start(1000)
+
+    def update_system_time(self):
+        current_time = shared_data.time
+        self.time.setPlainText(f" {current_time}")
+        self.date.setPlainText(f" {shared_data.date}")
+
     def open_settings_window1(self):
         file_path = self.directory_checker.path_data
-        self.SettingsWindow1_window = SettingsWindow1(
-            self.stacked_widget, file_path)
-        self.stacked_widget.addWidget(self.SettingsWindow1_window)
-        self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
-        self.timer.stop()
-        self.hide()
+        try:
+            self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path, self.process_manager)
+            self.stacked_widget.addWidget(self.SettingsWindow1_window)
+            self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
+            self.timer.stop()
+            self.hide()
+        except (OSError, ValueError) as e:
+            print(f"Error: {e}")
+            self.process_manager.terminate_process()
+            time.sleep(1)
+            raise e
 
     def open_next(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
     def open_connection(self):
-        self.connection_window = connectionWindow(self.stacked_widget)
+        self.connection_window = connectionWindow(self.stacked_widget, self.process_manager)
         self.connection_window.showFullScreen()
         self.hide()
 
     def open_work(self):
-        self.work_window = workWindow(self.stacked_widget)
+        self.work_window = workWindow(self.stacked_widget, self.process_manager)
         self.work_window.showFullScreen()
         self.hide()
 
     def open_virtual_keyboard(self, text_edit):
         virtual_keyboard = VirtualKeyboard(
-            lambda entered_text: self.update_text_edit(text_edit, entered_text))
+            lambda entered_text: self.update_text_edit(text_edit, entered_text)
+        )
         virtual_keyboard.mainloop()
 
 
 class connectionWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
-        loadUi('connection.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/connection.ui", self)
+        self._translate = QtCore.QCoreApplication.translate
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
         self.back.clicked.connect(self.go_back)
+        # Connect radio buttons to a function
+        self.r1.clicked.connect(self.on_selected)
+        self.r2.clicked.connect(self.on_selected)
+        self.r3.clicked.connect(self.on_selected)
+        self.r4.clicked.connect(self.on_selected)
+
+        self.read_config_xml()
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_system_time)
+        self.timer.start(1000)
+
+    def update_system_time(self):
+        current_time = shared_data.time
+        self.time.setPlainText(f" {current_time}")
+        self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
+    def on_selected(self):
+        self.process_manager.terminate_process()
+        if self.r1.isChecked():
+            print("selected = 'WiFi'")
+            self.edit_config_xml("true", "(none)")
+        elif self.r2.isChecked():
+            print("selected = 'Bluetooth'")
+            self.edit_config_xml("false", "/dev/rfcomm0")
+        elif self.r3.isChecked():
+            print("selected = 'USB'")
+            self.edit_config_xml("false", "/dev/ttyS0")
+        elif self.r4.isChecked():
+            print("selected = 'RS232'")
+            self.edit_config_xml("false", "/dev/ttyS1")
+########################need to change###############################
+
+    def read_config_xml(self):
+
+        # Load and parse the XML file
+        tree = ET.parse('/home/decas/config.xml')
+        root = tree.getroot()
+
+        # Find the ListenTCP element
+        listen_tcp = root.find('ListenTCP')
+
+        # Find the ComPort element
+        com_port = root.find('ComPort')
+
+        print(listen_tcp.text)
+        print(com_port.text)
+
+        if listen_tcp.text == "true" and com_port.text == "(none)":
+            self.r1.setChecked(True)
+            self.wifi.setText(
+            self._translate(
+                "MainWindow",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + self.get_current_network().decode("utf-8").strip()
+                + "</span></p></body></html>",
+            )
+        )
+        elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
+            self.r2.setChecked(True)
+        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS0":
+            self.r3.setChecked(True)
+        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
+            self.r4.setChecked(True)
+    
+    def get_current_network(self):
+        cmd = ["iwgetid", "-r"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+
+        if error is not None:
+            print(f"Error: {error}")
+            return None
+
+        return output.strip()
+    
+    def edit_config_xml(self, tcp, port):
+        self.tcp = tcp
+        self.port = port
+
+        # Load and parse the XML file
+        tree = ET.parse('/home/decas/config.xml')
+        root = tree.getroot()
+
+        # Find and modify the ListenTCP element
+        listen_tcp = root.find('ListenTCP')
+        if listen_tcp is not None:
+            listen_tcp.text = self.tcp
+
+        # Find and modify the ComPort element
+        com_port = root.find('ComPort')
+        if com_port is not None:
+            com_port.text = self.port
+
+        # Convert the tree to a string
+        xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
+
+        # Manually add the XML declaration and namespaces
+        final_xml = '<?xml version="1.0"?>\n<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' + xml_str.split('<Settings>', 1)[1]
+
+        # Write the final XML string to a file
+        with open('/home/decas/config.xml', 'w') as f:
+            f.write(final_xml)
+        
+        self.process_manager.start_process()
+
 
 class workWindow(JobsMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
+        self.search_keyword = ""
+        self._translate = QtCore.QCoreApplication.translate
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
 
         self.show_jobs()
+        self.search.clicked.connect(self.show_jobs)
         self.back.clicked.connect(self.go_back)
+        
+        self.search1.clicked.connect(
+            lambda: self.open_virtual_keyboard(self.textEdit1)
+        )
+
+    def update_text_edit(self, text_edit1, entered_text):
+        self.search_keyword = entered_text
+        text_edit1.setHtml(
+            self._translate(
+                "self",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:16pt; font-weight:600;">' + self.search_keyword + '</span></p></body></html>',
+            )
+        )
+
+    def open_virtual_keyboard(self, text_edit):
+        virtual_keyboard = VirtualKeyboard(
+            lambda entered_text: self.update_text_edit(text_edit, entered_text)
+            
+        )
+        virtual_keyboard.mainloop()
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -277,7 +585,7 @@ class workWindow(JobsMainWindow):
 
         try:
             # Read the file
-            with open('my_jobs.json', 'r') as f:
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
@@ -285,19 +593,33 @@ class workWindow(JobsMainWindow):
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
-            print("File 'my_jobs.json' not found.")
+            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
         if jobs:
             for key, value in jobs.items():
+                print(value["job_title"])
+                print("\n\n")
+                print(value)
+                print("\n\n")
                 # Replace this with your actual data
-                data = value["job_title"]
-                if value["data_sent"] is True:
-                    widget = CustomWidget(
-                        key, data, self.central_widget, False, self)
+                if self.search_keyword == "":
+                    if value["data_sent"] is True:
+                        widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
+                    else:
+                        widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
+                    self.scroll_layout.addWidget(widget)
                 else:
-                    widget = CustomWidget(
-                        key, data, self.central_widget, True, self)
-                self.scroll_layout.addWidget(widget)
+                    if (self.search_keyword in value["job_title"]["invoice"]) or (self.search_keyword in value["job_title"]["user_id"]) or (self.search_keyword in value["job_title"]["date_time"]) or (self.search_keyword in value["job_title"]["status"]):
+                        if value["data_sent"] is True:
+                            widget = CustomWidget(key, value["job_title"], self.central_widget, False, self)
+                        else:
+                            widget = CustomWidget(key, value["job_title"], self.central_widget, True, self)
+                        self.scroll_layout.addWidget(widget)
+                
+                # self.job_title["invoice"] = info["Invoice Number"]
+                # self.job_title["user_id"] = self.userID
+                # self.job_title["date_time"] = info["Date"]
+                # self.job_title["status"] = status
 
     def clear_layout(self, layout):
         while layout.count():
@@ -307,105 +629,165 @@ class workWindow(JobsMainWindow):
 
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
-        self.processingThread = ProcessingThread(
-            "", "", True, text)
-        self.processingThread.finished_signal.connect(
-            self.onProcessingFinished)
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread("", "", date_time, True, text)
+        self.processingThread.finished_signal.connect(self.onProcessingFinished)
+        self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
 
-    def onProcessingFinished(self, retrieval_code, data_sent):
+    def onProgress(self, notification):
+        _translate = QtCore.QCoreApplication.translate
+        self.notification.setText(
+            _translate(
+                "stacked_widget",
+                '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                + notification
+                + "</span></p></body></html>",
+            )
+        )
+
+    def onProcessingFinished(self, retrieval_code, data_sent, error):
         self.code = retrieval_code
         self.data_sent = data_sent
-        if self.data_sent:
-            pass
-        print("Processing finished!")
-        print(retrieval_code)
 
         # Refresh the screen by showing the jobs again
         self.show_jobs()
 
 
-class USBWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+class SettingsWindow(QMainWindow):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi('inset.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/setting.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
         self.stacked_widget = stacked_widget
-        self.wifi_window = WifiWindow(self.stacked_widget)
+        self.wifi_window = WifiWindow(self.stacked_widget, self.process_manager)
         self.back.clicked.connect(self.go_back)
-        self.usb.clicked.connect(self.open_usb)
+        # self.usb.clicked.connect(self.open_usb)
         self.bluetooth.clicked.connect(self.open_bluetooth)
         self.wifi.clicked.connect(self.open_wifi)
         self.about.clicked.connect(self.open_about)
-        self.rs.clicked.connect(self.open_rs)
+        # self.rs.clicked.connect(self.open_rs)
+
+        self.shared_data = shared_data
+        self.dateEdit.setDate(QDate(2023, 1, 1))
+        self.timeEdit.setTime(QTime(00, 00, 00))
+        # Connect signals to slots
+        self.dateEdit.dateChanged.connect(self.update_date)
+        self.timeEdit.timeChanged.connect(self.update_time)
+
+        self.checkBox.stateChanged.connect(self.enable_edit_date_time)
+
+    def enable_edit_date_time(self, state):
+        if state == 2:
+            self.dateEdit.setEnabled(False)
+            self.timeEdit.setEnabled(False)
+
+            self.update_shared_data(shared_data)
+
+        elif state == 0:
+
+            self.dateEdit.setEnabled(True)
+            self.timeEdit.setEnabled(True)
+
+    def update_shared_data(self, shared_data):
+        ntp_time = self.get_ntp_time()
+        ntp_datetime = datetime.fromtimestamp(ntp_time)
+        ntp_date = QDate(ntp_datetime.year, ntp_datetime.month, ntp_datetime.day)
+        ntp_time = QTime(ntp_datetime.hour, ntp_datetime.minute, ntp_datetime.second)
+        shared_data.set_system_time(ntp_date, ntp_time)
+
+    def get_ntp_time(self, host="pool.ntp.org"):
+        client = NTPClient()
+        response = client.request(host)
+        return response.tx_time
+
+    def update_date(self, date):
+        self.shared_data.date = date.toString("dd-MM-yyyy")
+
+    def update_time(self, time):
+        self.shared_data.time = time.toString("hh:mm:ss")
+
+    def go_back(self):
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.setting_window.showFullScreen()
+        self.hide()
+
+    def open_wifi(self):
+        # Pass 'self.stacked_widget' as an argument when creating a new WifiWindow instance
+        self.usb_window = WifiWindow(self.stacked_widget, self.process_manager)
+        self.usb_window.showFullScreen()
+        self.hide()
+
+    def open_about(self):
+        self.about_window = aboutWindow(self.stacked_widget, self.process_manager)
+        self.about_window.showFullScreen()
+        self.hide()
+
+    # def open_rs(self):
+    #     self.rs_window = RSWindow(self.stacked_widget)
+    #     self.rs_window.showFullScreen()
+    #     self.hide()
+
+    # def open_usb(self):
+    #     self.usb_window = usbWindow(self.stacked_widget)
+    #     self.usb_window.showFullScreen()
+    #     self.hide()
+
+    def open_bluetooth(self):
+        self.usb_window = bluetoothWindow(self.stacked_widget, self.process_manager)
+        self.usb_window.showFullScreen()
+        self.hide()
+
+
+class aboutWindow(QMainWindow):
+    def __init__(self, stacked_widget, process_manager):
+        super().__init__()
+        self.stacked_widget = stacked_widget
+        self._translate = QtCore.QCoreApplication.translate
+        loadUi("/home/decas/ui/DecasUI_New/About.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
+
+        # Set the window size
+        self.resize(1024, 600)
+
+        self.mac.setText(
+            self._translate(
+                "MainWindow",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + self.get_mac_address()
+                + "</span></p></body></html>",
+            )
+        )
+        self.ip.setText(
+            self._translate(
+                "MainWindow",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + self.get_local_ip_address("8.8.8.8")
+                + "</span></p></body></html>",
+            )
+        )
+        self.back.clicked.connect(self.go_back)
+        # Google's DNS as target to get the local ip
+        print(self.get_local_ip_address("8.8.8.8"))
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
         self.timer.start(1000)
 
     def update_system_time(self):
         current_time = shared_data.time
-        self.timeEdit.setTime(QTime.fromString(current_time))
-        self.dateEdit.setDate(QDate.fromString(shared_data.date, "yyyy-MM-dd"))
-
-    # def open_wifi(self):
-    #     # Show the existing wifi_window instance
-    #     self.wifi_window.showFullScreen()
-    #     self.hide()
+        self.time.setPlainText(f" {current_time}")
+        self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
-        self.setting_window.showFullScreen()
-        self.hide()
-
-    def open_wifi(self):
-        # Pass 'self.stacked_widget' as an argument when creating a new WifiWindow instance
-        self.usb_window = WifiWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
-
-    def open_about(self):
-        self.about_window = aboutWindow(self.stacked_widget)
-        self.about_window.showFullScreen()
-        self.hide()
-
-    def open_rs(self):
-        self.rs_window = RSWindow(self.stacked_widget)
-        self.rs_window.showFullScreen()
-        self.hide()
-
-    def open_usb(self):
-        self.usb_window = usbWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
-
-    def open_bluetooth(self):
-        self.usb_window = bluetoothWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
-
-
-class aboutWindow(QMainWindow):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        self._translate = QtCore.QCoreApplication.translate
-        loadUi('About.ui', self)
-
-        # Set the window size
-        self.resize(1024, 600)
-
-        self.mac.setText(self._translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">" +
-                                         self.get_mac_address() + "</span></p></body></html>"))
-        self.ip.setText(self._translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">" +
-                                        self.get_local_ip_address('8.8.8.8') + "</span></p></body></html>"))
-        self.back.clicked.connect(self.go_back)
-        # Google's DNS as target to get the local ip
-        print(self.get_local_ip_address('8.8.8.8'))
-
-    def go_back(self):
-        self.setting_window = SettingWindow(self.stacked_widget)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -413,16 +795,15 @@ class aboutWindow(QMainWindow):
         # mac_num = hex(uuid.getnode()).replace('0x', '').upper()
         # mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
         # return mac
-        
-        with open('/proc/cpuinfo', 'r') as f:
+
+        with open("/proc/cpuinfo", "r") as f:
             for line in f:
-                if line[0:6] == 'Serial':
+                if line[0:6] == "Serial":
                     return line.split(":")[1].strip()
         return "Unknown"
 
-
     def get_local_ip_address(self, target):
-        ip_address = ''
+        ip_address = ""
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect((target, 1))
@@ -434,9 +815,12 @@ class aboutWindow(QMainWindow):
 
 
 class WifiWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
-        loadUi('wifiset.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/wifiset.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -449,16 +833,20 @@ class WifiWindow(QMainWindow):
         self.back.clicked.connect(self.go_back)
 
         self.password.clicked.connect(
-            lambda: self.open_virtual_keyboard(self.textEdit1))
+            lambda: self.open_virtual_keyboard(self.textEdit1)
+        )
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
         self.timer.start(1000)
 
-        self.status.setText(self._translate(
-            "wifisetting", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">Scanning...Please wait!</span></p></body></html>"))
+        self.status.setText(
+            self._translate(
+                "wifisetting",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
+            )
+        )
         self.discovery_thread = WiFiDiscoveryThread(self)
-        self.discovery_thread.device_discovered.connect(
-            self.add_wifi_item)
+        self.discovery_thread.device_discovered.connect(self.add_wifi_item)
         self.discovery_thread.start()
 
         self.network_ssid = self.ssid.itemText(0)
@@ -469,16 +857,34 @@ class WifiWindow(QMainWindow):
 
     def refresh_wifi_scan(self):
         self.ssid.clear()
-        self.status.setText(self._translate(
-            "wifisetting", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">Scanning...Please wait!</span></p></body></html>"))
+        self.update_wifi_status("Scanning...Please wait!")
+        # self.status.setText(
+        #     self._translate(
+        #         "wifisetting",
+        #         '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
+        #     )
+        # )
         self.discovery_thread = WiFiDiscoveryThread(self)
-        self.discovery_thread.device_discovered.connect(
-            self.add_wifi_item)
+        self.discovery_thread.device_discovered.connect(self.add_wifi_item)
         self.discovery_thread.start()
+    
+    def update_wifi_status(self, update):
+        self.status.setText(
+            self._translate(
+                "wifisetting",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">' + update + '</span></p></body></html>',
+            )
+        )
 
     def add_wifi_item(self, name, devices):
-        self.status.setText(self._translate(
-            "wifisetting", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">" + devices + " network(s) found</span></p></body></html>"))
+        self.status.setText(
+            self._translate(
+                "wifisetting",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + devices
+                + " network(s) found</span></p></body></html>",
+            )
+        )
         self.ssid.addItem(name)
 
     def on_combobox_activated(self, text):
@@ -494,7 +900,7 @@ class WifiWindow(QMainWindow):
         self.network_password = str(self.textEdit1.toPlainText())
         print(self.network_password)
 
-        if (self.network_ssid != "" and self.network_password != ""):
+        if self.network_ssid != "" and self.network_password != "":
             self.connect_wifi(self.network_ssid, self.network_password)
 
     def get_current_network(self):
@@ -509,56 +915,130 @@ class WifiWindow(QMainWindow):
         return output.strip()
 
     def get_ssid_psk(self, config):
-        ssid_pattern = 'ssid="(.+?)"'
-        psk_pattern = 'psk="(.+?)"'
+        ssid_pattern = r'ssid="(.+?)"'
+        psk_pattern = r'psk=([^\s]+)'
 
         ssid = re.search(ssid_pattern, config)
         psk = re.search(psk_pattern, config)
+
+        print("Searched from wpa_supplicant SSID: ")
+        print(ssid)
+        print("\nSearched from wpa_supplicant PSK ")
+        print(psk)
+        print("\n")
 
         if ssid and psk:
             return ssid.group(1), psk.group(1)
         else:
             return None, None
 
+    def is_ascii(self, s):
+        return all(ord(c) < 128 for c in s)
+    
+    def on_timeout(self):
+        self.timeout_count += 1
+
+        if self.timeout_count == 1:
+            self.update_wifi_status("Connected to: " + self.new_network_ssid)
+            self.timer.stop()
+
+    def connect_wifi(self, new_network_ssid):
+        self.new_network_ssid = new_network_ssid  # Store the SSID for use in the timeout event
+        self.update_wifi_status("Connection Successful!!!")
+
+        self.timeout_count = 0  # Reset the counter
+        self.timer.start(3000)  # Start the timer with a 3-second interval
+    
     def connect_wifi(self, new_network_ssid, new_network_password):
+        self.update_wifi_status("Connecting to: " + new_network_ssid)
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
+            print("current_config: ")
+            print(current_config)
+            print("\n")
+
             current_ssid, current_psk = self.get_ssid_psk(current_config)
+            print("current_ssid: ")
+            print(current_ssid)
+            print("\n")
+            print("current_psk: ")
+            print(current_psk)
+            print("\n")
 
             new_config = current_config
+
+            # # Check if the current PSK is enclosed by quotes, and remove them for replacement
+            # if current_psk.startswith('"') and current_psk.endswith('"'):
+            #     current_psk = current_psk[1:-1]
+
             new_config = new_config.replace(current_ssid, new_network_ssid)
+            new_network_password = f'"{new_network_password}"'
             new_config = new_config.replace(current_psk, new_network_password)
+            
+            # # Check if new_network_password is ASCII
+            # if self.is_ascii(new_network_password):
+            #     new_network_password_quoted = f'"{new_network_password}"'
+            # else:
+            #     new_network_password_quoted = new_network_password
+            
+            print("new_network_ssid: ")
+            print(new_network_ssid)
+            print("\n")
+            print("new_network_password: ")
+            print(new_network_password)
+            print("\n")
+
+            # new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
+            print("new_config: ")
+            print(new_config)
+            print("\n")
 
         # Write the new network configuration to wpa_supplicant.conf
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "a") as wifi_config:
-            wifi_config.truncate(0)
+        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
+            # wifi_config.truncate(0)
             wifi_config.write(new_config)
             wifi_config.close()
 
         # Restart the wpa_supplicant service to connect to the new network
-        cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
+        # cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
+        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        # output, error = process.communicate()
 
-        if error is not None:
-            print(f"Error: {error}")
+        # if error is not None:
+        #     print(f"Error: {error}")
 
         cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+        cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         output, error = process.communicate()
+        print("\n ")
+        print(output)
 
         if error is not None:
             print(f"Error: {error}")
+
+        #wpa_cli reconfigure -i wlan0
+        
+        cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        print("\n ")
+        print(output)
+
+        if process.returncode != 0:
+            print(f"Error: {error.decode('utf-8')}")
 
         # Check if the connection was successful
         time.sleep(10)  # Wait for the connection to establish
 
-        new_ssid = self.get_current_network().decode('utf-8').strip()
+        new_ssid = self.get_current_network().decode("utf-8").strip()
 
         if new_network_ssid != new_ssid:
+            self.update_wifi_status("Connection failed!!!")
             print(
-                "Failed to connect to the new network. Reverting to the previous network configuration.")
+                "Failed to connect to the new network. Reverting to the previous network configuration."
+            )
 
             # Revert to the previous network configuration
             with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
@@ -580,9 +1060,13 @@ class WifiWindow(QMainWindow):
 
             if error is not None:
                 print(f"Error: {error}")
+        else:
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.on_timeout)
+            self.timeout_count = 0
 
     def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -591,95 +1075,120 @@ class WifiWindow(QMainWindow):
 
     def open_virtual_keyboard(self, text_edit):
         virtual_keyboard = VirtualKeyboard(
-            lambda entered_text: self.update_text_edit(text_edit, entered_text))
+            lambda entered_text: self.update_text_edit(text_edit, entered_text)
+        )
         virtual_keyboard.mainloop()
 
 
-class RSWindow(QMainWindow):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        loadUi('RSset.ui', self)
+# class RSWindow(QMainWindow):
+#     def __init__(self, stacked_widget):
+#         super().__init__()
+#         self.stacked_widget = stacked_widget
+#         loadUi("RSset.ui", self)
 
-        # Set the window size
-        self.resize(1024, 600)
+#         # Set the window size
+#         self.resize(1024, 600)
 
-        self.back.clicked.connect(self.go_back)
-        self.address.clicked.connect(
-            lambda: self.open_virtual_keyboard(self.textEdit))
-        self.baudrate.addItems(["9600", "19200", "38400", "115200"])
-        self.parity.addItems(["None", "Even", "Odd"])
-        # Connect the combo box's activated signal to a slot function
-        self.baudrate.activated[str].connect(self.on_combobox_activated)
+#         self.back.clicked.connect(self.go_back)
+#         self.address.clicked.connect(lambda: self.open_virtual_keyboard(self.textEdit))
+#         self.baudrate.addItems(["9600", "19200", "38400", "115200"])
+#         self.parity.addItems(["None", "Even", "Odd"])
+#         # Connect the combo box's activated signal to a slot function
+#         self.baudrate.activated[str].connect(self.on_combobox_activated)
 
-        self.parity.activated[str].connect(self.on_combobox_activated1)
+#         self.parity.activated[str].connect(self.on_combobox_activated1)
 
-    def on_combobox_activated(self, text):
-        print(f"Selected option: {text}")
+#         self.timer = QTimer(self)
+#         self.timer.timeout.connect(self.update_system_time)
+#         self.timer.start(1000)
 
-    def on_combobox_activated1(self, text):
-        print(f"Selected option: {text}")
+#     def update_system_time(self):
+#         current_time = shared_data.time
+#         self.time.setPlainText(f" {current_time}")
+#         self.date.setPlainText(f" {shared_data.date}")
 
-    def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
+#     def on_combobox_activated(self, text):
+#         print(f"Selected option: {text}")
 
-    def update_text_edit(self, text_edit, entered_text):
-        text_edit.setPlainText(entered_text)
+#     def on_combobox_activated1(self, text):
+#         print(f"Selected option: {text}")
 
-    def open_virtual_keyboard(self, text_edit):
-        virtual_keyboard = VirtualKeyboard(
-            lambda entered_text: self.update_text_edit(text_edit, entered_text))
-        virtual_keyboard.mainloop()
+#     def go_back(self):
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+#         self.usb_window.showFullScreen()
+#         self.hide()
+
+#     def update_text_edit(self, text_edit, entered_text):
+#         text_edit.setPlainText(entered_text)
+
+#     def open_virtual_keyboard(self, text_edit):
+#         virtual_keyboard = VirtualKeyboard(
+#             lambda entered_text: self.update_text_edit(text_edit, entered_text)
+#         )
+#         virtual_keyboard.mainloop()
 
 
-class usbWindow(QMainWindow):
-    def __init__(self, stacked_widget):
-        super().__init__()
-        self.stacked_widget = stacked_widget
-        loadUi('usbset.ui', self)
+# class usbWindow(QMainWindow):
+#     def __init__(self, stacked_widget):
+#         super().__init__()
+#         self.stacked_widget = stacked_widget
+#         loadUi("usbset.ui", self)
 
-        # Set the window size
-        self.resize(1024, 600)
+#         # Set the window size
+#         self.resize(1024, 600)
 
-        self.back.clicked.connect(self.go_back)
-        self.comport.addItems(["COM1", "COM2", "COM3", "COM4", "COM5", "COM6"])
+#         self.back.clicked.connect(self.go_back)
+#         self.comport.addItems(["COM1", "COM2", "COM3", "COM4", "COM5", "COM6"])
 
-        # Connect the combo box's activated signal to a slot function
-        self.comport.activated[str].connect(self.on_combobox_activated)
+#         # Connect the combo box's activated signal to a slot function
+#         self.comport.activated[str].connect(self.on_combobox_activated)
 
-    def on_combobox_activated(self, text):
-        print(f"Selected option: {text}")
+#         self.timer = QTimer(self)
+#         self.timer.timeout.connect(self.update_system_time)
+#         self.timer.start(1000)
 
-    def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
-        self.usb_window.showFullScreen()
-        self.hide()
+#     def update_system_time(self):
+#         current_time = shared_data.time
+#         self.time.setPlainText(f" {current_time}")
+#         self.date.setPlainText(f" {shared_data.date}")
 
-    def update_text_edit(self, entered_text):
-        self.textEdit.setPlainText(entered_text)
+#     def on_combobox_activated(self, text):
+#         print(f"Selected option: {text}")
 
-    def open_virtual_keyboard(self):
-        virtual_keyboard = VirtualKeyboard(self.update_text_edit)
-        virtual_keyboard.mainloop()
+#     def go_back(self):
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+#         self.usb_window.showFullScreen()
+#         self.hide()
+
+#     def update_text_edit(self, entered_text):
+#         self.textEdit.setPlainText(entered_text)
+
+#     def open_virtual_keyboard(self):
+#         virtual_keyboard = VirtualKeyboard(self.update_text_edit)
+#         virtual_keyboard.mainloop()
 
 
 class bluetoothWindow(QMainWindow):
-    def __init__(self, stacked_widget):
+    def __init__(self, stacked_widget, process_manager):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
-        loadUi('bluetooth.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/bluetooth.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
 
-        self.status.setText(self._translate(
-            "bluetooth", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">Scanning...Please wait!</span></p></body></html>"))
+        self.status.setText(
+            self._translate(
+                "bluetooth",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
+            )
+        )
         self.discovery_thread = BluetoothDiscoveryThread(self)
-        self.discovery_thread.device_discovered.connect(
-            self.add_bluetooth_item)
+        self.discovery_thread.device_discovered.connect(self.add_bluetooth_item)
         self.discovery_thread.start()
 
         self.refresh.clicked.connect(self.refresh_bluetooth_scan)
@@ -687,25 +1196,43 @@ class bluetoothWindow(QMainWindow):
         # Connect the combo box's activated signal to a slot function
         self.bluetooth1.activated[str].connect(self.on_combobox_activated)
 
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_system_time)
+        self.timer.start(1000)
+
+    def update_system_time(self):
+        current_time = shared_data.time
+        self.time.setPlainText(f" {current_time}")
+        self.date.setPlainText(f" {shared_data.date}")
+
     def refresh_bluetooth_scan(self):
         self.bluetooth1.clear()
-        self.status.setText(self._translate(
-            "bluetooth", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">Scanning...Please wait!</span></p></body></html>"))
+        self.status.setText(
+            self._translate(
+                "bluetooth",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
+            )
+        )
         self.discovery_thread = BluetoothDiscoveryThread(self)
-        self.discovery_thread.device_discovered.connect(
-            self.add_bluetooth_item)
+        self.discovery_thread.device_discovered.connect(self.add_bluetooth_item)
         self.discovery_thread.start()
 
     def add_bluetooth_item(self, name, devices):
-        self.status.setText(self._translate(
-            "bluetooth", "<html><head/><body><p align=\"center\"><span style=\" font-size:22pt; font-weight:600;\">" + devices + " devices found</span></p></body></html>"))
+        self.status.setText(
+            self._translate(
+                "bluetooth",
+                '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">'
+                + devices
+                + " devices found</span></p></body></html>",
+            )
+        )
         self.bluetooth1.addItem(name)
 
     def on_combobox_activated(self, text):
         print(f"Selected option: {text}")
 
     def go_back(self):
-        self.usb_window = USBWindow(self.stacked_widget)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -778,96 +1305,132 @@ class Blinker(QObject):
 class ScanThread(QThread):
     foundUserID = pyqtSignal(str)
 
-    def __init__(self, ser, pn532, start_stop_command_bytes, rfid_label, qr_label):
+    def __init__(
+        self,
+        ser,
+        pn532,
+        start_scan_command_bytes,
+        stop_scan_command_bytes,
+        rfid_label,
+        qr_label,
+    ):
         super().__init__()
         self.ser = ser
         self.pn532 = pn532
-        self.start_stop_command_bytes = start_stop_command_bytes
+        self.start_scan_command_bytes = start_scan_command_bytes
+        self.stop_scan_command_bytes = stop_scan_command_bytes
         self.rfid_blinker = Blinker(rfid_label)
         self.qr_blinker = Blinker(qr_label)
         self.scanned = False
-        self._isRunning = True
+        self._isScanning = True
+        self._isRunning = False
+
+        try:
+            if not self.ser.isOpen():
+                self.ser.open()
+        except Exception as e:
+            print(f"Failed to open serial port in __init__: {e}")
+
+    def blink_and_sleep(self, blinker):
+        QMetaObject.invokeMethod(
+            blinker,
+            "start_blinking",
+            Qt.QueuedConnection,
+            Q_ARG(int, 300),
+            Q_ARG(int, 3000),
+        )
+        time.sleep(3)
 
     def run(self):
-        while self._isRunning:
-            if not self.ser.isOpen():
-                try:
-                    self.ser.open()
-                except Exception as e:
-                    print(f"Failed to open serial port: {e}")
-                    break
+        if self._isRunning:
+            return
 
+        self._isRunning = True
+        try:
+            if not self.ser.isOpen():
+                self.ser.open()
+        except Exception as e:
+            print(f"Failed to open serial port in __init__: {e}")
+        self.ser.write(self.start_scan_command_bytes)
+
+        while self._isScanning:
             try:
                 data_bytes = self.ser.readline()
-                data = data_bytes[-2:].decode("utf-8").strip()
-                if data != "31":
-                    data = self.ser.readline().decode("utf-8").strip()
-                    if data:
-                        QMetaObject.invokeMethod(self.qr_blinker, "start_blinking",
-                                                 Qt.QueuedConnection,
-                                                 Q_ARG(int, 300),
-                                                 Q_ARG(int, 3000))
+                data_hex = data_bytes.hex()
+                print("Data in Hex:", data_hex)
 
-                        time.sleep(3)
-                        self.foundUserID.emit(data)
-                        self.scanned = True
-                        self.ser.write(self.start_stop_command_bytes)
+                if data_hex.endswith("3331"):  # checks if the hex string ends with "31" (hex '3331')
+                    print("Skipped 31")  # For debugging
+                    continue
 
-                    uid = self.pn532.read_passive_target(timeout=0.1)
-                    if uid is not None:
-                        QMetaObject.invokeMethod(self.rfid_blinker, "start_blinking",
-                                                 Qt.QueuedConnection,
-                                                 Q_ARG(int, 300),
-                                                 Q_ARG(int, 3000))
+                data = data_bytes.decode("utf-8").strip()
+                print("\nSerial Data: '{}' Type: {} Length: {}".format(data, type(data), len(data)))
 
-                        uid_string = ''.join(
-                            [hex(i)[2:].zfill(2) for i in uid])
-                        time.sleep(3)
-                        self.foundUserID.emit(uid_string)
-                        self.scanned = True
-                        self.ser.write(self.start_stop_command_bytes)
+                if data:  # Check if data is not empty
+                    print(f"Received data: {data}")
+                    print("\nSerial Data: " + data + "\n")
+                    self.blink_and_sleep(self.qr_blinker)
+                    self.foundUserID.emit(data)
+                    self.scanned = True
+                    self.ser.write(self.stop_scan_command_bytes)
+
+                uid = self.pn532.read_passive_target(timeout=0.1)
+                if uid is not None:
+                    self.blink_and_sleep(self.rfid_blinker)
+                    uid_string = "".join([hex(i)[2:].zfill(2) for i in uid])
+                    self.foundUserID.emit(uid_string)
+                    self.scanned = True
+                    self.ser.write(self.stop_scan_command_bytes)
 
             except Exception as e:
-                print(f"Error reading from serial port: {e}")
+                print(f"Error reading from serial port in run: {e}")
 
             if self.scanned:
-                self.stop()
                 break
+
+        self.cleanup()
 
     def restart(self):
         self.stop()
-        self._isRunning = True
+        self._isScanning = True
         self.scanned = False
         self.start()
 
     def stop(self):
+        self._isScanning = False
+
+    def cleanup(self):
         self._isRunning = False
-        # Close the serial port
         if self.ser.isOpen():
             try:
+                self.ser.write(self.stop_scan_command_bytes)
+                time.sleep(0.1)
                 self.ser.close()
             except Exception as e:
-                print(f"Error closing serial port: {e}")
-        self.wait()  # ensure the thread has fully stopped
-        # stop blinking when thread stops
+                print(f"Error closing serial port in cleanup: {e}")
+
         QMetaObject.invokeMethod(
-            self.rfid_blinker, "stop_blinking", Qt.QueuedConnection)
-        QMetaObject.invokeMethod(
-            self.qr_blinker, "stop_blinking", Qt.QueuedConnection)
+            self.rfid_blinker, "stop_blinking", Qt.QueuedConnection
+        )
+        QMetaObject.invokeMethod(self.qr_blinker, "stop_blinking", Qt.QueuedConnection)
 
 
 class ProcessingThread(QThread):
     # Signal emitted when thread finishes
-    finished_signal = pyqtSignal(str, bool)
+    finished_signal = pyqtSignal(str, bool, str)
+    # Signal emitted for UI updates
+    progress_signal = pyqtSignal(str)
 
-    def __init__(self, file_path, userID, retry=False, retry_text=""):
+    def __init__(self, file_path, userID, date_time, retry=False, retry_text=""):
         super().__init__()
+        self._isRunning = False
         self.file_path = file_path
         self.userID = userID
+        self.date_time = date_time
         self.retry = retry
         self.retry_text = retry_text
         self.data_sent = False
-        self.job_title = ""
+        self.job_title = {}
         self.receiver = ""
         self.company_name = ""
         self.company_address = ""
@@ -881,203 +1444,208 @@ class ProcessingThread(QThread):
         # self.url = "http://filesharing.n2rtech.com/api/send-data?"
 
     def run(self):
-        self.deviceID = self.get_mac_address()
-        # self.deviceID = "10000000f7bbda73"
-        if (self.retry is not True):
-            self.retrieval_code = ""
-            result = self.pdf_to_text_ocr()
-            print(result)
-            address = re.findall(
-                r'^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$', result, re.MULTILINE)
-            if address:
-                address = address[0]
-            else:
-                address = " "
-            print(address)
+        if not self._isRunning:
+            self._isRunning = True
+            self.deviceID = self.get_mac_address()
 
-            keywords = ["item", "Quantity", "qty", "items"]
-            keywords_info = ["Tax No", "Phone", "Email", "Invoice No", "Date"]
+            if self.retry is not True:
+                self.progress_signal.emit("Please wait!  Processing receipt...")
 
-            receipt_info = self.find_table(result, keywords_info)
-            info = self.extract_info(receipt_info)
-            print(f"Tax Number: {info['Tax Number']}")
-            print(f"Phone Number: {info['Phone Number']}")
-            print(f"Email: {info['Email']}")
-            print(f"Invoice Number: {info['Invoice Number']}")
-            print(f"Date: {info['Date']}")
-            print("\n\n")
+                self.retrieval_code = ""
 
-            receipt_text = self.find_table(result, keywords)
-            print(receipt_text)
-            print("\n\n")
+                try:
+                    result = self.pdf_to_table_data(self.file_path)
+                    print("\n\n")
+                    print(result)
+                    print("\n\n")
 
-            receipt_text = receipt_text.replace('_', '0')
-            receipt_text = receipt_text.replace('-', '0')
-            receipt_text = receipt_text.replace('---', '0')
-            items = self.extract_items(receipt_text)
-            api_data = self.items_to_api_format(items)
-            print(api_data)
-            print("\n\n")
+                    receipt_text = ""
+                    for i, row in enumerate(result):
+                        row['quantity'] = row['quantity'].replace(",", "")
+                        row['price'] = row['price'].replace(",", "")
+                        row['tax'] = row['tax'].replace(",", "")
+                        row['discount'] = row['discount'].replace(",", "")
+                        row['total'] = row['total'].replace(",", "")
+                        print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
 
-            print(self.userID)
-            print("\n\n")
+                        receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
 
-            print(self.deviceID)
-            print("\n\n")
+                    receipt_info = self.pdf_to_text(self.file_path)
+                    print("\n\n")
+                    print(receipt_info)
+                    print("\n\n")
 
-            # (data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number)
-            get_response = self.send_api_data(api_data, self.userID, "N2R Technologies3", address,
-                                              info['Phone Number'], info['Date'], self.deviceID, info['Invoice Number'])
-            self.decode_response(get_response)
+                    info = self.extract_info(receipt_info)
+                    if "Tax Number" in info:
+                        print(f"Tax Number: {info['Tax Number']}")
+                    else:
+                        info['Tax Number'] = 'Nil'
+                    if "Phone Number" in info:
+                        print(f"Phone Number: {info['Phone Number']}")
+                    else:
+                        info['Phone Number'] = 'Nil'
+                    if "Email" in info:
+                        print(f"Email: {info['Email']}")
+                    else:
+                        info['Email'] = 'Nil'
+                    if "Invoice Number" in info:
+                        print(f"Invoice Number: {info['Invoice Number']}")
+                    else:
+                        info['Invoice Number'] = 'Nil'
+                    if "Date" in info:
+                        print(f"Date: {info['Date']}")
+                    else:
+                        info['Date'] = 'Nil'
+                    print("\n\n")
 
-            if (self.data_sent is True):
-                self.job_title = "Invoice No. " + info['Invoice Number'] + "\n" + "Email: " + info['Email'] + "\n" + "Receipt Data: \n" + receipt_text
-            else:
-                self.job_title = "Error: " + self.parsed_data['response'] + "\n\n" + "Invoice No. " + info['Invoice Number'] + "\n" + "Email: " + info['Email'] + "\n" + "Receipt Data: \n" + receipt_text
+                    address = re.findall(
+                        r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", receipt_info, re.MULTILINE
+                    )
+                    if address:
+                        address = address[0]
+                    else:
+                        address = " "
+                    print(address)
 
-            self.update_jobs_dict()
+                    api_data = self.items_to_api_format(result)
+                    print(api_data)
+                    print("\n\n")
 
-            # Emit signal when processing is done
-            self.finished_signal.emit(self.retrieval_code, self.data_sent)
-        else:
-            try:
-                # Read the file
-                with open('my_jobs.json', 'r') as f:
-                    jobs = json.load(f)  # This will give you a dictionary
-                    # Get the size of the dictionary
-                    size = len(jobs)
-                    print(f"The dictionary contains {size} key-value pairs.")
-                    print(f"Dictionary: '{jobs[self.retry_text]}'")
+                    print(self.userID)
+                    print("\n\n")
 
-                    payload = jobs[self.retry_text]["payload"]
+                    print(self.deviceID)
+                    print("\n\n")
 
-                    files = [
-                    ]
-                    headers = {}
+                    self.progress_signal.emit("Sending data to REPSLIPS server...")
 
-                    response = requests.request(
-                        "POST", self.url, headers=headers, data=payload, files=files)
+                    # (data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number)
+                    get_response = self.send_api_data(
+                        api_data,
+                        self.userID,
+                        "N2R Technologies3",
+                        address,
+                        info["Phone Number"],
+                        info["Date"],
+                        self.deviceID,
+                        info["Invoice Number"],
+                    )
+                    self.decode_response(get_response)
 
-                    self.decode_response(response.text)
+                    if self.data_sent is True:
+                        status = "Success"
+                    else:
+                        status = "Failed. " + str(self.parsed_data["response"])
 
-                    # self.data_sent
-                    self.job_title = jobs[self.retry_text]["job_title"]
-                    self.receiver = jobs[self.retry_text]["receiver"]
-                    self.company_name = jobs[self.retry_text]["company_name"]
-                    self.company_address = jobs[self.retry_text]["company_address"]
-                    self.company_phone = jobs[self.retry_text]["company_phone"]
-                    self.date = jobs[self.retry_text]["date"]
-                    self.receipt_number = jobs[self.retry_text]["receipt_number"]
-                    self.payload = payload
-                    self.response = response.text
-                    # self.response_code
+                    self.job_title["invoice"] = info["Invoice Number"]
+                    self.job_title["user_id"] = self.userID
+                    self.job_title["date_time"] = info["Date"]
+                    self.job_title["status"] = status
+                    print("\n\n")
+                    print(self.job_title)
+                    print("\n\n")
 
                     self.update_jobs_dict()
 
                     # Emit signal when processing is done
                     self.finished_signal.emit(
-                        "", self.data_sent)
+                        self.retrieval_code, self.data_sent, self.response_message
+                    )
+                except Exception as e:
+                    print(f"Error: {e}")
+                    print("\n")
+                    print("Error! Unsupported PDF")
+                    raise e
+                    # self.progress_signal.emit("Error! Unsupported PDF")
+                    # time.sleep(3)
+                    # # Emit signal when processing is done
+                    # self.finished_signal.emit(
+                    #     "", self.data_sent, "error_PDF"
+                    # )
 
-            except json.JSONDecodeError:
-                print("File is not valid JSON")
-            except FileNotFoundError:
-                print("File 'my_jobs.json' not found.")
+            else:
+                try:
+                    # Read the file
+                    with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
+                        jobs = json.load(f)  # This will give you a dictionary
+                        # Get the size of the dictionary
+                        size = len(jobs)
+                        print(f"The dictionary contains {size} key-value pairs.")
+                        print(f"Dictionary: '{jobs[self.retry_text]}'")
+
+                        payload = jobs[self.retry_text]["payload"]
+
+                        files = []
+                        headers = {}
+
+                        response = requests.request(
+                            "POST", self.url, headers=headers, data=payload, files=files
+                        )
+
+                        self.decode_response(response.text)
+
+                        # self.data_sent
+                        self.job_title = jobs[self.retry_text]["job_title"]
+                        self.receiver = jobs[self.retry_text]["receiver"]
+                        self.company_name = jobs[self.retry_text]["company_name"]
+                        self.company_address = jobs[self.retry_text]["company_address"]
+                        self.company_phone = jobs[self.retry_text]["company_phone"]
+                        self.date = jobs[self.retry_text]["date"]
+                        self.receipt_number = jobs[self.retry_text]["receipt_number"]
+                        self.payload = payload
+                        self.response = response.text
+                        # self.response_code
+
+                        self.update_jobs_dict()
+
+                        # Emit signal when processing is done
+                        self.finished_signal.emit(
+                            "", self.data_sent, self.response_message
+                        )
+
+                except json.JSONDecodeError:
+                    print("File is not valid JSON")
+                except FileNotFoundError:
+                    print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
+
+            self._isRunning = False
 
     def get_mac_address(self):
         # mac_num = hex(uuid.getnode()).replace('0x', '').upper()
         # mac = '-'.join(mac_num[i: i + 2] for i in range(0, 11, 2))
         # return mac
-        
-        with open('/proc/cpuinfo', 'r') as f:
+
+        with open("/proc/cpuinfo", "r") as f:
             for line in f:
-                if line[0:6] == 'Serial':
+                if line[0:6] == "Serial":
                     return line.split(":")[1].strip()
-        return "Unknown"
+        # return "Unknown"
 
-    def find_table(self, text, keywords, min_columns=4):
-        lines = text.split('\n')
-        table_data = []
-        header_found = False
-        headers = []
+    def pdf_to_table_data(self, file_path):
+        data = []
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                # Extract the tables from the page
+                tables = page.extract_tables()
 
-        # Compile the regular expressions for case-insensitive keyword matching
-        keyword_patterns = [re.compile(
-            re.escape(kw), re.IGNORECASE) for kw in keywords]
+                for table in tables:
+                    # convert headers to lowercase and replace headers containing "price" with "price"
+                    headers = ['price' if 'price' in header.lower() else header.lower() for header in table[0]]
+                    for row in table[1:]:
+                        if len(row) >= 4:  # check if the row has at least 4 columns
+                            row_data = {headers[i]: value.replace("---", "0") for i, value in enumerate(row)}
+                            data.append(row_data)
+            
+        return data
 
-        for line in lines:
-            # Check if any of the keywords are present in the current line
-            if any(pattern.search(line) for pattern in keyword_patterns):
-                header_found = True
-                headers.append(line)
-                continue
+    def pdf_to_text(self, file_path):
+        data = ''
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                # Extract the text from the page
+                data += page.extract_text()
 
-            if header_found:
-                row = line.split()
-
-                # Stop processing when a row with fewer columns than min_columns is encountered
-                if len(row) < min_columns:
-                    break
-
-                # Add the row to the table data
-                table_data.append(line)
-
-        # Reformat the table data
-        formatted_table_data = []
-        for data in table_data:
-            formatted_data = ' '.join(data.split())
-            formatted_table_data.append(formatted_data)
-
-        # Join the headers and table data into a single string
-        headers_string = "\n".join(headers)
-        table_string = "\n".join(formatted_table_data)
-        result = f"{headers_string}\n{table_string}"
-
-        return result
-
-    # def pdf_to_text_ocr(self):
-    #     text = ''
-    #     with pdfplumber.open(self.file_path) as pdf:
-    #         for page in pdf.pages:
-    #             text += page.extract_text()
-    #     return text
-
-    def pdf_to_text_ocr(self):
-        # Convert PDF to images
-        images = convert_from_path(self.file_path)
-
-        # Initialize the OCR result string
-        result = ""
-
-        # Loop through the images and perform OCR
-        for i, img in enumerate(images):
-            # Extract non-table text from the page
-            text = pytesseract.image_to_string(img, config="--psm 6 --oem 3")
-            result += text
-        return result
-
-    def extract_items(self, text):
-        lines = text.split('\n')
-        items = []
-        for line in lines:
-            # Updated regex pattern to match item, quantity, unit price, tax, discount, and total
-            pattern = r'\d+\s+([\w\s]+)\s+(\d+)\s+([\d\.]+)\s+([_\d\.%]+)\s+([_\d\.%]+)\s+([\d\.]+)'
-            match = re.search(pattern, line)
-            if match:
-                item = match.group(1).strip()
-                quantity = int(match.group(2))
-                unit_price = float(match.group(3))
-                tax = match.group(4)
-                discount = match.group(5)
-                total = float(match.group(6))
-                items.append({
-                    'item': item,
-                    'quantity': quantity,
-                    'unit_price': unit_price,
-                    'tax': tax,
-                    'discount': discount,
-                    'total': total
-                })
-        return items
+        return data
 
     def extract_info(self, text_info):
         # dictionary to hold the results
@@ -1087,82 +1655,84 @@ class ProcessingThread(QThread):
         tax_pattern = r"Tax No\.:\s(\d+)"
         phone_pattern = r"Phone:\s(\d+)"
         email_pattern = r"Email:\s(\S+)"
-        invoice_pattern = r"Bill to Invoice No\.:\s(\S+)"
+        invoice_pattern = r'Invoice No.:\s(.+)'
         date_pattern = r"\b(\d{1,2}[/-]\d{1,2}[/-]\d{4}|\d{1,2} \w{3}, \d{4}|\d{1,2},\w{3},\d{4}|\d{1,2} \w{3} \d{4})\b"
 
         # search for each pattern and add to dictionary
         tax_search = re.search(tax_pattern, text_info)
         if tax_search:
-            info['Tax Number'] = tax_search.group(1)
+            info["Tax Number"] = tax_search.group(1)
 
         phone_search = re.search(phone_pattern, text_info)
         if phone_search:
-            info['Phone Number'] = phone_search.group(1)
+            info["Phone Number"] = phone_search.group(1)
 
         email_search = re.search(email_pattern, text_info)
         if email_search:
-            info['Email'] = email_search.group(1)
+            info["Email"] = email_search.group(1)
 
         invoice_search = re.search(invoice_pattern, text_info)
         if invoice_search:
-            info['Invoice Number'] = invoice_search.group(1)
+            info["Invoice Number"] = invoice_search.group(1)
 
             # Extract only numbers from the text
-            info['Invoice Number'] = "".join(
-                filter(str.isdigit, info['Invoice Number']))
+            info["Invoice Number"] = "".join(filter(str.isdigit, info["Invoice Number"]))
 
             # If the length of the numbers string is more than 9 characters
-            if len(info['Invoice Number']) > 9:
+            if len(info["Invoice Number"]) > 9:
                 # Trim the numbers string to the first 9 characters
-                info['Invoice Number'] = info['Invoice Number'][:9]
-
+                info["Invoice Number"] = info["Invoice Number"][:9]
+        
         match = re.search(date_pattern, str(text_info))
         if match:
-            if '/' in match.group():
-                info['Date'] = (datetime.strptime(
-                    match.group(), "%d/%m/%Y").date()).isoformat()
-            elif '-' in match.group():
-                info['Date'] = (datetime.strptime(
-                    match.group(), "%d-%m-%Y").date()).isoformat()
-            elif ',' in match.group() and ' ' not in match.group():
-                info['Date'] = (datetime.strptime(
-                    match.group(), "%d,%b,%Y").date()).isoformat()
-            elif ',' in match.group() and ' ' in match.group():
-                info['Date'] = (datetime.strptime(
-                    match.group(), "%d %b, %Y").date()).isoformat()
-            elif ' ' in match.group() and ',' not in match.group():
-                info['Date'] = (datetime.strptime(
-                    match.group(), "%d %b %Y").date()).isoformat()
+            try:
+                date = parse(match.group())
+                info["Date"] = date.date().isoformat()
+            except ValueError:
+                print(f"Could not parse date: {match.group()}")
 
         return info
 
-    def items_to_api_format(self, items):
+
+    def items_to_api_format(self, result):
         api_data = {}
-        for i, item in enumerate(items):
-            api_data[f'products[{i}][product]'] = item['item']
-            api_data[f'products[{i}][quantity]'] = str(item['quantity'])
-            api_data[f'products[{i}][price]'] = str(item['unit_price'])
-            api_data[f'products[{i}][tax]'] = item['tax']
-            api_data[f'products[{i}][total]'] = str(item['total'])
+
+        for i, row in enumerate(result):
+            api_data[f"products[{i}][product]"] = row["item"]
+            api_data[f"products[{i}][quantity]"] = str(row["quantity"])
+            api_data[f"products[{i}][price]"] = str(row["price"])
+            api_data[f"products[{i}][tax]"] = row["tax"]
+            api_data[f"products[{i}][total]"] = str(row["total"])
         return api_data
 
-    def send_api_data(self, data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number):
-        payload = {'receiver': receiver,
-                   'company_name': company_name,
-                   'company_address': company_address,
-                   'company_phone': company_phone,
-                   'date': date,
-                   'device_id': device_id,
-                   'receipt_number': receipt_number}
+    def send_api_data(
+        self,
+        data,
+        receiver,
+        company_name,
+        company_address,
+        company_phone,
+        date,
+        device_id,
+        receipt_number,
+    ):
+        payload = {
+            "receiver": receiver,
+            "company_name": company_name,
+            "company_address": company_address,
+            "company_phone": company_phone,
+            "date": date,
+            "device_id": device_id,
+            "receipt_number": receipt_number,
+        }
 
         payload.update(data)
-        files = [
-
-        ]
+        files = []
         headers = {}
 
         response = requests.request(
-            "POST", self.url, headers=headers, data=payload, files=files)
+            "POST", self.url, headers=headers, data=payload, files=files
+        )
 
         self.receiver = receiver
         self.company_name = company_name
@@ -1179,25 +1749,26 @@ class ProcessingThread(QThread):
         self.parsed_data = json.loads(response_text)
 
         # Check if 'success' or 'error' key exists in the parsed data
-        if 'success' in self.parsed_data:
+        if "success" in self.parsed_data:
             self.response_code = "success"
+            self.response_message = self.parsed_data["success"]
             self.data_sent = True
             print("Data uploaded successfully to API.")
 
-        elif 'error' in self.parsed_data:
-            error = self.parsed_data['error']
+        elif "error" in self.parsed_data:
+            error = self.parsed_data["error"]
             self.response_code = "error: " + str(error)
-            response_message = self.parsed_data['response']
+            self.response_message = self.parsed_data["response"]
 
             # Print the error message
             print(f"Error: {error}")
-            print(f"Response: {response_message}")
+            print(f"Response: {self.response_message}")
 
         else:
             print("Unexpected response format.")
 
-        if 'CODE' in self.parsed_data:
-            code = self.parsed_data['CODE']
+        if "CODE" in self.parsed_data:
+            code = self.parsed_data["CODE"]
 
             # Print the extracted values
             print(f"CODE: {code}")
@@ -1209,7 +1780,7 @@ class ProcessingThread(QThread):
 
         try:
             # Read the file
-            with open('my_jobs.json', 'r') as f:
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
@@ -1217,7 +1788,7 @@ class ProcessingThread(QThread):
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
-            print("File 'my_jobs.json' not found.")
+            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
         if jobs:
             # Get the last key-value pair added
@@ -1225,7 +1796,7 @@ class ProcessingThread(QThread):
             print(f"Last key: {last_key}, last value: {last_value}")
             i = int(last_key)
 
-        if (self.retry is True):
+        if self.retry is True:
             # Removing an item using del
             del jobs[self.retry_text]
 
@@ -1247,14 +1818,17 @@ class ProcessingThread(QThread):
 
         # print(jobs)
         # Write the updated dictionary back to the file
-        with open('my_jobs.json', 'w') as f:
+        with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
             json.dump(jobs, f)
 
 
 class SettingsWindow1(QMainWindow, Ui_MainWindow3):
-    def __init__(self, stacked_widget, file_path):
+    def __init__(self, stacked_widget, file_path, process_manager):
         super().__init__()
         self.setupUi(self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
@@ -1269,10 +1843,10 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.baud_rate = 9600
         start_scan_command = "7E 00 08 01 00 02 01 AB CD"
         self.start_scan_command_bytes = bytes.fromhex(
-            start_scan_command.replace(" ", ""))
-        start_stop_command = "7E 00 08 01 00 02 00 AB CD"
-        self.start_stop_command_bytes = bytes.fromhex(
-            start_stop_command.replace(" ", ""))
+            start_scan_command.replace(" ", "")
+        )
+        stop_scan_command = "7E 00 08 01 00 02 00 AB CD"
+        self.stop_scan_command_bytes = bytes.fromhex(stop_scan_command.replace(" ", ""))
 
         # PN532
         i2c = busio.I2C(board.SCL, board.SDA)
@@ -1280,46 +1854,103 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.pn532.SAM_configuration()
 
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
-        self.ser.write(self.start_scan_command_bytes)
 
         self.scanThread = ScanThread(
-            self.ser, self.pn532, self.start_stop_command_bytes, self.RFID_Icon, self.QR_Icon)
+            self.ser,
+            self.pn532,
+            self.start_scan_command_bytes,
+            self.stop_scan_command_bytes,
+            self.RFID_Icon,
+            self.QR_Icon,
+        )
         self.scanThread.foundUserID.connect(self.processUserID)
         self.scanThread.start()
 
         self.numeric_keyboard = NumericKeyboard(
-            self, self.stacked_widget, self, self.scanThread, self.file_path)
+            self, self.stacked_widget, self, self.scanThread, self.file_path
+        )
         self.stacked_widget.addWidget(self.numeric_keyboard)
+
+    def update_user_id(self, user_id=""):
+        if user_id != "":
+            self.userID = user_id
+            date_time = str(shared_data.date) + str(shared_data.time)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+            self.processingThread.finished_signal.connect(self.onProcessingFinished)
+            self.processingThread.progress_signal.connect(self.onProgress)
+            self.processingThread.start()
 
     def processUserID(self, scanned_data):
         self.userID = scanned_data
         print("Found a User ID:", scanned_data)
-        self.processingThread = ProcessingThread(
-            self.file_path, self.userID)
-        self.processingThread.finished_signal.connect(
-            self.onProcessingFinished)
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread.finished_signal.connect(self.onProcessingFinished)
+        self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
 
-    def onProcessingFinished(self, retrieval_code, data_sent):
+    def onProgress(self, notification):
+        _translate = QtCore.QCoreApplication.translate
+        self.notification.setText(
+            _translate(
+                "stacked_widget",
+                '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                + notification
+                + "</span></p></body></html>",
+            )
+        )
+        if notification == "Sending data to REPSLIPS server...":
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.go_home)
+            self.timer.start(2000)
+
+    def onProcessingFinished(self, retrieval_code, data_sent, error):
         self.code = retrieval_code
         self.data_sent = data_sent
-        if self.data_sent:
-            pass
-        # use the remove() function to delete the file
-        os.remove(self.file_path)
+
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
         print("Processing finished!")
         print(retrieval_code)
-        
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.go_home)
-        self.timer.start(500)
-        
+
+        if self.data_sent and error != "error_PDF":
+            self.DataSentWindow_window = DataSentWindow(
+                self.file_path, self.stacked_widget, self.process_manager
+            )
+            self.stacked_widget.addWidget(self.DataSentWindow_window)
+            self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
+        else:
+            _translate = QtCore.QCoreApplication.translate
+            self.notification.setText(
+                _translate(
+                    "stacked_widget",
+                    '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                    + error
+                    + "</span></p></body></html>",
+                )
+            )
+            time.sleep(3)
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.go_home)
+            self.timer.start(5000)
+
     def go_home(self):
         self.timer.stop()
-        self.SettingWindow_window = SettingWindow(
-            self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
     def open_keyboard(self):
         self.scanThread.stop()
@@ -1329,18 +1960,64 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
     def print_retrieval_code(self):
         self.scanThread.stop()
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
-        self.ser.write(self.start_stop_command_bytes)
-        self.PrintRetrievalCode_window = PrintRetrievalCode(
-            self.file_path, self.stacked_widget, self.scanThread)
-        self.stacked_widget.addWidget(self.PrintRetrievalCode_window)
-        self.stacked_widget.setCurrentWidget(self.PrintRetrievalCode_window)
+        self.ser.write(self.stop_scan_command_bytes)
+
+        self.userID = ""
+        date_time = str(shared_data.date) + str(shared_data.time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
+        self.processingThread.progress_signal.connect(self.onProgress_Print)
+        self.processingThread.start()
+
+    def onProgress_Print(self, notification):
+        _translate = QtCore.QCoreApplication.translate
+        self.notification.setText(
+            _translate(
+                "stacked_widget",
+                '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                + notification
+                + "</span></p></body></html>",
+            )
+        )
+
+    def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
+        self.code = retrieval_code
+        self.data_sent = data_sent
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
+
+        if self.data_sent:
+            print("Processing finished!")
+            print(self.code)
+
+            self.PrintRetrievalCode_window = PrintRetrievalCode(
+                self.file_path, self.stacked_widget, self.code, self.process_manager
+            )
+            self.stacked_widget.addWidget(self.PrintRetrievalCode_window)
+            self.stacked_widget.setCurrentWidget(self.PrintRetrievalCode_window)
+        else:
+            while self.stacked_widget.count() > 0:
+                widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+                self.stacked_widget.removeWidget(
+                    widget_to_remove
+                )  # remove it from stacked_widget
+                widget_to_remove.setParent(
+                    None
+                )  # optional: set its parent to None so it gets deleted
+
+            self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.stacked_widget.addWidget(self.ReadyWindow_window)
+            self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class NumericKeyboard(QMainWindow):
+    userID_signal = pyqtSignal(str)  # Define signal, payload is str (userID)
 
     def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path):
         super(NumericKeyboard, self).__init__()
-        loadUi('W4.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/W4.ui", self)
 
         # Set the window size
         self.resize(1024, 600)
@@ -1354,21 +2031,30 @@ class NumericKeyboard(QMainWindow):
         self.saved_value = ""
         self.name = ""
         # Connect buttons to their respective functions
-        self.b0.clicked.connect(lambda: self.add_number('0'))
-        self.b1.clicked.connect(lambda: self.add_number('1'))
-        self.b2.clicked.connect(lambda: self.add_number('2'))
-        self.b3.clicked.connect(lambda: self.add_number('3'))
-        self.b4.clicked.connect(lambda: self.add_number('4'))
-        self.b5.clicked.connect(lambda: self.add_number('5'))
-        self.b6.clicked.connect(lambda: self.add_number('6'))
-        self.b7.clicked.connect(lambda: self.add_number('7'))
-        self.b8.clicked.connect(lambda: self.add_number('8'))
-        self.b9.clicked.connect(lambda: self.add_number('9'))
+        self.b0.clicked.connect(lambda: self.add_number("0"))
+        self.b1.clicked.connect(lambda: self.add_number("1"))
+        self.b2.clicked.connect(lambda: self.add_number("2"))
+        self.b3.clicked.connect(lambda: self.add_number("3"))
+        self.b4.clicked.connect(lambda: self.add_number("4"))
+        self.b5.clicked.connect(lambda: self.add_number("5"))
+        self.b6.clicked.connect(lambda: self.add_number("6"))
+        self.b7.clicked.connect(lambda: self.add_number("7"))
+        self.b8.clicked.connect(lambda: self.add_number("8"))
+        self.b9.clicked.connect(lambda: self.add_number("9"))
 
         self.Del.clicked.connect(self.delete_number)
         self.enter.clicked.connect(self.enter_pressed)
         self.Retry.clicked.connect(self.show_output)
         self.cross.clicked.connect(self.destroy)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_system_time)
+        self.timer.start(1000)
+
+    def update_system_time(self):
+        current_time = shared_data.time
+        self.time.setPlainText(f" {current_time}")
+        self.date.setPlainText(f" {shared_data.date}")
 
     def add_number(self, number):
         current_text = self.textEdit.toPlainText()
@@ -1382,26 +2068,13 @@ class NumericKeyboard(QMainWindow):
 
     def enter_pressed(self):
         if self.number_found:
-            self.userID = self.name
-            self.processingThread = ProcessingThread(
-                self.file_path, self.userID)
-            self.processingThread.finished_signal.connect(
-                self.onProcessingFinished)
-            self.processingThread.start()
-            self.DataSentWindow_window = DataSentWindow(
-                self.file_path, self.stacked_widget, self.scanThread)
-            self.stacked_widget.addWidget(self.DataSentWindow_window)
-            self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
+            self.userID = self.number
+            self.numeric_keyboard.update_user_id(self.userID)
 
-    def onProcessingFinished(self, retrieval_code, data_sent):
-        self.code = retrieval_code
-        self.data_sent = data_sent
-        if self.data_sent:
-            pass
-        # use the remove() function to delete the file
-        os.remove(self.file_path)
-        print("Processing finished!")
-        print(retrieval_code)
+            # Switch back to the SettingsWindow1
+            index = self.parent.stacked_widget.indexOf(self.numeric_keyboard)
+            self.parent.stacked_widget.setCurrentIndex(index)
+            self.hide()
 
     def show_output(self):
         self.number = self.textEdit.toPlainText()
@@ -1417,38 +2090,42 @@ class NumericKeyboard(QMainWindow):
         self.hide()
 
     def check_number_api(self):
+        self.myText = ""
         self.url = "http://filesharing.n2rtech.com/api/mobile-verify"
-        self.payload = {'mobile': self.number}
+        self.payload = {"mobile": self.number}
         self.files = []
         self.headers = {}
         self.response = requests.request(
-            "POST", self.url, headers=self.headers, data=self.payload, files=self.files)
+            "POST", self.url, headers=self.headers, data=self.payload, files=self.files
+        )
+
+        _translate = QtCore.QCoreApplication.translate
 
         # Parse the JSON string into a Python dictionary
         self.parsed_data = json.loads(self.response.text)
 
         # Check if 'success' or 'error' key exists in the parsed data
-        if 'success' in self.parsed_data:
-            success = self.parsed_data['success']
-            if self.parsed_data['firstname']:
-                firstname = self.parsed_data['firstname']
+        if "success" in self.parsed_data:
+            success = self.parsed_data["success"]
+            if self.parsed_data["firstname"]:
+                firstname = self.parsed_data["firstname"]
                 self.name = str(firstname)
                 print(f"First name: {firstname}")
-            if self.parsed_data['lastname']:
-                lastname = self.parsed_data['lastname']
+            if self.parsed_data["lastname"]:
+                lastname = self.parsed_data["lastname"]
                 self.name += str(lastname)
                 print(f"Last name: {lastname}")
 
             # Print the extracted values
             print(f"Success: {success}")
             print(f"Name: {self.name}")
-            self.username.setText(self.name)
+            self.myText = self.name
             self.number_found = True
 
-        elif 'error' in self.parsed_data:
-            self.error = self.parsed_data['error']
-            self.response_message = self.parsed_data['response']
-            self.username.setText("Number not found!!!")
+        elif "error" in self.parsed_data:
+            self.error = self.parsed_data["error"]
+            self.response_message = self.parsed_data["response"]
+            self.myText = "Number not found!!!"
 
             # Print the error message
             print(f"Error: {self.error}")
@@ -1458,19 +2135,33 @@ class NumericKeyboard(QMainWindow):
         else:
             print("Unexpected response format.")
             self.number_found = False
+        self.username.setHtml(
+            _translate(
+                "MainWindow4",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:24pt; font-weight:600; font-style:normal;\">\n"
+                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:22pt;">'
+                + self.myText
+                + "</span></p></body></html>",
+            )
+        )
 
 
 class DataSentWindow(QMainWindow):
-    def __init__(self, file_path, stacked_widget, scanThread):
+    def __init__(self, file_path, stacked_widget, process_manager):
         super().__init__()
-        loadUi('w6.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/w6.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
 
         self.file_path = file_path
         self.stacked_widget = stacked_widget
-        self.scanThread = scanThread
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go_home)
@@ -1478,37 +2169,41 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.SettingWindow_window = SettingWindow(
-            self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class PrintRetrievalCode(QMainWindow):
-    def __init__(self, file_path, stacked_widget, scanThread):
+    def __init__(self, file_path, stacked_widget, code, process_manager):
         super().__init__()
-        loadUi('w5.ui', self)
+        loadUi("/home/decas/ui/DecasUI_New/w5.ui", self)
+
+        # Create an instance of ProcessManager
+        self.process_manager = process_manager
 
         # Set the window size
         self.resize(1024, 600)
 
         self.file_path = file_path
         self.stacked_widget = stacked_widget
+        self.code = code
         self.thermal_print()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go_home)
-        self.timer.start(500)
+        self.timer.start(5000)
 
     def thermal_print(self):
-        p = Serial(devfile='/dev/ttySC1',
-                   baudrate=9600,
-                   bytesize=8,
-                   parity='N',
-                   stopbits=1,
-                   timeout=1.00,
-                   dsrdtr=True
-                   )
+        p = Serial(
+            devfile="/dev/ttySC1",
+            baudrate=9600,
+            bytesize=8,
+            parity="N",
+            stopbits=1,
+            timeout=1.00,
+            dsrdtr=True,
+        )
         p.set(
             align="center",
             font="b",
@@ -1521,7 +2216,7 @@ class PrintRetrievalCode(QMainWindow):
         )
         # Printing the image
         # here location can be your image path in “ ”
-        p.image("/home/decas/Logo.png", impl="bitImageColumn")
+        p.image("/home/decas/ui/DecasUI_New/pics/Logo.png", impl="bitImageColumn")
 
         p.set(
             align="center",
@@ -1540,20 +2235,16 @@ class PrintRetrievalCode(QMainWindow):
             align="left",
         )
         p.text("\n")
-        p.text("""Retrieve receipt on repslips.com\nSteps:\n
-        1) Sign up / Log on to:  \n
-                repslips.com\n2) Click on menu -->RETRIVAL \n
-        3) Type the above code and SUBMIT \n
-        4) View on recent Receipt \n
-        Enjoy.........\n\n\n""")
+        p.text(
+            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
+        )
         print("done")
 
     def go_home(self):
         self.timer.stop()
-        self.SettingWindow_window = SettingWindow(
-            self.stacked_widget)
-        self.stacked_widget.addWidget(self.SettingWindow_window)
-        self.stacked_widget.setCurrentWidget(self.SettingWindow_window)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class DirectoryChecker(QObject):
@@ -1564,8 +2255,10 @@ class DirectoryChecker(QObject):
         self.path_data = ""  # Initialize path_data with an empty string
 
     def check_directory(self):
-        # directory_path = '/home/decas/PDF/'
-        directory_path = '/var/spool/cups-pdf/ANONYMOUS/'
+        # directory_path = "C:/Users/Bilal/Documents/Decas"
+        # directory_path = "/var/spool/cups-pdf/ANONYMOUS/"
+        # directory_path = "/home/decas/ui/DecasUI/Print/"
+        directory_path = "/home/decas/output/"
         # directory_path = 'D:/DecasUI/DecasUI/ANONYMOUS/'
 
         contents = os.listdir(directory_path)
@@ -1579,46 +2272,66 @@ class DirectoryChecker(QObject):
             self.open_settings_window1_signal.emit()
 
 
-class MyApp(QApplication):
-    def __init__(self):
-        super().__init__(sys.argv)
-
-        # Configure the serial port and baud rate
-        self.serial_port = "/dev/ttySC0"
-        self.baud_rate = 9600
-
+class SerialManager:
+    def __init__(self, port="/dev/ttySC0", baud_rate=9600):
+        self.serial_port = port
+        self.baud_rate = baud_rate
+        
         # Barcode Commands to be sent
         self.uart_output_command = "7E000801000D00ABCD"
         self.single_scanning_time_command = "7E000801000600ABCD"
         self.command_mode_command = "7E0008010000D5ABCD"
         self.reset_command = "7E00080100D950ABCD"
 
+    def connect(self):
         try:
-            # Open the serial port
             with serial.Serial(self.serial_port, self.baud_rate, timeout=1) as ser:
                 print(f"Connected to {self.serial_port} at {self.baud_rate} baud rate.")
-
-                # Send the commands
                 ser.write(bytes.fromhex(self.uart_output_command))
                 ser.write(bytes.fromhex(self.single_scanning_time_command))
                 ser.write(bytes.fromhex(self.command_mode_command))
                 ser.close()
-        
         except Exception as e:
             print(f"Error: {e}")
+
+class MyApp(QApplication):
+    def __init__(self, app):
+        super().__init__(sys.argv)
+        self.process_manager = MonoDecasProcessManager()
+        self.serial_manager = SerialManager()
+
+        # Initialize serial and UI components
+        self.init_serial()
+        self.init_ui()
+
+    def init_serial(self):
+        self.serial_manager.connect()
+
+    def init_ui(self):
+        try:
+            self.stacked_widget = QStackedWidget()
+            self.process_manager.start_process()
+            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.stacked_widget.addWidget(self.setting_window)
+            self.stacked_widget.showFullScreen()
             
-        self.stacked_widget = QStackedWidget()
+        except (OSError, ValueError) as e:
+            print(f"Error: {e}")
+            self.process_manager.terminate_process()
 
-        self.setting_window = SettingWindow(self.stacked_widget)
-        self.stacked_widget.addWidget(self.setting_window)
-        self.stacked_widget.showFullScreen()
+def create_main_app(app):
+    return MyApp(app)
 
-
-if __name__ == '__main__':
-    app = MyApp()
-    sys.exit(app.exec_())
-
+def run_main_app(app):
+    return app.exec_()
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pip3 install adafruit-circuitpython-pn532 pyserial escpos pytesseract cryptography==36.0.0 pdfplumber pdf2image
+# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil
+
+# sudo apt-get update
+# sudo apt-get upgrade
+# sudo apt-get install python3-pyqt5 python3-tk python3-requests python3-bluez mono-complete
+# sudo pip3 install adafruit-circuitpython-pn532 board pyserial escpos pdfplumber ntplib python-dateutil
+# sudo mkdir ui
+# sudo chmod 777 /home/decas/output/
