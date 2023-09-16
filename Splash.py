@@ -167,7 +167,7 @@ def update_progress():
 # Timer setup
 timer = QTimer()
 timer.timeout.connect(update_progress)
-timer.start(60)  # 60 milliseconds
+timer.start(40)  # 40 milliseconds
 
 # Show window
 window.showFullScreen()
