@@ -27,6 +27,7 @@ from unittest.mock import Mock, patch
 import board
 import busio
 import serial
+import adafruit_ds3231
 from adafruit_pn532.i2c import PN532_I2C
 from escpos.printer import Serial
 # except (ModuleNotFoundError, NotImplementedError):
