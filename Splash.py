@@ -100,12 +100,8 @@ Setup_barcode()
 
 def Clean_Output_Folder():
     try:
-        subprocess.run(["cd", "/home/decas/output/"], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
-    
-    try:
-        subprocess.run(["sudo", "rm", "-r", "*"], check=True)
+        command = "sudo rm -r /home/decas/output/*"
+        subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred: {e}")
 
