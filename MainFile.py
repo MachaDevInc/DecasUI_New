@@ -913,23 +913,18 @@ class WifiWindow(QMainWindow):
 
         return output.strip()
 
-    def get_ssid_psk(self, config):
-        ssid_pattern = r'ssid="(.+?)"'
-        psk_pattern = r'psk=([^\s]+)'
+    def get_network_block(self, config):
+        pattern = r'(network=\{[\s\S]+?\})'
+        return re.findall(pattern, config)
 
-        ssid = re.search(ssid_pattern, config)
-        psk = re.search(psk_pattern, config)
-
-        print("Searched from wpa_supplicant SSID: ")
-        print(ssid)
-        print("\nSearched from wpa_supplicant PSK ")
-        print(psk)
-        print("\n")
-
-        if ssid and psk:
-            return ssid.group(1), psk.group(1)
-        else:
-            return None, None
+    def replace_ssid_psk(self, network_block, new_ssid, new_psk):
+        ssid_pattern = r'(ssid=)(".*?")'
+        psk_pattern = r'(psk=)(".*?"|[^\s]+)'
+        
+        new_block = re.sub(ssid_pattern, rf'\1"{new_ssid}"', network_block)
+        new_block = re.sub(psk_pattern, rf'\1"{new_psk}"', new_block)
+        
+        return new_block
 
     def is_ascii(self, s):
         return all(ord(c) < 128 for c in s)
@@ -949,55 +944,69 @@ class WifiWindow(QMainWindow):
         self.timer.start(3000)  # Start the timer with a 3-second interval
     
     def connect_wifi(self, new_network_ssid, new_network_password):
-        self.update_wifi_status("Connecting to: " + new_network_ssid)
+        self.update_wifi_status("Connected to: " + new_network_ssid)
         # Save the current network configuration
         with open("/etc/wpa_supplicant/wpa_supplicant.conf", "r") as wifi_config:
             current_config = wifi_config.read()
+            network_blocks = self.get_network_block(current_config)
             print("current_config: ")
             print(current_config)
             print("\n")
 
-            current_ssid, current_psk = self.get_ssid_psk(current_config)
-            print("current_ssid: ")
-            print(current_ssid)
-            print("\n")
-            print("current_psk: ")
-            print(current_psk)
+            print("network_blocks: ")
+            print(network_blocks)
             print("\n")
 
-            new_config = current_config
+            if network_blocks:
+                first_network_block = network_blocks[0]
+                new_network_block = self.replace_ssid_psk(first_network_block, new_network_ssid, new_network_password)
+                new_config = current_config.replace(first_network_block, new_network_block)
+
+            # current_ssid, current_psk = self.get_ssid_psk(current_config)
+            # print("current_ssid: ")
+            # print(current_ssid)
+            # print("\n")
+            # print("current_psk: ")
+            # print(current_psk)
+            # print("\n")
+
+            # new_config = current_config
 
             # # Check if the current PSK is enclosed by quotes, and remove them for replacement
             # if current_psk.startswith('"') and current_psk.endswith('"'):
             #     current_psk = current_psk[1:-1]
 
-            new_config = new_config.replace(current_ssid, new_network_ssid)
-            new_network_password = f'"{new_network_password}"'
-            new_config = new_config.replace(current_psk, new_network_password)
+            # new_config = new_config.replace(current_ssid, new_network_ssid)
+            # new_network_password = f'"{new_network_password}"'
+            # new_config = new_config.replace(current_psk, new_network_password)
             
             # # Check if new_network_password is ASCII
             # if self.is_ascii(new_network_password):
             #     new_network_password_quoted = f'"{new_network_password}"'
             # else:
             #     new_network_password_quoted = new_network_password
+                
+                # Write the new network configuration to wpa_supplicant.conf
+                with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
+                    wifi_config.write(new_config)
             
-            print("new_network_ssid: ")
-            print(new_network_ssid)
-            print("\n")
-            print("new_network_password: ")
-            print(new_network_password)
-            print("\n")
+                    print("new_network_ssid: ")
+                    print(new_network_ssid)
+                    print("\n")
+                    print("new_network_password: ")
+                    print(new_network_password)
+                    print("\n")
 
             # new_config = new_config.replace(f'psk={current_psk}', f'psk={new_network_password_quoted}')
-            print("new_config: ")
-            print(new_config)
-            print("\n")
+                    print("new_config: ")
+                    print(new_config)
+                    print("\n")
 
         # Write the new network configuration to wpa_supplicant.conf
-        with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
-            # wifi_config.truncate(0)
-            wifi_config.write(new_config)
-            wifi_config.close()
+        # with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
+        #     # wifi_config.truncate(0)
+        #     wifi_config.write(new_config)
+        #     wifi_config.close()
 
         # Restart the wpa_supplicant service to connect to the new network
         # cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
@@ -1007,62 +1016,62 @@ class WifiWindow(QMainWindow):
         # if error is not None:
         #     print(f"Error: {error}")
 
-        cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
-        cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-        print("\n ")
-        print(output)
+                cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+                cmd = ["sudo", "wpa_supplicant", "-B", "-c", "/etc/wpa_supplicant/wpa_supplicant.conf", "-i", "wlan0"]
+                process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                output, error = process.communicate()
+                print("\n ")
+                print(output)
 
-        if error is not None:
-            print(f"Error: {error}")
+                if error is not None:
+                    print(f"Error: {error}")
 
-        #wpa_cli reconfigure -i wlan0
-        
-        cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        output, error = process.communicate()
-        print("\n ")
-        print(output)
+                #wpa_cli reconfigure -i wlan0
+                
+                cmd = ["wpa_cli", "reconfigure", "-i", "wlan0"]
+                process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                output, error = process.communicate()
+                print("\n ")
+                print(output)
 
-        if process.returncode != 0:
-            print(f"Error: {error.decode('utf-8')}")
+                if process.returncode != 0:
+                    print(f"Error: {error.decode('utf-8')}")
 
-        # Check if the connection was successful
-        time.sleep(10)  # Wait for the connection to establish
+                # Check if the connection was successful
+                time.sleep(10)  # Wait for the connection to establish
 
-        new_ssid = self.get_current_network().decode("utf-8").strip()
+                new_ssid = self.get_current_network().decode("utf-8").strip()
 
-        if new_network_ssid != new_ssid:
-            self.update_wifi_status("Connection failed!!!")
-            print(
-                "Failed to connect to the new network. Reverting to the previous network configuration."
-            )
+                if new_network_ssid != new_ssid:
+                    self.update_wifi_status("Connection failed!!!")
+                    print(
+                        "Failed to connect to the new network. Reverting to the previous network configuration."
+                    )
 
-            # Revert to the previous network configuration
-            with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
-                wifi_config.truncate(0)
-                wifi_config.write(current_config)
-                wifi_config.close()
+                    # Revert to the previous network configuration
+                    with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi_config:
+                        wifi_config.truncate(0)
+                        wifi_config.write(current_config)
+                        wifi_config.close()
 
-            # Restart the wpa_supplicant service to reconnect to the previous network
-            cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            output, error = process.communicate()
+                    # Restart the wpa_supplicant service to reconnect to the previous network
+                    cmd = ["sudo", "systemctl", "restart", "wpa_supplicant"]
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                    output, error = process.communicate()
 
-            if error is not None:
-                print(f"Error: {error}")
+                    if error is not None:
+                        print(f"Error: {error}")
 
-            cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
-            process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            output, error = process.communicate()
+                    cmd = ["sudo", "wpa_cli", "-i", "wlan0", "reconfigure"]
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                    output, error = process.communicate()
 
-            if error is not None:
-                print(f"Error: {error}")
-        else:
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.on_timeout)
-            self.timeout_count = 0
+                    if error is not None:
+                        print(f"Error: {error}")
+                else:
+                    self.timer = QTimer()
+                    self.timer.timeout.connect(self.on_timeout)
+                    self.timeout_count = 0
 
     def go_back(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
