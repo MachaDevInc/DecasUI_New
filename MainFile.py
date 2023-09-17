@@ -1038,7 +1038,7 @@ class WifiWindow(QMainWindow):
                     print(f"Error: {error.decode('utf-8')}")
 
                 # Check if the connection was successful
-                time.sleep(10)  # Wait for the connection to establish
+                time.sleep(7)  # Wait for the connection to establish
 
                 new_ssid = self.get_current_network().decode("utf-8").strip()
 
