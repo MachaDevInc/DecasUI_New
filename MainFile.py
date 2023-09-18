@@ -382,7 +382,11 @@ class ReadyWindow(QMainWindow):
             print(f"Error: {e}")
             self.process_manager.terminate_process()
             time.sleep(1)
-            raise e
+            if "[Errno 2]" in str(e):
+                print("SerialException error with Errno 2 caught. Restarting Raspberry Pi.")
+                os.system('sudo reboot')
+            else:
+                print(f"An error occurred: {e}")
 
     def open_next(self):
         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
