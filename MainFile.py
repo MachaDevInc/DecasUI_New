@@ -1549,9 +1549,12 @@ class ProcessingThread(QThread):
                     else:
                         status = "Failed. " + str(self.parsed_data["response"])
 
+                    current_time = shared_data.time
+                    current_date = shared_data.date
+
                     self.job_title["invoice"] = info["Invoice Number"]
                     self.job_title["user_id"] = self.userID
-                    self.job_title["date_time"] = info["Date"]
+                    self.job_title["date_time"] = current_date + " " + current_time
                     self.job_title["status"] = status
                     print("\n\n")
                     print(self.job_title)
@@ -2344,6 +2347,7 @@ def run_main_app(app):
 # sudo apt-get update
 # sudo apt-get upgrade
 # sudo apt-get install python3-pyqt5 python3-tk python3-requests python3-bluez mono-complete
-# sudo pip3 install adafruit-circuitpython-pn532 board pyserial escpos pdfplumber ntplib python-dateutil
+# sudo apt-get install -y libjpeg-dev libtiff-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libharfbuzz-dev libfribidi-dev tcl8.6-dev tk8.6-dev python3-tk
+# sudo pip3 install adafruit-circuitpython-pn532 pyserial escpos pdfplumber ntplib python-dateutil
 # sudo mkdir ui
 # sudo chmod 777 /home/decas/output/
