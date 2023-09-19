@@ -52,7 +52,7 @@ class CustomWidget(QWidget):
 
         # Style the header
         font = QtGui.QFont()
-        font.setPointSize(12)
+        font.setPointSize(10)
         font.setWeight(60)
         font.setBold(True)
         self.table.horizontalHeader().setFont(font)
