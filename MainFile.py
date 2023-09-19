@@ -1390,7 +1390,21 @@ class ScanThread(QThread):
                 if uid is not None:
                     self.blink_and_sleep(self.rfid_blinker)
                     uid_string = "".join([hex(i)[2:].zfill(2) for i in uid])
-                    self.foundUserID.emit(uid_string)
+                    # Initialize an empty string to hold tag data
+                    full_text_data = ""
+
+                    # Read from block 8 to block 16 (replace with your specific block range)
+                    for i in range(8, 16):
+                        ntag2xx_block = self.pn532.ntag2xx_read_block(i)
+                        if ntag2xx_block:
+                            # Convert to string and append to full_text_data
+                            block_text_data = ''.join(chr(i) for i in ntag2xx_block if i >= 32 and i <= 126)  # Remove non-ASCII characters
+                            full_text_data += block_text_data
+                        else:
+                            print(f"Failed to read block {i}.")
+
+                    print("Full text data:", full_text_data)
+                    self.foundUserID.emit(full_text_data)
                     self.scanned = True
                     self.ser.write(self.stop_scan_command_bytes)
 
