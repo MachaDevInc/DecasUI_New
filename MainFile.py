@@ -1497,9 +1497,9 @@ class ProcessingThread(QThread):
                         receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
 
                     receipt_info = self.pdf_to_text(self.file_path)
-                    print("\n\n")
-                    print(receipt_info)
-                    print("\n\n")
+                    # print("\n\n")
+                    # print(receipt_info)
+                    # print("\n\n")
 
                     info = self.extract_info(receipt_info)
                     if "Tax Number" in info:
@@ -1534,7 +1534,7 @@ class ProcessingThread(QThread):
                     print(address)
 
                     api_data = self.items_to_api_format(result)
-                    print(api_data)
+                    # print(api_data)
                     print("\n\n")
 
                     print(self.userID)
@@ -1822,7 +1822,7 @@ class ProcessingThread(QThread):
         if jobs:
             # Get the last key-value pair added
             last_key, last_value = next(reversed(jobs.items()))
-            print(f"Last key: {last_key}, last value: {last_value}")
+            # print(f"Last key: {last_key}, last value: {last_value}")
             i = int(last_key)
 
         if self.retry is True:
