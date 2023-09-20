@@ -336,13 +336,15 @@ class MonoDecasProcessManager:
 
 
 class ReadyWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened = False):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
         # Create an instance of ProcessManager
         self.process_manager = process_manager
 
         self.ScanningWindow_window = None
+
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -354,7 +356,7 @@ class ReadyWindow(QMainWindow):
 
         self.directory_checker = DirectoryChecker()
         self.directory_checker.open_settings_window1_signal.connect(
-            self.open_settings_window1
+            self.open_scanning_window
         )
 
         self.timer = QTimer()
@@ -370,11 +372,16 @@ class ReadyWindow(QMainWindow):
         self.time.setPlainText(f" {current_time}")
         self.date.setPlainText(f" {shared_data.date}")
 
-    def open_settings_window1(self):
+    def open_scanning_window(self):
+        if self.is_scanning_opened:
+            print("\nPreventing to open another instance of scanning window\n")
+            return
+        self.is_scanning_opened = True
+        
         file_path = self.directory_checker.path_data
         try:
             print("\nOpening Scanning Screen\n")
-            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager)
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager, self.is_scanning_opened)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
             self.timer.stop()
@@ -1861,12 +1868,14 @@ class ProcessingThread(QThread):
 
 
 class ScanningWindow(QMainWindow, Ui_MainWindow3):
-    def __init__(self, stacked_widget, file_path, process_manager):
+    def __init__(self, stacked_widget, file_path, process_manager, is_scanning_opened):
         super().__init__()
         self.setupUi(self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
+
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -1994,7 +2003,8 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )  # optional: set its parent to None so it gets deleted
 
         print("\nOpening ReadyWindow\n")
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.is_scanning_opened = False
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
