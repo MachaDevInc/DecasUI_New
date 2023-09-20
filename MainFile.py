@@ -1371,7 +1371,7 @@ class ScanThread(QThread):
                 data_hex = data_bytes.hex()
                 print("Data in Hex:", data_hex)
 
-                if data_hex.endswith("3331"):  # checks if the hex string ends with "31" (hex '3331')
+                if data_hex.endswith("02000001003331"):  # checks if the hex string ends with "31" (hex '3331')
                     print("Skipped 31")  # For debugging
                     continue
 
