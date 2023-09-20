@@ -1481,9 +1481,9 @@ class ProcessingThread(QThread):
 
                 try:
                     result = self.pdf_to_table_data(self.file_path)
-                    print("\n\n")
-                    print(result)
-                    print("\n\n")
+                    # print("\n\n")
+                    # print(result)
+                    # print("\n\n")
 
                     receipt_text = ""
                     for i, row in enumerate(result):
