@@ -1471,6 +1471,7 @@ class ProcessingThread(QThread):
 
     def run(self):
         if not self._isRunning:
+            print("\nRunning ProcessingThread\n")
             self._isRunning = True
             self.deviceID = self.get_mac_address()
 
