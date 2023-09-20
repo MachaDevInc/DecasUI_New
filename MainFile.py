@@ -1991,30 +1991,30 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
             print("\nGoing back to home screen\n")
 
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.go_home)
-            self.timer.start(3000)
+            # self.timer = QTimer()
+            # self.timer.timeout.connect(self.go_home)
+            # self.timer.start(3000)
             # time.sleep(3)
 
     def go_home(self):
         self.timer.stop()
 
-        # while self.stacked_widget.count() > 0:
-        #     widget_to_remove = self.stacked_widget.widget(0)  # get the widget
-        #     print("\nRemoving Widget from Stack\n")
-        #     self.stacked_widget.removeWidget(
-        #         widget_to_remove
-        #     )  # remove it from stacked_widget
-        #     widget_to_remove.setParent(
-        #         None
-        #     )  # optional: set its parent to None so it gets deleted
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            print("\nRemoving Widget from Stack\n")
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
 
-        # print("\nOpening ReadyWindow\n")
-        # print("\is_scanning_opened False\n")
-        # self.is_scanning_opened = False
-        # self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
-        # self.stacked_widget.addWidget(self.ReadyWindow_window)
-        # self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
+        print("\nOpening ReadyWindow\n")
+        print("\is_scanning_opened False\n")
+        self.is_scanning_opened = False
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
     def open_keyboard(self):
         self.scanThread.stop()
