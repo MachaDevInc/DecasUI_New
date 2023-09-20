@@ -1956,10 +1956,10 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 + "</span></p></body></html>",
             )
         )
-        if notification == "Sending data to REPSLIPS server...":
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.go_home)
-            self.timer.start(2000)
+        # if notification == "Sending data to REPSLIPS server...":
+        #     self.timer = QTimer()
+        #     self.timer.timeout.connect(self.go_home)
+        #     self.timer.start(2000)
 
     def onProcessingFinished(self, retrieval_code, data_sent, error):
         self.code = retrieval_code
@@ -1991,9 +1991,9 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
             print("\nGoing back to home screen\n")
 
-            # self.timer = QTimer()
-            # self.timer.timeout.connect(self.go_home)
-            # self.timer.start(3000)
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.go_home)
+            self.timer.start(3000)
             # time.sleep(3)
 
     def go_home(self):
