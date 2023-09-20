@@ -1942,6 +1942,20 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 + "</span></p></body></html>",
             )
         )
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.clear_onScanProgress)
+        self.timer.start(3000)
+    
+    def clear_onScanProgress(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.notification.setText(
+            _translate(
+                "stacked_widget",
+                '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                + ""
+                + "</span></p></body></html>",
+            )
+        )
 
     def update_user_id(self, user_id=""):
         if user_id != "":
