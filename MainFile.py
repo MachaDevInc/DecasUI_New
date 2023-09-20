@@ -660,6 +660,7 @@ class workWindow(JobsMainWindow):
         )
 
     def onProcessingFinished(self, retrieval_code, data_sent, error):
+        self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
 
@@ -1993,6 +1994,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         #     self.timer.start(2000)
 
     def onProcessingFinished(self, retrieval_code, data_sent, error):
+        self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
 
@@ -2076,6 +2078,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         )
 
     def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
+        self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
         try:
