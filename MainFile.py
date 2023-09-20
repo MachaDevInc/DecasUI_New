@@ -2232,9 +2232,9 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
-        self.stacked_widget.addWidget(self.ReadyWindow_window)
-        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
+        # self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
+        # self.stacked_widget.addWidget(self.ReadyWindow_window)
+        # self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class PrintRetrievalCode(QMainWindow):
@@ -2256,7 +2256,7 @@ class PrintRetrievalCode(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go_home)
-        self.timer.start(8000)
+        self.timer.start(5000)
 
     def thermal_print(self):
         p = Serial(
