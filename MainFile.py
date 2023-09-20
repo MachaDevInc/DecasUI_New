@@ -336,7 +336,7 @@ class MonoDecasProcessManager:
 
 
 class ReadyWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager, is_scanning_opened = False):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
         # Create an instance of ProcessManager
@@ -2357,6 +2357,7 @@ class MyApp(QApplication):
         super().__init__(sys.argv)
         self.process_manager = MonoDecasProcessManager()
         self.serial_manager = SerialManager()
+        self.is_scanning_opened = False
 
         # Initialize serial and UI components
         self.init_serial()
@@ -2369,7 +2370,7 @@ class MyApp(QApplication):
         try:
             self.stacked_widget = QStackedWidget()
             self.process_manager.start_process()
-            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
             
