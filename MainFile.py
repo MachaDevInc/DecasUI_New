@@ -2229,7 +2229,7 @@ class DataSentWindow(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go_home)
-        self.timer.start(3000)
+        self.timer.start(5000)
 
     def go_home(self):
         self.timer.stop()
