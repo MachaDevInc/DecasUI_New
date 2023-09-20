@@ -1881,8 +1881,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
-        self.is_scanning_opened = is_scanning_opened
-
         # Set the window size
         self.resize(1024, 600)
 
@@ -1975,7 +1973,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         if self.data_sent and error != "error_PDF":
             self.DataSentWindow_window = DataSentWindow(
-                self.file_path, self.stacked_widget, self.process_manager
+                self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
