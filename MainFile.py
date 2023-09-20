@@ -1973,6 +1973,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print(retrieval_code)
 
         if self.data_sent and error != "error_PDF":
+            print("Opening DataSentWindow")
             self.DataSentWindow_window = DataSentWindow(
                 self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
             )
