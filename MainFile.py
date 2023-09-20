@@ -375,6 +375,7 @@ class ReadyWindow(QMainWindow):
         if self.is_scanning_opened:
             print("\nPreventing to open another instance of scanning window\n")
             return
+        print("\is_scanning_opened True\n")
         self.is_scanning_opened = True
         
         file_path = self.directory_checker.path_data
@@ -2007,6 +2008,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )  # optional: set its parent to None so it gets deleted
 
         print("\nOpening ReadyWindow\n")
+        print("\is_scanning_opened False\n")
         self.is_scanning_opened = False
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
