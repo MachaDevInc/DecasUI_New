@@ -1330,6 +1330,8 @@ class Blinker(QObject):
 
 class ScanThread(QThread):
     foundUserID = pyqtSignal(str)
+    # Signal emitted for UI updates
+    RFID_No_Data = pyqtSignal(str)
 
     def __init__(
         self,
@@ -1420,9 +1422,12 @@ class ScanThread(QThread):
                             print(f"Failed to read block {i}.")
 
                     print("Full text data:", full_text_data)
-                    self.foundUserID.emit(full_text_data)
-                    self.scanned = True
-                    self.ser.write(self.stop_scan_command_bytes)
+                    if full_text_data:
+                        self.foundUserID.emit(full_text_data)
+                        self.scanned = True
+                        self.ser.write(self.stop_scan_command_bytes)
+                    else:
+                        self.RFID_No_Data.emit("Your RFID Card has no Data!!!")
 
             except Exception as e:
                 print(f"Error reading from serial port in run: {e}")
@@ -1918,6 +1923,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.QR_Icon,
         )
         self.scanThread.foundUserID.connect(self.processUserID)
+        self.scanThread.RFID_No_Data.connect(self.onScanProgress)
         print("\nStarting Scan Thread\n")
         self.scanThread.start()
 
@@ -1925,6 +1931,17 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self, self.stacked_widget, self, self.scanThread, self.file_path
         )
         self.stacked_widget.addWidget(self.numeric_keyboard)
+    
+    def onScanProgress(self, notification):
+        _translate = QtCore.QCoreApplication.translate
+        self.notification.setText(
+            _translate(
+                "stacked_widget",
+                '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                + notification
+                + "</span></p></body></html>",
+            )
+        )
 
     def update_user_id(self, user_id=""):
         if user_id != "":
