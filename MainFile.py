@@ -1988,11 +1988,12 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                     + "</span></p></body></html>",
                 )
             )
-            # time.sleep(3)
             print("\nGoing back to home screen\n")
+
             self.timer = QTimer()
             self.timer.timeout.connect(self.go_home)
             self.timer.start(3000)
+            # time.sleep(3)
 
     def go_home(self):
         self.timer.stop()
@@ -2228,7 +2229,7 @@ class DataSentWindow(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go_home)
-        self.timer.start(8000)
+        self.timer.start(3000)
 
     def go_home(self):
         self.timer.stop()
