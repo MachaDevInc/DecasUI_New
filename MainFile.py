@@ -342,7 +342,7 @@ class ReadyWindow(QMainWindow):
         # Create an instance of ProcessManager
         self.process_manager = process_manager
 
-        self.SettingsWindow1_window = None
+        self.ScanningWindow_window = None
 
         # Set the window size
         self.resize(1024, 600)
@@ -373,9 +373,10 @@ class ReadyWindow(QMainWindow):
     def open_settings_window1(self):
         file_path = self.directory_checker.path_data
         try:
-            self.SettingsWindow1_window = SettingsWindow1(self.stacked_widget, file_path, self.process_manager)
-            self.stacked_widget.addWidget(self.SettingsWindow1_window)
-            self.stacked_widget.setCurrentWidget(self.SettingsWindow1_window)
+            print("\nOpening Scanning Screen\n")
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager)
+            self.stacked_widget.addWidget(self.ScanningWindow_window)
+            self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
             self.timer.stop()
             self.hide()
         except (OSError, ValueError) as e:
@@ -1339,6 +1340,7 @@ class ScanThread(QThread):
 
         try:
             if not self.ser.isOpen():
+                print("\nReopening Serial Port in ScanThread initialization\n")
                 self.ser.open()
         except Exception as e:
             print(f"Failed to open serial port in __init__: {e}")
@@ -1360,6 +1362,7 @@ class ScanThread(QThread):
         self._isRunning = True
         try:
             if not self.ser.isOpen():
+                print("\nReopening Serial Port after ScanThread initialization\n")
                 self.ser.open()
         except Exception as e:
             print(f"Failed to open serial port in __init__: {e}")
@@ -1414,6 +1417,7 @@ class ScanThread(QThread):
             if self.scanned:
                 break
 
+        print("\nCalling cleanup function\n")
         self.cleanup()
 
     def restart(self):
@@ -1431,6 +1435,7 @@ class ScanThread(QThread):
             try:
                 self.ser.write(self.stop_scan_command_bytes)
                 time.sleep(0.1)
+                print("\nClosing Serial port in Cleanup function\n")
                 self.ser.close()
             except Exception as e:
                 print(f"Error closing serial port in cleanup: {e}")
@@ -1538,11 +1543,13 @@ class ProcessingThread(QThread):
                     # print(api_data)
                     print("\n\n")
 
+                    print("\nUser ID: ")
                     print(self.userID)
-                    print("\n\n")
+                    print("\n")
 
+                    print("\nDevice ID: ")
                     print(self.deviceID)
-                    print("\n\n")
+                    print("\n")
 
                     self.progress_signal.emit("Sending data to REPSLIPS server...")
 
@@ -1578,6 +1585,7 @@ class ProcessingThread(QThread):
                     self.update_jobs_dict()
 
                     # Emit signal when processing is done
+                    print("\nEmitting ProcessingThread signal\n")
                     self.finished_signal.emit(
                         self.retrieval_code, self.data_sent, self.response_message
                     )
@@ -1852,7 +1860,7 @@ class ProcessingThread(QThread):
             json.dump(jobs, f)
 
 
-class SettingsWindow1(QMainWindow, Ui_MainWindow3):
+class ScanningWindow(QMainWindow, Ui_MainWindow3):
     def __init__(self, stacked_widget, file_path, process_manager):
         super().__init__()
         self.setupUi(self)
@@ -1878,11 +1886,13 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         stop_scan_command = "7E 00 08 01 00 02 00 AB CD"
         self.stop_scan_command_bytes = bytes.fromhex(stop_scan_command.replace(" ", ""))
 
+        print("\nConnecting PN532\n")
         # PN532
         i2c = busio.I2C(board.SCL, board.SDA)
         self.pn532 = PN532_I2C(i2c, debug=False)
         self.pn532.SAM_configuration()
 
+        print("\nConnecting Barcode Scanner over ttySC0\n")
         self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=0.5)
 
         self.scanThread = ScanThread(
@@ -1894,6 +1904,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
             self.QR_Icon,
         )
         self.scanThread.foundUserID.connect(self.processUserID)
+        print("\nStarting Scan Thread\n")
         self.scanThread.start()
 
         self.numeric_keyboard = NumericKeyboard(
@@ -1905,6 +1916,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         if user_id != "":
             self.userID = user_id
             date_time = str(shared_data.date) + str(shared_data.time)
+            print("\nOpening ProcessingThread after getting phone number\n")
             self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
@@ -1914,6 +1926,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
         self.userID = scanned_data
         print("Found a User ID:", scanned_data)
         date_time = str(shared_data.date) + str(shared_data.time)
+        print("\nOpening ProcessingThread after scan is done\n")
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
@@ -1961,16 +1974,18 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                     + "</span></p></body></html>",
                 )
             )
-            time.sleep(3)
+            # time.sleep(3)
+            print("\nGoing back to home screen\n")
             self.timer = QTimer()
             self.timer.timeout.connect(self.go_home)
-            self.timer.start(5000)
+            self.timer.start(3000)
 
     def go_home(self):
         self.timer.stop()
 
         while self.stacked_widget.count() > 0:
             widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            print("\nRemoving Widget from Stack\n")
             self.stacked_widget.removeWidget(
                 widget_to_remove
             )  # remove it from stacked_widget
@@ -1978,6 +1993,7 @@ class SettingsWindow1(QMainWindow, Ui_MainWindow3):
                 None
             )  # optional: set its parent to None so it gets deleted
 
+        print("\nOpening ReadyWindow\n")
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
@@ -2101,7 +2117,7 @@ class NumericKeyboard(QMainWindow):
             self.userID = self.number
             self.numeric_keyboard.update_user_id(self.userID)
 
-            # Switch back to the SettingsWindow1
+            # Switch back to the ScanningWindow
             index = self.parent.stacked_widget.indexOf(self.numeric_keyboard)
             self.parent.stacked_widget.setCurrentIndex(index)
             self.hide()
@@ -2112,7 +2128,7 @@ class NumericKeyboard(QMainWindow):
         self.check_number_api()
 
     def destroy(self):
-        # Switch back to the SettingsWindow1
+        # Switch back to the ScanningWindow
         index = self.parent.stacked_widget.indexOf(self.numeric_keyboard)
         self.parent.stacked_widget.setCurrentIndex(index)
         # Restart the scanThread
@@ -2297,7 +2313,9 @@ class DirectoryChecker(QObject):
             for content in contents:
                 file_path = os.path.join(directory_path, content)
                 if os.path.isfile(file_path):
+                    print("\nFound a new print file: ")
                     print(file_path)
+                    print("\n")
             self.path_data = file_path  # Update path_data with the last file_path
             self.open_settings_window1_signal.emit()
 
