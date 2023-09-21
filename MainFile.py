@@ -1623,7 +1623,7 @@ class ProcessingThread(QThread):
                     time.sleep(3)
                     # Emit signal when processing is done
                     self.finished_signal.emit(
-                        "", self.data_sent, "error_PDF"
+                        "", self.data_sent, "error_PDF", self.is_scanning_opened
                     )
 
             else:
