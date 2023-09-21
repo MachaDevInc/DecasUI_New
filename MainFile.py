@@ -1467,7 +1467,7 @@ class ScanThread(QThread):
 
 class ProcessingThread(QThread):
     # Signal emitted when thread finishes
-    finished_signal = pyqtSignal(str, bool, str)
+    finished_signal = pyqtSignal(str, bool, str, bool)
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
@@ -1612,7 +1612,7 @@ class ProcessingThread(QThread):
                     print(self.is_scanning_opened)
                     print("\n")
                     self.finished_signal.emit(
-                        self.retrieval_code, self.data_sent, self.response_message
+                        self.retrieval_code, self.data_sent, self.response_message, self.is_scanning_opened
                     )
                 except Exception as e:
                     print(f"Error: {e}")
@@ -2000,10 +2000,11 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         #     self.timer.timeout.connect(self.go_home)
         #     self.timer.start(2000)
 
-    def onProcessingFinished(self, retrieval_code, data_sent, error):
+    def onProcessingFinished(self, retrieval_code, data_sent, error, is_scanning_opened):
         # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
+        self.is_scanning_opened = is_scanning_opened
 
         try:
             subprocess.run(["sudo", "rm", self.file_path], check=True)
@@ -2087,10 +2088,11 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
         )
 
-    def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
+    def onProcessingFinished_Print(self, retrieval_code, data_sent, error, is_scanning_opened):
         # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
+        self.is_scanning_opened = is_scanning_opened
         try:
             subprocess.run(["sudo", "rm", self.file_path], check=True)
         except subprocess.CalledProcessError as e:
