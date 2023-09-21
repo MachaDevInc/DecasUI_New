@@ -602,7 +602,7 @@ class workWindow(JobsMainWindow):
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
-                print(f"The dictionary contains {size} key-value pairs.")
+                print(f"The dictionary contains {size} key-value pairs. Reading this from show_jobs function in workWindow")
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
@@ -1633,7 +1633,7 @@ class ProcessingThread(QThread):
                         jobs = json.load(f)  # This will give you a dictionary
                         # Get the size of the dictionary
                         size = len(jobs)
-                        print(f"The dictionary contains {size} key-value pairs.")
+                        print(f"The dictionary contains {size} key-value pairs. Reading this else condition of 'if self.retry' in ProcessingThread")
                         print(f"Dictionary: '{jobs[self.retry_text]}'")
 
                         payload = jobs[self.retry_text]["payload"]
@@ -1848,7 +1848,7 @@ class ProcessingThread(QThread):
                 jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
                 size = len(jobs)
-                print(f"The dictionary contains {size} key-value pairs.")
+                print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
