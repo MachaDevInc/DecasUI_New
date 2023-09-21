@@ -1607,6 +1607,7 @@ class ProcessingThread(QThread):
 
                     # Emit signal when processing is done
                     print("\nEmitting ProcessingThread signal\n")
+                    self.is_scanning_opened = False
                     self.finished_signal.emit(
                         self.retrieval_code, self.data_sent, self.response_message
                     )
@@ -1667,7 +1668,7 @@ class ProcessingThread(QThread):
                 except FileNotFoundError:
                     print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
-            self.is_scanning_opened = False
+            # self.is_scanning_opened = False
             self._isRunning = False
 
     def get_mac_address(self):
