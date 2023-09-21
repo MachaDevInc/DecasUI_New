@@ -1667,8 +1667,8 @@ class ProcessingThread(QThread):
                 except FileNotFoundError:
                     print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
-            self._isRunning = False
             self.is_scanning_opened = False
+            self._isRunning = False
 
     def get_mac_address(self):
         # mac_num = hex(uuid.getnode()).replace('0x', '').upper()
