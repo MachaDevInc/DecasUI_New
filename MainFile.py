@@ -1608,6 +1608,9 @@ class ProcessingThread(QThread):
                     # Emit signal when processing is done
                     print("\nEmitting ProcessingThread signal\n")
                     self.is_scanning_opened = False
+                    print("\nself.is_scanning_opened: ")
+                    print(self.is_scanning_opened)
+                    print("\n")
                     self.finished_signal.emit(
                         self.retrieval_code, self.data_sent, self.response_message
                     )
@@ -2006,6 +2009,9 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             subprocess.run(["sudo", "rm", self.file_path], check=True)
         except subprocess.CalledProcessError as e:
             print(f"An error occurred: {e}")
+        print("\nself.is_scanning_opened: ")
+        print(self.is_scanning_opened)
+        print("\n")
         print("Processing finished!")
         print(retrieval_code)
 
@@ -2091,6 +2097,9 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             print(f"An error occurred: {e}")
 
         if self.data_sent:
+            print("\nself.is_scanning_opened: ")
+            print(self.is_scanning_opened)
+            print("\n")
             print("Processing finished!")
             print(self.code)
 
