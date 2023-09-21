@@ -643,7 +643,7 @@ class workWindow(JobsMainWindow):
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
         date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread("", "", date_time, True, text)
+        self.processingThread = ProcessingThread("", "", date_time, self.is_scanning_opened, True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -660,7 +660,7 @@ class workWindow(JobsMainWindow):
         )
 
     def onProcessingFinished(self, retrieval_code, data_sent, error):
-        self.is_scanning_opened = False
+        # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
 
@@ -1471,12 +1471,14 @@ class ProcessingThread(QThread):
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
-    def __init__(self, file_path, userID, date_time, retry=False, retry_text=""):
+    def __init__(self, file_path, userID, date_time, is_scanning_opened, retry=False, retry_text=""):
         super().__init__()
         self._isRunning = False
         self.file_path = file_path
         self.userID = userID
         self.date_time = date_time
+        self.is_scanning_opened = is_scanning_opened
+
         self.retry = retry
         self.retry_text = retry_text
         self.data_sent = False
@@ -1517,7 +1519,7 @@ class ProcessingThread(QThread):
                         row['tax'] = row['tax'].replace(",", "")
                         row['discount'] = row['discount'].replace(",", "")
                         row['total'] = row['total'].replace(",", "")
-                        print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
+                        # print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
 
                         receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
 
@@ -1547,7 +1549,7 @@ class ProcessingThread(QThread):
                         print(f"Date: {info['Date']}")
                     else:
                         info['Date'] = 'Nil'
-                    print("\n\n")
+                    # print("\n\n")
 
                     address = re.findall(
                         r"^(.*(?:Street|Avenue|Road|Lane).*\d{4}?.*)$", receipt_info, re.MULTILINE
@@ -1560,7 +1562,7 @@ class ProcessingThread(QThread):
 
                     api_data = self.items_to_api_format(result)
                     # print(api_data)
-                    print("\n\n")
+                    # print("\n\n")
 
                     print("\nUser ID: ")
                     print(self.userID)
@@ -1666,6 +1668,7 @@ class ProcessingThread(QThread):
                     print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
             self._isRunning = False
+            self.is_scanning_opened = False
 
     def get_mac_address(self):
         # mac_num = hex(uuid.getnode()).replace('0x', '').upper()
@@ -1963,7 +1966,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.userID = user_id
             date_time = str(shared_data.date) + str(shared_data.time)
             print("\nOpening ProcessingThread after getting phone number\n")
-            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -1973,7 +1976,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print("Found a User ID:", scanned_data)
         date_time = str(shared_data.date) + str(shared_data.time)
         print("\nOpening ProcessingThread after scan is done\n")
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
@@ -1994,7 +1997,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         #     self.timer.start(2000)
 
     def onProcessingFinished(self, retrieval_code, data_sent, error):
-        self.is_scanning_opened = False
+        # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
 
@@ -2043,8 +2046,8 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )  # optional: set its parent to None so it gets deleted
 
         print("\nOpening ReadyWindow\n")
-        print("\is_scanning_opened False\n")
-        self.is_scanning_opened = False
+        # print("\is_scanning_opened False\n")
+        # self.is_scanning_opened = False
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
@@ -2061,7 +2064,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         self.userID = ""
         date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
         self.processingThread.start()
@@ -2078,7 +2081,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         )
 
     def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
-        self.is_scanning_opened = False
+        # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
         try:
