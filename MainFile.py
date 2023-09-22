@@ -323,8 +323,8 @@ class MonoDecasProcessManager:
         
     def start_process(self):
         if self.process is None or self.process.poll() is not None:
-            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe", "-c"])
-            # self.process = subprocess.Popen(["sudo", "mono", "/home/decas/DecasPi.exe", "-c"])
+            # self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe", "-c"])
+            self.process = subprocess.Popen(["sudo", "mono", "/home/decas/DecasPi.exe", "-c"])
         
     def terminate_process(self):
         if self.process and self.process.poll() is None:
