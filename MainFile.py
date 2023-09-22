@@ -1622,6 +1622,11 @@ class ProcessingThread(QThread):
                     self.progress_signal.emit("Error! Unsupported PDF")
                     time.sleep(3)
                     # Emit signal when processing is done
+                    print("\nEmitting ProcessingThread signal\n")
+                    self.is_scanning_opened = False
+                    print("\nself.is_scanning_opened: ")
+                    print(self.is_scanning_opened)
+                    print("\n")
                     self.finished_signal.emit(
                         "", self.data_sent, "error_PDF", self.is_scanning_opened
                     )
