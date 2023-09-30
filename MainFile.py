@@ -2061,7 +2061,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 widget_to_remove.setParent(
                     None
                 )  # optional: set its parent to None so it gets deleted
-                
+
             self.DataSentWindow_window = DataSentWindow(
                 self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
             )
@@ -2380,7 +2380,7 @@ class PrintRetrievalCode(QMainWindow):
         )
         # Printing the image
         # here location can be your image path in “ ”
-        p.image("/home/decas/ui/DecasUI_New/pics/Logo.png", impl="bitImageColumn")
+        p.image("/home/decas/ui/DecasUI_New/pics/Logo.bmp", impl="bitImageColumn")
 
         p.set(
             align="center",
