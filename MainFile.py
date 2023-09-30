@@ -1372,7 +1372,7 @@ class ScanThread(QThread):
             Q_ARG(int, 300),
             Q_ARG(int, 3000),
         )
-        # time.sleep(3)
+        time.sleep(3)
 
     def run(self):
         if self._isRunning:
