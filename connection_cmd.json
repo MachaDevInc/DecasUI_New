@@ -1,0 +1,3 @@
+{
+    "cmd_list": ["mono", "/home/decas/DecasPi.exe", "-n"]
+}

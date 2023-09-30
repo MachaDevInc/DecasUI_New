@@ -318,24 +318,31 @@ shared_data = SharedData()
 import subprocess
 
 class MonoDecasProcessManager:
-    def __init__(self):
+    def __init__(self, cmd_list):
         self.process = None
+        if cmd_list is None:
+            self.cmd_list = ["mono", "/home/decas/DecasPi.exe", "-n"]
+        else:
+            self.cmd_list = cmd_list
         
     def start_process(self):
-        pass
         if self.process is None or self.process.poll() is not None:
-            self.process = subprocess.Popen(["mono", "/home/decas/DecasPi.exe", "-n"])
-        #     self.process = subprocess.Popen(["sudo", "mono", "/home/decas/DecasPi.exe", "-c"])
+            print("\n Running MonoDecasProcessManager with Command: ")
+            print(self.cmd_list)
+            print("\n")
+            self.process = subprocess.Popen(self.cmd_list)
         
     def terminate_process(self):
-        pass
-        # if self.process and self.process.poll() is None:
-        #     self.process.terminate()
-        #     self.process.wait()
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+            self.process.wait()
         
     def restart_process(self):
         self.terminate_process()
         self.start_process()
+
+    def update_command(self, cmd_list):
+        self.cmd_list = cmd_list
 
 
 class ReadyWindow(QMainWindow):
@@ -441,7 +448,7 @@ class connectionWindow(QMainWindow):
         self.r3.clicked.connect(self.on_selected)
         self.r4.clicked.connect(self.on_selected)
 
-        self.read_config_xml()
+        self.read_cmd_in_json()
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_system_time)
@@ -461,34 +468,58 @@ class connectionWindow(QMainWindow):
         self.process_manager.terminate_process()
         if self.r1.isChecked():
             print("selected = 'WiFi'")
-            self.edit_config_xml("true", "(none)")
+            # self.edit_config_xml("true", "(none)")
+            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-n"]
+            self.update_cmd_in_json(new_cmd)
+            self.process_manager.update_command(new_cmd)
+            self.process_manager.restart_process()
         elif self.r2.isChecked():
             print("selected = 'Bluetooth'")
-            self.edit_config_xml("false", "/dev/rfcomm0")
+            # self.edit_config_xml("false", "/dev/rfcomm0")
+            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/rfcomm0"]
+            self.update_cmd_in_json(new_cmd)
+            self.process_manager.update_command(new_cmd)
+            self.process_manager.restart_process()
         elif self.r3.isChecked():
             print("selected = 'USB'")
-            self.edit_config_xml("false", "/dev/ttyS0")
+            # self.edit_config_xml("false", "/dev/ttyS0")
+            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS0"]
+            self.update_cmd_in_json(new_cmd)
+            self.process_manager.update_command(new_cmd)
+            self.process_manager.restart_process()
         elif self.r4.isChecked():
             print("selected = 'RS232'")
-            self.edit_config_xml("false", "/dev/ttyS1")
+            # self.edit_config_xml("false", "/dev/ttyS1")
+            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS1"]
+            self.update_cmd_in_json(new_cmd)
+            self.process_manager.update_command(new_cmd)
+            self.process_manager.restart_process()
 ########################need to change###############################
 
-    def read_config_xml(self):
+    def read_cmd_in_json(self):
 
-        # Load and parse the XML file
-        tree = ET.parse('/home/decas/config.xml')
-        root = tree.getroot()
+        # Read cmd_list from JSON file
+        try:
+            with open("/home/decas/ui/DecasUI_New/connection_cmd.json", "r") as f:
+                data = json.load(f)  
+                read_cmd_list = data['cmd_list']  
+                print("\n Read data from connection_cmd.json: ")
+                print(read_cmd_list)
+                print("\n")
+        except json.JSONDecodeError:
+            print("File is not valid JSON.")
+            read_cmd_list = None
+        except FileNotFoundError:
+            print("File '/home/decas/ui/DecasUI_New/connection_cmd.json' not found.")
+            read_cmd_list = None
+        
+        wifi_cmd_list = ["mono", "/home/decas/NewPi.exe", "-n"]
+        bluetooth_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/rfcomm0"]
+        usb_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS0"]
+        rs232_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS1"]
 
-        # Find the ListenTCP element
-        listen_tcp = root.find('ListenTCP')
-
-        # Find the ComPort element
-        com_port = root.find('ComPort')
-
-        print(listen_tcp.text)
-        print(com_port.text)
-
-        if listen_tcp.text == "true" and com_port.text == "(none)":
+        # Compare the two lists
+        if read_cmd_list == wifi_cmd_list:
             self.r1.setChecked(True)
             self.wifi.setText(
             self._translate(
@@ -498,11 +529,11 @@ class connectionWindow(QMainWindow):
                 + "</span></p></body></html>",
             )
         )
-        elif listen_tcp.text == "false" and com_port.text == "/dev/rfcomm0":
+        elif read_cmd_list == bluetooth_cmd_list:
             self.r2.setChecked(True)
-        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS0":
+        elif read_cmd_list == usb_cmd_list:
             self.r3.setChecked(True)
-        elif listen_tcp.text == "false" and com_port.text == "/dev/ttyS1":
+        elif read_cmd_list == rs232_cmd_list:
             self.r4.setChecked(True)
     
     def get_current_network(self):
@@ -516,35 +547,13 @@ class connectionWindow(QMainWindow):
 
         return output.strip()
     
-    def edit_config_xml(self, tcp, port):
-        self.tcp = tcp
-        self.port = port
-
-        # Load and parse the XML file
-        tree = ET.parse('/home/decas/config.xml')
-        root = tree.getroot()
-
-        # Find and modify the ListenTCP element
-        listen_tcp = root.find('ListenTCP')
-        if listen_tcp is not None:
-            listen_tcp.text = self.tcp
-
-        # Find and modify the ComPort element
-        com_port = root.find('ComPort')
-        if com_port is not None:
-            com_port.text = self.port
-
-        # Convert the tree to a string
-        xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
-
-        # Manually add the XML declaration and namespaces
-        final_xml = '<?xml version="1.0"?>\n<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' + xml_str.split('<Settings>', 1)[1]
-
-        # Write the final XML string to a file
-        with open('/home/decas/config.xml', 'w') as f:
-            f.write(final_xml)
+    def update_cmd_in_json(self, new_cmd_list):
+        data = {
+            "cmd_list": new_cmd_list
+        }
         
-        self.process_manager.start_process()
+        with open("/home/decas/ui/DecasUI_New/connection_cmd.json", "w") as f:
+            json.dump(data, f, indent=4)
 
 
 class workWindow(JobsMainWindow):
@@ -2433,7 +2442,28 @@ class SerialManager:
 class MyApp(QApplication):
     def __init__(self, app):
         super().__init__(sys.argv)
-        self.process_manager = MonoDecasProcessManager()
+        jobs = {}
+
+        # Read the cmd_list from JSON file
+        try:
+            with open("/home/decas/ui/DecasUI_New/connection_cmd.json", "r") as f:
+                data = json.load(f)  
+                custom_cmd = data['cmd_list']  
+        except json.JSONDecodeError:
+            print("File is not valid JSON")
+            custom_cmd = None
+        except FileNotFoundError:
+            print("File '/home/decas/ui/DecasUI_New/connection_cmd.json' not found.")
+            custom_cmd = None
+
+        if custom_cmd:
+            self.process_manager = MonoDecasProcessManager(custom_cmd)
+            self.process_manager.start_process()
+        else:
+            print("Failed to read command from JSON. Using default.")
+            self.process_manager = MonoDecasProcessManager()
+            self.process_manager.start_process()
+
         self.serial_manager = SerialManager()
         self.is_scanning_opened = False
 
