@@ -1408,10 +1408,12 @@ class ScanThread(QThread):
                     self.scanned = True
                     self.ser.write(self.stop_scan_command_bytes)
 
-                uid = self.pn532.read_passive_target(timeout=0.1)
+                uid = self.pn532.read_passive_target(timeout=0.5)
                 if uid is not None:
                     self.blink_and_sleep(self.rfid_blinker)
-                    uid_string = "".join([hex(i)[2:].zfill(2) for i in uid])
+                    uid_string = ''.join([hex(i)[2:].zfill(2) for i in uid])  # Convert UID to a string
+                    print("Found an RFID card with UID:", uid_string)
+
                     # Initialize an empty string to hold tag data
                     full_text_data = ""
 
