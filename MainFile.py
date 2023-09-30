@@ -2052,6 +2052,16 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         if self.data_sent and error != "error_PDF":
             print("Opening DataSentWindow")
+
+            while self.stacked_widget.count() > 0:
+                widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+                self.stacked_widget.removeWidget(
+                    widget_to_remove
+                )  # remove it from stacked_widget
+                widget_to_remove.setParent(
+                    None
+                )  # optional: set its parent to None so it gets deleted
+                
             self.DataSentWindow_window = DataSentWindow(
                 self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
             )
@@ -2127,6 +2137,9 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.code = retrieval_code
         self.data_sent = data_sent
         self.is_scanning_opened = is_scanning_opened
+
+        self.scanThread.stop()
+
         try:
             subprocess.run(["sudo", "rm", self.file_path], check=True)
         except subprocess.CalledProcessError as e:
