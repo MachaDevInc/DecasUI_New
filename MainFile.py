@@ -1503,7 +1503,7 @@ class ProcessingThread(QThread):
     def run(self):
         if not self._isRunning:
             print("\nRunning ProcessingThread\n")
-            print("\nself.file_path: " + self.file_path + "\n")
+            # print("\nself.file_path: " + self.file_path + "\n")
             self._isRunning = True
             self.deviceID = self.get_mac_address()
 
@@ -1996,7 +1996,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print("Found a User ID:", scanned_data)
         date_time = str(shared_data.date) + str(shared_data.time)
         print("\nOpening ProcessingThread after scan is done\n")
-        print("\nself.file_path: " + self.file_path + "\n")
+        # print("\nself.file_path: " + self.file_path + "\n")
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
@@ -2055,7 +2055,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.timer = QTimer()
             self.timer.timeout.connect(self.go_home)
             self.timer.start(3000)
-            # time.sleep(3)
+            time.sleep(3)
 
     def go_home(self):
         self.timer.stop()
