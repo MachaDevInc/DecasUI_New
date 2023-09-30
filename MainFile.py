@@ -2218,6 +2218,8 @@ class NumericKeyboard(QMainWindow):
             self.userID = self.number
             self.numeric_keyboard.update_user_id(self.userID)
 
+            self.scanThread.stop()
+
             # Switch back to the ScanningWindow
             index = self.parent.stacked_widget.indexOf(self.numeric_keyboard)
             self.parent.stacked_widget.setCurrentIndex(index)
