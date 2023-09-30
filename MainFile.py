@@ -2400,7 +2400,7 @@ class PrintRetrievalCode(QMainWindow):
         )
         p.text("\n")
         p.text(
-            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n     repslips.com\n2) Click on menu -->RETRIVAL \n3) Type the above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
+            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n         repslips.com\n2) Click on menu -->RETRIVAL \n3) Type above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
         )
         print("done")
 
