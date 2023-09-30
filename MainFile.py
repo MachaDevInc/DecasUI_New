@@ -1410,7 +1410,6 @@ class ScanThread(QThread):
 
                 uid = self.pn532.read_passive_target(timeout=0.5)
                 if uid is not None:
-                    self.blink_and_sleep(self.rfid_blinker)
                     uid_string = ''.join([hex(i)[2:].zfill(2) for i in uid])  # Convert UID to a string
                     print("Found an RFID card with UID:", uid_string)
 
@@ -1925,8 +1924,13 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         print("\nConnecting PN532\n")
         # PN532
+        # Configure the PN532 connection
         i2c = busio.I2C(board.SCL, board.SDA)
         self.pn532 = PN532_I2C(i2c, debug=False)
+        ic, ver, rev, support = self.pn532.firmware_version
+        print("Found PN532 with firmware version: {0}.{1}".format(ver, rev))
+
+        # Configure PN532 to communicate with RFID cards
         self.pn532.SAM_configuration()
 
         print("\nConnecting Barcode Scanner over ttySC0\n")
