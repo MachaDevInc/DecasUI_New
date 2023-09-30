@@ -469,28 +469,28 @@ class connectionWindow(QMainWindow):
         if self.r1.isChecked():
             print("selected = 'WiFi'")
             # self.edit_config_xml("true", "(none)")
-            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-n"]
+            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-n"]
             self.update_cmd_in_json(new_cmd)
             self.process_manager.update_command(new_cmd)
             self.process_manager.restart_process()
         elif self.r2.isChecked():
             print("selected = 'Bluetooth'")
             # self.edit_config_xml("false", "/dev/rfcomm0")
-            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/rfcomm0"]
+            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/rfcomm0"]
             self.update_cmd_in_json(new_cmd)
             self.process_manager.update_command(new_cmd)
             self.process_manager.restart_process()
         elif self.r3.isChecked():
             print("selected = 'USB'")
             # self.edit_config_xml("false", "/dev/ttyS0")
-            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS0"]
+            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS0"]
             self.update_cmd_in_json(new_cmd)
             self.process_manager.update_command(new_cmd)
             self.process_manager.restart_process()
         elif self.r4.isChecked():
             print("selected = 'RS232'")
             # self.edit_config_xml("false", "/dev/ttyS1")
-            new_cmd = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS1"]
+            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS1"]
             self.update_cmd_in_json(new_cmd)
             self.process_manager.update_command(new_cmd)
             self.process_manager.restart_process()
@@ -513,13 +513,14 @@ class connectionWindow(QMainWindow):
             print("File '/home/decas/ui/DecasUI_New/connection_cmd.json' not found.")
             read_cmd_list = None
         
-        wifi_cmd_list = ["mono", "/home/decas/NewPi.exe", "-n"]
-        bluetooth_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/rfcomm0"]
-        usb_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS0"]
-        rs232_cmd_list = ["mono", "/home/decas/AnotherPi.exe", "-s", "/dev/ttyS1"]
+        wifi_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-n"]
+        bluetooth_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/rfcomm0"]
+        usb_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS0"]
+        rs232_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS1"]
 
         # Compare the two lists
         if read_cmd_list == wifi_cmd_list:
+            print("\n connection_cmd.json contains configuration for wifi_cmd_list\n")
             self.r1.setChecked(True)
             self.wifi.setText(
             self._translate(
@@ -530,10 +531,13 @@ class connectionWindow(QMainWindow):
             )
         )
         elif read_cmd_list == bluetooth_cmd_list:
+            print("\n connection_cmd.json contains configuration for bluetooth_cmd_list\n")
             self.r2.setChecked(True)
         elif read_cmd_list == usb_cmd_list:
+            print("\n connection_cmd.json contains configuration for usb_cmd_list\n")
             self.r3.setChecked(True)
         elif read_cmd_list == rs232_cmd_list:
+            print("\n connection_cmd.json contains configuration for rs232_cmd_list\n")
             self.r4.setChecked(True)
     
     def get_current_network(self):
