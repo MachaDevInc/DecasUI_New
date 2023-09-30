@@ -1427,13 +1427,13 @@ class ScanThread(QThread):
                             print(f"Failed to read block {i}.")
 
                     print("Full text data:", full_text_data)
+                    self.blink_and_sleep(self.rfid_blinker)
                     if full_text_data:
                         self.foundUserID.emit(full_text_data)
                         self.scanned = True
                         self.ser.write(self.stop_scan_command_bytes)
                     else:
                         self.RFID_No_Data.emit("Your RFID Card has no Data!!!")
-                    self.blink_and_sleep(self.rfid_blinker)
 
             except Exception as e:
                 print(f"Error reading from serial port in run: {e}")
