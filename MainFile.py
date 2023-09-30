@@ -1410,7 +1410,6 @@ class ScanThread(QThread):
 
                 uid = self.pn532.read_passive_target(timeout=0.5)
                 if uid is not None:
-                    self.blink_and_sleep(self.rfid_blinker)
                     uid_string = ''.join([hex(i)[2:].zfill(2) for i in uid])  # Convert UID to a string
                     print("Found an RFID card with UID:", uid_string)
 
@@ -1434,6 +1433,7 @@ class ScanThread(QThread):
                         self.ser.write(self.stop_scan_command_bytes)
                     else:
                         self.RFID_No_Data.emit("Your RFID Card has no Data!!!")
+                    self.blink_and_sleep(self.rfid_blinker)
 
             except Exception as e:
                 print(f"Error reading from serial port in run: {e}")
