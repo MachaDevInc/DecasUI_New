@@ -891,16 +891,23 @@ class WifiWindow(QMainWindow):
     def refresh_wifi_scan(self):
         self.ssid.clear()
         self.update_wifi_status("Scanning...Please wait!")
-        # self.status.setText(
-        #     self._translate(
-        #         "wifisetting",
-        #         '<html><head/><body><p align="center"><span style=" font-size:22pt; font-weight:600;">Scanning...Please wait!</span></p></body></html>',
-        #     )
-        # )
-        self.discovery_thread = WiFiDiscoveryThread(self)
+        
+        # If the thread is running, try to terminate or wait
+        if self.discovery_thread.isRunning():
+            # Optionally terminate or wait
+            self.discovery_thread.terminate()  # Consider the implications of this
+            self.discovery_thread.wait()
+        
+        # Disconnect any previous connections to the signal (if any)
+        try:
+            self.discovery_thread.device_discovered.disconnect(self.add_wifi_item)
+        except TypeError:  # Raised if the signal is not connected
+            pass
+        
+        # Connect the signal
         self.discovery_thread.device_discovered.connect(self.add_wifi_item)
         self.discovery_thread.start()
-    
+
     def update_wifi_status(self, update):
         self.status.setText(
             self._translate(
