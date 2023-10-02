@@ -2359,48 +2359,44 @@ class PrintRetrievalCode(QMainWindow):
         self.timer.start(5000)
 
     def thermal_print(self):
-        p = Serial(
-            devfile="/dev/ttySC1",
-            baudrate=9600,
-            bytesize=8,
-            parity="N",
-            stopbits=1,
-            timeout=1.00,
-            dsrdtr=True,
+        p = Serial(devfile='/dev/ttySC1',
+           baudrate=9600,
+           bytesize=8,
+           parity='N',
+           stopbits=1,
+           timeout=1.00,
+           dsrdtr=True
         )
-        p.set(
-            align="center",
-            font="b",
-            width=1,
-            height=1,
-            density=2,
-            invert=0,
-            smooth=True,
-            flip=False,
-        )
-        # Printing the image
-        # here location can be your image path in “ ”
-        p.image("/home/decas/ui/DecasUI_New/pics/Logo.bmp", impl="bitImageColumn")
 
-        p.set(
-            align="center",
-            font="a",
-            width=2,
-            height=2,
-            density=2,
-            invert=0,
-            smooth=False,
-            flip=False,
-        )
-        p.text(str("TOKEN: " + str(self.code) + "\n"))
+        def set_font_size(printer, width_multiplier, height_multiplier):
+            size_byte = (width_multiplier - 1) + ((height_multiplier - 1) << 4)
+            printer._raw(bytes([0x1D, 0x21, size_byte]))
 
-        # printing the initial data
+        def print_centered_text(printer, text):
+            printer._raw(b'\x1B\x61\x01')  # ESC a 1 for center alignment
+            printer.text(text)
+            printer._raw(b'\x1B\x61\x00')  # ESC a 0 to reset to left alignment
+
+        # Using the functions:
+        set_font_size(p, 1, 3)
+        print_centered_text(p, "REPSLIPS\n")
+        print_centered_text(p, "TOKEN:\n")
+        print_centered_text(p, str(self.code) + "\n")
+
+        #printing the initial data
         p.set(
-            align="left",
+                align="left",
+                font="a",
+                width=2,
+                height=2,
+                density=2,
+                invert=0,
+                smooth=False,
+                flip=False,
         )
         p.text("\n")
         p.text(
-            """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n         repslips.com\n2) Click on menu -->RETRIVAL \n3) Type above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
+        """Retrieve receipt on repslips.com\nSteps:\n1) Sign up / Log on to:  \n         repslips.com\n2) Click on menu -->RETRIVAL \n3) Type above code and SUBMIT \n4) View on recent Receipt \nEnjoy.........\n\n\n"""
         )
         print("done")
 
