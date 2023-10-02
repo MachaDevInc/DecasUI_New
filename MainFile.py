@@ -2379,7 +2379,7 @@ class PrintRetrievalCode(QMainWindow):
 
         # Using the functions:
         set_font_size(p, 1, 3)
-        print_centered_text(p, "REPSLIPS\n")
+        print_centered_text(p, "REPSLIPS\n\n")
         print_centered_text(p, "TOKEN:\n")
         print_centered_text(p, str(self.code) + "\n")
 
