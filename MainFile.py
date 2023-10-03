@@ -460,6 +460,15 @@ class connectionWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
         self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.setting_window.showFullScreen()
         self.hide()
@@ -2100,6 +2109,16 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print("\nOpening ReadyWindow\n")
         # print("\is_scanning_opened False\n")
         # self.is_scanning_opened = False
+
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
@@ -2332,6 +2351,16 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
+
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
@@ -2402,6 +2431,16 @@ class PrintRetrievalCode(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
+
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
         self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
