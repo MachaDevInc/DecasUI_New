@@ -346,15 +346,12 @@ class MonoDecasProcessManager:
 
 
 class ReadyWindow(QMainWindow):
-    # Class-level variable to ensure persistence across instances
-    is_scanning_opened = False
-
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/Ready.ui", self)
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         self.ScanningWindow_window = None
 
@@ -385,22 +382,18 @@ class ReadyWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def open_scanning_window(self):
-        # if self.is_scanning_opened:
-        #     print("\nPreventing to open another instance of scanning window\n")
-        #     return
-        # print("\is_scanning_opened True\n")
-        # self.is_scanning_opened = True
+        if self.is_scanning_opened:
+            print("\nPreventing to open another instance of scanning window\n")
+            return
+        print("\is_scanning_opened True\n")
+        self.is_scanning_opened = True
         
         file_path = self.directory_checker.path_data
         try:
             print("\nOpening Scanning Screen\n")
-            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager)
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager, self.is_scanning_opened)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
-
-            # Connect the scanning_done_in_scanning_window_signal of ScanningWindow to the scanning_completed slot
-            self.ScanningWindow_window.scanning_done_in_scanning_window_signal.connect(self.scanning_completed)
-
             self.timer.stop()
             self.hide()
         except (OSError, ValueError) as e:
@@ -413,25 +406,18 @@ class ReadyWindow(QMainWindow):
             else:
                 print(f"An error occurred: {e}")
 
-    @pyqtSlot()
-    def scanning_completed(self):
-        """Slot function to handle the completion of the scanning process."""
-        print("\nScanning process completed in ReadyWindow\n")
-        ReadyWindow.is_scanning_opened = False
-        self.timer.start(500)  # Restart the directory checker timer
-
     def open_next(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.usb_window.showFullScreen()
         self.hide()
 
     def open_connection(self):
-        self.connection_window = connectionWindow(self.stacked_widget, self.process_manager)
+        self.connection_window = connectionWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.connection_window.showFullScreen()
         self.hide()
 
     def open_work(self):
-        self.work_window = workWindow(self.stacked_widget, self.process_manager)
+        self.work_window = workWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.work_window.showFullScreen()
         self.hide()
 
@@ -443,7 +429,7 @@ class ReadyWindow(QMainWindow):
 
 
 class connectionWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         self.stacked_widget = stacked_widget
         loadUi("/home/decas/ui/DecasUI_New/connection.ui", self)
@@ -451,7 +437,7 @@ class connectionWindow(QMainWindow):
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -474,7 +460,7 @@ class connectionWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -575,7 +561,7 @@ class connectionWindow(QMainWindow):
 
 
 class workWindow(JobsMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.search_keyword = ""
@@ -583,7 +569,7 @@ class workWindow(JobsMainWindow):
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -617,7 +603,7 @@ class workWindow(JobsMainWindow):
         virtual_keyboard.mainloop()
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -673,17 +659,14 @@ class workWindow(JobsMainWindow):
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
         date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread("", "", date_time, True, text)
+        self.processingThread = ProcessingThread("", "", date_time, self.is_scanning_opened, True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
+<<<<<<< HEAD
         self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
+=======
+>>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
-    
-    def handle_processing_done(self):
-        print("\nScanning process completed in ScanningWindow\n")
-
-        # Emit another signal to inform ReadyWindow
-        self.scanning_done_in_scanning_window_signal.emit()
 
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
@@ -706,18 +689,18 @@ class workWindow(JobsMainWindow):
 
 
 class SettingsWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/setting.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
         self.stacked_widget = stacked_widget
-        self.wifi_window = WifiWindow(self.stacked_widget, self.process_manager)
+        self.wifi_window = WifiWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.back.clicked.connect(self.go_back)
         # self.usb.clicked.connect(self.open_usb)
         self.bluetooth.clicked.connect(self.open_bluetooth)
@@ -765,18 +748,18 @@ class SettingsWindow(QMainWindow):
         self.shared_data.time = time.toString("hh:mm:ss")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.setting_window.showFullScreen()
         self.hide()
 
     def open_wifi(self):
         # Pass 'self.stacked_widget' as an argument when creating a new WifiWindow instance
-        self.usb_window = WifiWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = WifiWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.usb_window.showFullScreen()
         self.hide()
 
     def open_about(self):
-        self.about_window = aboutWindow(self.stacked_widget, self.process_manager)
+        self.about_window = aboutWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.about_window.showFullScreen()
         self.hide()
 
@@ -791,13 +774,13 @@ class SettingsWindow(QMainWindow):
     #     self.hide()
 
     def open_bluetooth(self):
-        self.usb_window = bluetoothWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = bluetoothWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.usb_window.showFullScreen()
         self.hide()
 
 
 class aboutWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
@@ -805,7 +788,7 @@ class aboutWindow(QMainWindow):
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -840,7 +823,7 @@ class aboutWindow(QMainWindow):
         self.date.setPlainText(f" {shared_data.date}")
 
     def go_back(self):
-        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.setting_window.showFullScreen()
         self.hide()
 
@@ -868,13 +851,13 @@ class aboutWindow(QMainWindow):
 
 
 class WifiWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/wifiset.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -1129,7 +1112,7 @@ class WifiWindow(QMainWindow):
                     self.timeout_count = 0
 
     def go_back(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -1177,7 +1160,7 @@ class WifiWindow(QMainWindow):
 #         print(f"Selected option: {text}")
 
 #     def go_back(self):
-#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
 #         self.usb_window.showFullScreen()
 #         self.hide()
 
@@ -1219,7 +1202,7 @@ class WifiWindow(QMainWindow):
 #         print(f"Selected option: {text}")
 
 #     def go_back(self):
-#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+#         self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
 #         self.usb_window.showFullScreen()
 #         self.hide()
 
@@ -1232,7 +1215,7 @@ class WifiWindow(QMainWindow):
 
 
 class bluetoothWindow(QMainWindow):
-    def __init__(self, stacked_widget, process_manager):
+    def __init__(self, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         self.stacked_widget = stacked_widget
         self._translate = QtCore.QCoreApplication.translate
@@ -1240,7 +1223,7 @@ class bluetoothWindow(QMainWindow):
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -1296,7 +1279,7 @@ class bluetoothWindow(QMainWindow):
         print(f"Selected option: {text}")
 
     def go_back(self):
-        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager)
+        self.usb_window = SettingsWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.usb_window.showFullScreen()
         self.hide()
 
@@ -1514,15 +1497,13 @@ class ProcessingThread(QThread):
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
-    scanning_complete_signal = pyqtSignal()
-
-    def __init__(self, file_path, userID, date_time, retry=False, retry_text=""):
+    def __init__(self, file_path, userID, date_time, is_scanning_opened, retry=False, retry_text=""):
         super().__init__()
         self._isRunning = False
         self.file_path = file_path
         self.userID = userID
         self.date_time = date_time
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         self.retry = retry
         self.retry_text = retry_text
@@ -1653,14 +1634,12 @@ class ProcessingThread(QThread):
 
                     # Emit signal when processing is done
                     print("\nEmitting ProcessingThread signal\n")
-                    # self.is_scanning_opened = False
-                    # At the end of run method, emit the signal indicating completion
-                    self.scanning_complete_signal.emit()
+                    self.is_scanning_opened = False
                     print("\nself.is_scanning_opened: ")
-                    # print(self.is_scanning_opened)
+                    print(self.is_scanning_opened)
                     print("\n")
                     self.finished_signal.emit(
-                        self.retrieval_code, self.data_sent, self.response_message
+                        self.retrieval_code, self.data_sent, self.response_message, self.is_scanning_opened
                     )
                 except Exception as e:
                     print(f"Error: {e}")
@@ -1671,14 +1650,12 @@ class ProcessingThread(QThread):
                     time.sleep(3)
                     # Emit signal when processing is done
                     print("\nEmitting ProcessingThread signal\n")
-                    # self.is_scanning_opened = False
-                    # At the end of run method, emit the signal indicating completion
-                    self.scanning_complete_signal.emit()
+                    self.is_scanning_opened = False
                     print("\nself.is_scanning_opened: ")
-                    # print(self.is_scanning_opened)
+                    print(self.is_scanning_opened)
                     print("\n")
                     self.finished_signal.emit(
-                        "", self.data_sent, "error_PDF"
+                        "", self.data_sent, "error_PDF", self.is_scanning_opened
                     )
 
             else:
@@ -1942,15 +1919,13 @@ class ProcessingThread(QThread):
 
 
 class ScanningWindow(QMainWindow, Ui_MainWindow3):
-    scanning_done_in_scanning_window_signal = pyqtSignal()
-
-    def __init__(self, stacked_widget, file_path, process_manager):
+    def __init__(self, stacked_widget, file_path, process_manager, is_scanning_opened):
         super().__init__()
         self.setupUi(self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -2032,10 +2007,13 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.userID = user_id
             date_time = str(shared_data.date) + str(shared_data.time)
             print("\nOpening ProcessingThread after getting phone number\n")
-            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
+<<<<<<< HEAD
             self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
+=======
+>>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
             self.processingThread.start()
 
     def processUserID(self, scanned_data):
@@ -2044,10 +2022,13 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         date_time = str(shared_data.date) + str(shared_data.time)
         print("\nOpening ProcessingThread after scan is done\n")
         # print("\nself.file_path: " + self.file_path + "\n")
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
+<<<<<<< HEAD
         self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
+=======
+>>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
     
     def handle_processing_done(self):
@@ -2072,19 +2053,19 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         #     self.timer.timeout.connect(self.go_home)
         #     self.timer.start(2000)
 
-    def onProcessingFinished(self, retrieval_code, data_sent, error):
+    def onProcessingFinished(self, retrieval_code, data_sent, error, is_scanning_opened):
         # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         try:
             subprocess.run(["sudo", "rm", self.file_path], check=True)
         except subprocess.CalledProcessError as e:
             print(f"An error occurred: {e}")
-        # print("\nself.is_scanning_opened: ")
-        # print(self.is_scanning_opened)
-        # print("\n")
+        print("\nself.is_scanning_opened: ")
+        print(self.is_scanning_opened)
+        print("\n")
         print("Processing finished!")
         print(retrieval_code)
 
@@ -2101,7 +2082,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 )  # optional: set its parent to None so it gets deleted
 
             self.DataSentWindow_window = DataSentWindow(
-                self.file_path, self.stacked_widget, self.process_manager
+                self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
@@ -2138,7 +2119,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print("\nOpening ReadyWindow\n")
         # print("\is_scanning_opened False\n")
         # self.is_scanning_opened = False
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
@@ -2154,10 +2135,13 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         self.userID = ""
         date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
+<<<<<<< HEAD
         self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
+=======
+>>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
 
     def onProgress_Print(self, notification):
@@ -2171,11 +2155,11 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
         )
 
-    def onProcessingFinished_Print(self, retrieval_code, data_sent, error):
+    def onProcessingFinished_Print(self, retrieval_code, data_sent, error, is_scanning_opened):
         # self.is_scanning_opened = False
         self.code = retrieval_code
         self.data_sent = data_sent
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         self.scanThread.stop()
 
@@ -2185,14 +2169,14 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             print(f"An error occurred: {e}")
 
         if self.data_sent:
-            # print("\nself.is_scanning_opened: ")
-            # print(self.is_scanning_opened)
-            # print("\n")
+            print("\nself.is_scanning_opened: ")
+            print(self.is_scanning_opened)
+            print("\n")
             print("Processing finished!")
             print(self.code)
 
             self.PrintRetrievalCode_window = PrintRetrievalCode(
-                self.file_path, self.stacked_widget, self.code, self.process_manager
+                self.file_path, self.stacked_widget, self.code, self.process_manager, self.is_scanning_opened
             )
             self.stacked_widget.addWidget(self.PrintRetrievalCode_window)
             self.stacked_widget.setCurrentWidget(self.PrintRetrievalCode_window)
@@ -2206,7 +2190,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                     None
                 )  # optional: set its parent to None so it gets deleted
 
-            self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
             self.stacked_widget.addWidget(self.ReadyWindow_window)
             self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
@@ -2351,13 +2335,13 @@ class NumericKeyboard(QMainWindow):
 
 
 class DataSentWindow(QMainWindow):
-    def __init__(self, file_path, stacked_widget, process_manager):
+    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w6.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -2371,19 +2355,19 @@ class DataSentWindow(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class PrintRetrievalCode(QMainWindow):
-    def __init__(self, file_path, stacked_widget, code, process_manager):
+    def __init__(self, file_path, stacked_widget, code, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w5.ui", self)
 
         # Create an instance of ProcessManager
         self.process_manager = process_manager
-        # self.is_scanning_opened = is_scanning_opened
+        self.is_scanning_opened = is_scanning_opened
 
         # Set the window size
         self.resize(1024, 600)
@@ -2441,7 +2425,7 @@ class PrintRetrievalCode(QMainWindow):
 
     def go_home(self):
         self.timer.stop()
-        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager)
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
         self.stacked_widget.addWidget(self.ReadyWindow_window)
         self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
@@ -2521,7 +2505,7 @@ class MyApp(QApplication):
             self.process_manager.start_process()
 
         self.serial_manager = SerialManager()
-        # self.is_scanning_opened = False
+        self.is_scanning_opened = False
 
         # Initialize serial and UI components
         self.init_serial()
@@ -2534,7 +2518,7 @@ class MyApp(QApplication):
         try:
             self.stacked_widget = QStackedWidget()
             self.process_manager.start_process()
-            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager)
+            self.setting_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened)
             self.stacked_widget.addWidget(self.setting_window)
             self.stacked_widget.showFullScreen()
             
