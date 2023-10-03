@@ -1510,7 +1510,7 @@ class ScanThread(QThread):
 
 class ProcessingThread(QThread):
     # Signal emitted when thread finishes
-    finished_signal = pyqtSignal(str, bool, str, bool)
+    finished_signal = pyqtSignal(str, bool, str)
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
