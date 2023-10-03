@@ -381,12 +381,17 @@ class ReadyWindow(QMainWindow):
         self.time.setPlainText(f" {current_time}")
         self.date.setPlainText(f" {shared_data.date}")
 
+    def simulate_touch(self):
+        command = ["xdotool", "mousemove", "0", "0", "click", "1"]
+        subprocess.run(command)
+
     def open_scanning_window(self):
         if self.is_scanning_opened:
             print("\nPreventing to open another instance of scanning window\n")
             return
         print("\is_scanning_opened True\n")
         self.is_scanning_opened = True
+        self.simulate_touch()
         
         file_path = self.directory_checker.path_data
         try:
