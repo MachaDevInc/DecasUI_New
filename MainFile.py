@@ -56,6 +56,8 @@ from ntplib import NTPClient
 
 import xml.etree.ElementTree as ET
 
+from PIL import Image
+
 # proc1 = subprocess.Popen(["python", "/home/decas/ui/DecasUI_New/progress bar.py"])
 # time.sleep(1)
 # proc1.terminate()
@@ -2402,6 +2404,43 @@ class PrintRetrievalCode(QMainWindow):
            dsrdtr=True
         )
 
+        # Define paper width in dots (e.g., 384 for 58mm paper)
+        PAPER_WIDTH = 384
+
+        def set_left_margin(printer, margin):
+            """Set left margin using ESC/POS command."""
+            # Low and high bytes of margin
+            l = margin % 256
+            h = margin // 256
+            printer._raw(bytes([0x1D, 0x4C, l, h]))
+
+        def print_centered_image(printer, image_path, paper_width_dots):
+            """Print image centered on the paper."""
+            # Load the image
+            img = Image.open(image_path)
+            image_width, _ = img.size
+
+            # Calculate the left margin needed to center the image
+            margin = (paper_width_dots - image_width) // 2
+            set_left_margin(printer, margin)
+
+            # Print the image
+            printer.image(image_path)
+
+        # Print the image centered
+        print_centered_image(p, "/home/decas/ui/DecasUI_New/pics/Logo1.bmp", PAPER_WIDTH)
+
+        p.set(
+                align="center",
+                font="a",
+                width=2,
+                height=2,
+                density=2,
+                invert=0,
+                smooth=False,
+                flip=False,
+        )
+
         def set_font_size(printer, width_multiplier, height_multiplier):
             size_byte = (width_multiplier - 1) + ((height_multiplier - 1) << 4)
             printer._raw(bytes([0x1D, 0x21, size_byte]))
@@ -2413,7 +2452,7 @@ class PrintRetrievalCode(QMainWindow):
 
         # Using the functions:
         set_font_size(p, 1, 3)
-        print_centered_text(p, "REPSLIPS\n\n")
+        # print_centered_text(p, "REPSLIPS\n")
         print_centered_text(p, "TOKEN:\n")
         print_centered_text(p, str(self.code) + "\n")
 
