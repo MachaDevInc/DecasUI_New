@@ -2049,6 +2049,13 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
         self.processingThread.start()
+    
+    def handle_processing_done(self):
+        """Slot function to handle the completion of the scanning process in ScanningWindow."""
+        print("\nScanning process completed in ScanningWindow\n")
+
+        # Emit another signal to inform ReadyWindow
+        self.scanning_done_in_scanning_window_signal.emit()
 
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
