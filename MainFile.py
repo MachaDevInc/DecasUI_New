@@ -662,10 +662,6 @@ class workWindow(JobsMainWindow):
         self.processingThread = ProcessingThread("", "", date_time, self.is_scanning_opened, True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
-<<<<<<< HEAD
-        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
-=======
->>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
 
     def onProgress(self, notification):
@@ -1493,7 +1489,7 @@ class ScanThread(QThread):
 
 class ProcessingThread(QThread):
     # Signal emitted when thread finishes
-    finished_signal = pyqtSignal(str, bool, str)
+    finished_signal = pyqtSignal(str, bool, str, bool)
     # Signal emitted for UI updates
     progress_signal = pyqtSignal(str)
 
@@ -2010,10 +2006,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
-<<<<<<< HEAD
-            self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
-=======
->>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
             self.processingThread.start()
 
     def processUserID(self, scanned_data):
@@ -2025,18 +2017,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
-<<<<<<< HEAD
-        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
-=======
->>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
-    
-    def handle_processing_done(self):
-        """Slot function to handle the completion of the scanning process in ScanningWindow."""
-        print("\nScanning process completed in ScanningWindow\n")
-
-        # Emit another signal to inform ReadyWindow
-        self.scanning_done_in_scanning_window_signal.emit()
 
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
@@ -2138,10 +2119,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time, self.is_scanning_opened)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
-<<<<<<< HEAD
-        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
-=======
->>>>>>> parent of e648291 (redefined whole code to prevent from multiple calling of readyscreen class)
         self.processingThread.start()
 
     def onProgress_Print(self, notification):
