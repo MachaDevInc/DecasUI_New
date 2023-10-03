@@ -676,7 +676,7 @@ class workWindow(JobsMainWindow):
         self.processingThread = ProcessingThread("", "", date_time, True, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
-        self.processing_thread.scanning_complete_signal.connect(self.handle_processing_done)
+        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
         self.processingThread.start()
     
     def handle_processing_done(self):
@@ -2035,7 +2035,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
-            self.processing_thread.scanning_complete_signal.connect(self.handle_processing_done)
+            self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
             self.processingThread.start()
 
     def processUserID(self, scanned_data):
@@ -2047,7 +2047,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
-        self.processing_thread.scanning_complete_signal.connect(self.handle_processing_done)
+        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
         self.processingThread.start()
 
     def onProgress(self, notification):
@@ -2150,7 +2150,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.processingThread = ProcessingThread(self.file_path, self.userID, date_time)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
-        self.processing_thread.scanning_complete_signal.connect(self.handle_processing_done)
+        self.processingThread.scanning_complete_signal.connect(self.handle_processing_done)
         self.processingThread.start()
 
     def onProgress_Print(self, notification):
