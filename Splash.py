@@ -29,7 +29,7 @@ app = QApplication([])  # Initialize just one QApplication instance
 main_app = create_main_app(app)  # Pass the QApplication instance to MyApp
 
 # Configure the serial port and baud rate
-serial_port = "/dev/ttySC0"
+serial_port = "/dev/ttySC2"
 baud_rate = 9600
 
 # Barcode Commands to be sent
