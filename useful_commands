@@ -1,0 +1,74 @@
+cd /home/decas/ui/DecasUI/
+cd ..
+sudo rm -r DecasUI
+sudo git clone https://github.com/MachaDevInc/DecasUI.git
+cd /home/decas/ui/DecasUI/
+sudo python3 MainFile.py
+
+
+cd /home/decas/ui/DecasUI/
+cd ..
+sudo rm -r DecasUI_New
+sudo git clone https://github.com/MachaDevInc/DecasUI_New.git
+cd /home/decas/ui/DecasUI_New/
+sudo python3 MainFile.py
+
+cd ..
+sudo rm -r DecasUI_New
+sudo git clone https://github.com/MachaDevInc/DecasUI_New.git
+cd /home/decas/DecasUI/DecasUI_New
+sudo python3 MainFile.py
+
+sudo ifconfig wlan0 down
+sudo ifconfig wlan0 up
+
+sudo systemctl restart wpa_supplicant
+sudo ip link set wlan0 down
+sudo ip link set wlan0 up
+
+sudo systemctl stop dhcpcd
+sudo dhclient -r wlan0
+sudo dhclient wlan0
+
+
+sudo chown decas:decas /home/decas/ui/
+sudo chmod u+rw /home/decas/ui/
+sudo chmod 777 /home/decas/ui/
+
+sudo systemctl stop my_pyqt5_app.service
+
+cd /home/decas/ui/DecasUI_New/
+cd ..
+sudo rm -r DecasUI_New
+sudo git clone https://github.com/MachaDevInc/DecasUI_New.git
+cd /home/decas/ui/DecasUI_New/
+cd
+
+sudo chown decas:decas /home/decas/output/
+sudo chmod u+rw /home/decas/output/
+sudo chmod 777 /home/decas/output/
+
+sudo chown decas:decas /home/decas/ui/DecasUI_New/connection_cmd.json
+sudo chmod u+rw /home/decas/ui/DecasUI_New/connection_cmd.json
+sudo chmod 777 /home/decas/ui/DecasUI_New/connection_cmd.json
+
+sudo chown decas:decas /home/decas/ui/DecasUI_New/my_jobs.json
+sudo chmod u+rw /home/decas/ui/DecasUI_New/my_jobs.json
+sudo chmod 777 /home/decas/ui/DecasUI_New/my_jobs.json
+
+sudo chown decas:decas /etc/wpa_supplicant/wpa_supplicant.conf
+sudo chmod u+rw /etc/wpa_supplicant/wpa_supplicant.conf
+sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf
+
+sudo chown decas:decas /home/decas/DecasPi.exe
+sudo chmod u+rw /home/decas/DecasPi.exe
+sudo chmod 777 /home/decas/DecasPi.exe
+
+sudo systemctl restart my_pyqt5_app.service
+
+
+sudo chown decas:decas /usr/share/plymouth/themes/Decas_Splash
+sudo chmod u+rw /usr/share/plymouth/themes/Decas_Splash
+sudo chmod 777 /usr/share/plymouth/themes/Decas_Splash
+
+Repslips@#access@#
