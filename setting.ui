@@ -181,145 +181,164 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:22pt; font-weight:600;&quot;&gt;Bluetooth&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QTimeEdit" name="timeEdit">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>860</x>
-      <y>30</y>
-      <width>141</width>
-      <height>51</height>
+      <x>0</x>
+      <y>0</y>
+      <width>1031</width>
+      <height>151</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>16</pointsize>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="wrapping">
-     <bool>false</bool>
-    </property>
-    <property name="frame">
-     <bool>true</bool>
-    </property>
-    <property name="buttonSymbols">
-     <enum>QAbstractSpinBox::PlusMinus</enum>
-    </property>
-    <property name="maximumDate">
-     <date>
-      <year>2050</year>
-      <month>1</month>
-      <day>1</day>
-     </date>
-    </property>
-    <property name="minimumDate">
-     <date>
-      <year>2020</year>
-      <month>1</month>
-      <day>1</day>
-     </date>
-    </property>
-   </widget>
-   <widget class="QDateEdit" name="dateEdit">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>30</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>16</pointsize>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>30</y>
-      <width>621</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="baseSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="font">
-     <font>
-      <family>MS Shell rgb(0, 0, 0)Dlg 2</family>
-      <pointsize>22</pointsize>
-      <italic>false</italic>
-      <fontweight>DemiBold</fontweight>
-     </font>
-    </property>
-    <property name="mouseTracking">
-     <bool>true</bool>
     </property>
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">font: 600 22pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+     <string notr="true">background-color: rgba(170, 255, 255, 195);</string>
     </property>
-    <property name="inputMethodHints">
-     <set>Qt::ImhNone</set>
+    <property name="title">
+     <string/>
     </property>
-    <property name="text">
-     <string>Automatic Update</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>30</width>
-      <height>30</height>
-     </size>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <property name="autoRepeat">
-     <bool>false</bool>
-    </property>
-    <property name="tristate">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="savedatetime">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>90</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">font: 600 22pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Save</string>
-    </property>
+    <widget class="QPushButton" name="savedatetime">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>171</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 600 22pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="dateEdit">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>171</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>20</y>
+       <width>621</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Shell rgb(0, 0, 0)Dlg 2</family>
+       <pointsize>20</pointsize>
+       <italic>false</italic>
+       <fontweight>DemiBold</fontweight>
+      </font>
+     </property>
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 600 20pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+     <property name="text">
+      <string>Automatic Update</string>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <property name="autoRepeat">
+      <bool>false</bool>
+     </property>
+     <property name="tristate">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QTimeEdit" name="timeEdit">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>860</x>
+       <y>20</y>
+       <width>141</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="wrapping">
+      <bool>false</bool>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::PlusMinus</enum>
+     </property>
+     <property name="maximumDate">
+      <date>
+       <year>2050</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="minimumDate">
+      <date>
+       <year>2020</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+    </widget>
    </widget>
    <zorder>label</zorder>
    <zorder>label_4</zorder>
@@ -328,10 +347,7 @@
    <zorder>about</zorder>
    <zorder>bluetooth</zorder>
    <zorder>label_2</zorder>
-   <zorder>timeEdit</zorder>
-   <zorder>dateEdit</zorder>
-   <zorder>checkBox</zorder>
-   <zorder>savedatetime</zorder>
+   <zorder>groupBox</zorder>
   </widget>
  </widget>
  <resources/>
