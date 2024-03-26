@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QLabel,
 )
 from PyQt5.uic import loadUi
-import time
+import time as time_module
 from PyQt5.QtCore import QTimer, QTime, QDate
 
 from Ui_Work import JobsMainWindow
@@ -302,7 +302,7 @@ class SharedData(QObject):
         time_str = time.toString("HH:mm:ss")
         # Combine and parse the datetime string
         datetime_str = f"{date_str} {time_str}"
-        t = time.strptime(datetime_str, "%d-%m-%Y %H:%M:%S")
+        t = time_module.strptime(datetime_str, "%d-%m-%Y %H:%M:%S")
         # Set the RTC datetime
         self.rtc.datetime = t
 
@@ -411,7 +411,7 @@ class ReadyWindow(QMainWindow):
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
             self.process_manager.terminate_process()
-            time.sleep(1)
+            time_module.sleep(1)
             if "[Errno 2]" in str(e):
                 print("SerialException error with Errno 2 caught. Restarting Raspberry Pi.")
                 os.system('sudo reboot')
@@ -1098,7 +1098,7 @@ class WifiWindow(QMainWindow):
                     print(f"Error: {error.decode('utf-8')}")
 
                 # Check if the connection was successful
-                time.sleep(8)  # Wait for the connection to establish
+                time_module.sleep(8)  # Wait for the connection to establish
 
                 new_ssid = self.get_current_network().decode("utf-8").strip()
 
@@ -1412,7 +1412,7 @@ class ScanThread(QThread):
             Q_ARG(int, 300),
             Q_ARG(int, 3000),
         )
-        time.sleep(3)
+        time_module.sleep(3)
 
     def run(self):
         if self._isRunning:
@@ -1502,7 +1502,7 @@ class ScanThread(QThread):
         if self.ser.isOpen():
             try:
                 self.ser.write(self.stop_scan_command_bytes)
-                time.sleep(0.1)
+                time_module.sleep(0.1)
                 print("\nClosing Serial port in Cleanup function\n")
                 self.ser.close()
             except Exception as e:
@@ -1671,7 +1671,7 @@ class ProcessingThread(QThread):
                     print("Error! Unsupported PDF")
                     # raise e
                     self.progress_signal.emit("Error! Unsupported PDF")
-                    time.sleep(3)
+                    time_module.sleep(3)
                     # Emit signal when processing is done
                     print("\nEmitting ProcessingThread signal\n")
                     self.is_scanning_opened = False
@@ -2111,7 +2111,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.timer = QTimer()
             self.timer.timeout.connect(self.go_home)
             self.timer.start(3000)
-            time.sleep(3)
+            time_module.sleep(3)
 
     def go_home(self):
         self.timer.stop()
