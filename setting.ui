@@ -196,7 +196,6 @@
     <property name="font">
      <font>
       <pointsize>16</pointsize>
-      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -236,7 +235,6 @@
     <property name="font">
      <font>
       <pointsize>16</pointsize>
-      <weight>75</weight>
       <bold>true</bold>
      </font>
     </property>
@@ -272,9 +270,8 @@
      <font>
       <family>MS Shell rgb(0, 0, 0)Dlg 2</family>
       <pointsize>22</pointsize>
-      <weight>75</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <fontweight>DemiBold</fontweight>
      </font>
     </property>
     <property name="mouseTracking">
@@ -308,6 +305,22 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="savedatetime">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>90</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 600 22pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Save</string>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>label_4</zorder>
    <zorder>wifi</zorder>
@@ -318,8 +331,8 @@
    <zorder>timeEdit</zorder>
    <zorder>dateEdit</zorder>
    <zorder>checkBox</zorder>
+   <zorder>savedatetime</zorder>
   </widget>
-  
  </widget>
  <resources/>
  <connections/>
