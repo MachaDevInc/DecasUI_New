@@ -296,7 +296,7 @@ class SharedData(QObject):
         self._date = value
         self.date_updated.emit(value)
 
-    def set_rtc_datetime_with_qt(self, date, time):
+    def set_rtc_datetime(self, date, time):
         # Convert QDate and QTime to strings
         date_str = date.toString("dd-MM-yyyy")
         time_str = time.toString("HH:mm:ss")
