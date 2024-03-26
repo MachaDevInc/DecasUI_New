@@ -748,7 +748,7 @@ class SettingsWindow(QMainWindow):
         ntp_datetime = datetime.fromtimestamp(ntp_time)
         ntp_date = QDate(ntp_datetime.year, ntp_datetime.month, ntp_datetime.day)
         ntp_time = QTime(ntp_datetime.hour, ntp_datetime.minute, ntp_datetime.second)
-        shared_data.set_system_time(ntp_date, ntp_time)
+        shared_data.set_rtc_datetime(ntp_date, ntp_time)
 
     def get_ntp_time(self, host="pool.ntp.org"):
         client = NTPClient()
