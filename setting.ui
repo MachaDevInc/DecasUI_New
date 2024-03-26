@@ -209,7 +209,7 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 600 22pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+      <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;</string>
      </property>
      <property name="text">
       <string>Save</string>
@@ -260,10 +260,10 @@
      </property>
      <property name="font">
       <font>
-       <family>MS Shell rgb(0, 0, 0)Dlg 2</family>
-       <pointsize>20</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>16</pointsize>
        <italic>false</italic>
-       <fontweight>DemiBold</fontweight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="mouseTracking">
@@ -273,7 +273,7 @@
       <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 600 20pt &quot;MS Shell rgb(0, 0, 0)Dlg 2&quot;;</string>
+      <string notr="true">font: 700 16pt &quot;Segoe UI&quot;;</string>
      </property>
      <property name="inputMethodHints">
       <set>Qt::ImhNone</set>
