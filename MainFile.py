@@ -744,8 +744,8 @@ class SettingsWindow(QMainWindow):
         try:
             with open("/home/decas/ui/DecasUI_New/date_time_settings.json", "r") as f:
                 data = json.load(f)  
-                date_time_edit_enable_check = data['cmd_list']  
-                print("\n Read data from connection_cmd.json: ")
+                date_time_edit_enable_check = data['date_time_edit_enable']  
+                print("\n Read data from date_time_settings.json: ")
                 print(date_time_edit_enable_check)
                 print("\n")
                 return date_time_edit_enable_check
