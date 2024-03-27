@@ -209,7 +209,8 @@
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;</string>
+      <string notr="true">font: 700 20pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);</string>
      </property>
      <property name="text">
       <string>Save</string>
@@ -229,6 +230,16 @@
        <pointsize>16</pointsize>
        <bold>true</bold>
       </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::PlusMinus</enum>
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
@@ -273,7 +284,8 @@
       <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 700 16pt &quot;Segoe UI&quot;;</string>
+      <string notr="true">font: 700 16pt &quot;Segoe UI&quot;;
+color: rgb(0, 0, 0);</string>
      </property>
      <property name="inputMethodHints">
       <set>Qt::ImhNone</set>
@@ -315,18 +327,33 @@
        <bold>true</bold>
       </font>
      </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);</string>
+     </property>
      <property name="wrapping">
       <bool>false</bool>
      </property>
      <property name="frame">
       <bool>true</bool>
      </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::PlusMinus</enum>
      </property>
+     <property name="accelerated">
+      <bool>false</bool>
+     </property>
+     <property name="keyboardTracking">
+      <bool>true</bool>
+     </property>
      <property name="maximumDate">
       <date>
-       <year>2050</year>
+       <year>2020</year>
        <month>1</month>
        <day>1</day>
       </date>
@@ -337,6 +364,12 @@
        <month>1</month>
        <day>1</day>
       </date>
+     </property>
+     <property name="currentSection">
+      <enum>QDateTimeEdit::HourSection</enum>
+     </property>
+     <property name="timeSpec">
+      <enum>Qt::UTC</enum>
      </property>
     </widget>
    </widget>

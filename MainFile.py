@@ -736,8 +736,22 @@ class SettingsWindow(QMainWindow):
         self.timeEdit.timeChanged.connect(self.update_time)
 
         self.checkBox.stateChanged.connect(self.enable_edit_date_time)
+        self.savedatetime.clicked.connect(self.open_about)
+        
 
-    def enable_edit_date_time(self, state):
+    def save_date_time(self, state):
+        if state == 2:
+            self.dateEdit.setEnabled(False)
+            self.timeEdit.setEnabled(False)
+
+            self.update_shared_data(self.shared_data)
+
+        elif state == 0:
+
+            self.dateEdit.setEnabled(True)
+            self.timeEdit.setEnabled(True)
+    
+    def enable_edit_date_time(self):
         if state == 2:
             self.dateEdit.setEnabled(False)
             self.timeEdit.setEnabled(False)
