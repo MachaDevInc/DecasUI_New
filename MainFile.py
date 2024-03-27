@@ -737,8 +737,18 @@ class SettingsWindow(QMainWindow):
 
         self.checkBox.stateChanged.connect(self.enable_edit_date_time)
         self.savedatetime.clicked.connect(self.save_date_time)
+
+        self.update_state_checkBox()
         
 
+    def update_state_checkBox(self):
+        state = self.read_date_time_edit_enable_in_json()
+        if state == 2:
+            self.checkBox.setChecked(True)
+
+        elif state == 0:
+            self.checkBox.setChecked(False)
+    
     def read_date_time_edit_enable_in_json(self):
         # Read date_time_edit_enable from JSON file
         try:
