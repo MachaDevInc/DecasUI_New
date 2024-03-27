@@ -751,7 +751,7 @@ class SettingsWindow(QMainWindow):
             self.dateEdit.setEnabled(True)
             self.timeEdit.setEnabled(True)
     
-    def enable_edit_date_time(self):
+    def enable_edit_date_time(self, state):
         if state == 2:
             self.dateEdit.setEnabled(False)
             self.timeEdit.setEnabled(False)
