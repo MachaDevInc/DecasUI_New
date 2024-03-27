@@ -511,8 +511,8 @@ class connectionWindow(QMainWindow):
             self.process_manager.restart_process()
         elif self.r4.isChecked():
             print("selected = 'RS232'")
-            # self.edit_config_xml("false", "/dev/ttyS1")
-            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS1"]
+            # self.edit_config_xml("false", "/dev/ttySC2")
+            new_cmd = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttySC2"]
             self.update_cmd_in_json(new_cmd)
             self.process_manager.update_command(new_cmd)
             self.process_manager.restart_process()
@@ -538,7 +538,7 @@ class connectionWindow(QMainWindow):
         wifi_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-n"]
         bluetooth_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/rfcomm0"]
         usb_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS0"]
-        rs232_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttyS1"]
+        rs232_cmd_list = ["mono", "/home/decas/DecasPi.exe", "-s", "/dev/ttySC2"]
 
         # Compare the two lists
         if read_cmd_list == wifi_cmd_list:
@@ -2015,7 +2015,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.Retreive.clicked.connect(self.print_retrieval_code)
 
         # Barcode
-        self.serial_port = "/dev/ttySC2"
+        self.serial_port = "/dev/ttySC0"
         self.baud_rate = 9600
         start_scan_command = "7E 00 08 01 00 02 01 AB CD"
         self.start_scan_command_bytes = bytes.fromhex(
@@ -2464,7 +2464,7 @@ class PrintRetrievalCode(QMainWindow):
         self.timer.start(5000)
 
     def thermal_print(self):
-        p = Serial(devfile='/dev/ttySC3',
+        p = Serial(devfile='/dev/ttySC1',
            baudrate=9600,
            bytesize=8,
            parity='N',
@@ -2587,7 +2587,7 @@ class DirectoryChecker(QObject):
 
 
 class SerialManager:
-    def __init__(self, port="/dev/ttySC2", baud_rate=9600):
+    def __init__(self, port="/dev/ttySC0", baud_rate=9600):
         self.serial_port = port
         self.baud_rate = baud_rate
         
