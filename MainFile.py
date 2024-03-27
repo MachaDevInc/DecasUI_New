@@ -729,7 +729,7 @@ class SettingsWindow(QMainWindow):
         # self.rs.clicked.connect(self.open_rs)
 
         self.shared_data = shared_data
-        self.dateEdit.setDate(QDate(2023, 1, 1))
+        self.dateEdit.setDate(QDate(2024, 1, 1))
         self.timeEdit.setTime(QTime(00, 00, 00))
         # Connect signals to slots
         self.dateEdit.dateChanged.connect(self.update_date)
@@ -757,7 +757,7 @@ class SettingsWindow(QMainWindow):
             date_time_edit_enable_check = None
     
     def save_date_time(self):
-        state = self.read_date_time_edit_enable_in_json(self)
+        state = self.read_date_time_edit_enable_in_json()
         if state == 2:
             self.update_shared_data_from_ntp(self.shared_data)
 
