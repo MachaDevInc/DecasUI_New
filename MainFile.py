@@ -739,36 +739,66 @@ class SettingsWindow(QMainWindow):
         self.savedatetime.clicked.connect(self.save_date_time)
         
 
-    def save_date_time(self, state):
+    def read_date_time_edit_enable_in_json(self):
+        # Read date_time_edit_enable from JSON file
+        try:
+            with open("/home/decas/ui/DecasUI_New/date_time_settings.json", "r") as f:
+                data = json.load(f)  
+                date_time_edit_enable_check = data['cmd_list']  
+                print("\n Read data from connection_cmd.json: ")
+                print(date_time_edit_enable_check)
+                print("\n")
+                return date_time_edit_enable_check
+        except json.JSONDecodeError:
+            print("File '/home/decas/ui/DecasUI_New/date_time_settings.json' is not valid JSON.")
+            date_time_edit_enable_check = None
+        except FileNotFoundError:
+            print("File '/home/decas/ui/DecasUI_New/date_time_settings.json' not found.")
+            date_time_edit_enable_check = None
+    
+    def save_date_time(self):
+        state = self.read_date_time_edit_enable_in_json(self)
         if state == 2:
-            self.dateEdit.setEnabled(False)
-            self.timeEdit.setEnabled(False)
-
-            self.update_shared_data(self.shared_data)
+            self.update_shared_data_from_ntp(self.shared_data)
 
         elif state == 0:
-
-            self.dateEdit.setEnabled(True)
-            self.timeEdit.setEnabled(True)
+            self.update_shared_data_from_user(self.shared_data)
     
     def enable_edit_date_time(self, state):
         if state == 2:
             self.dateEdit.setEnabled(False)
             self.timeEdit.setEnabled(False)
 
-            self.update_shared_data(self.shared_data)
+            set_state = {
+                "date_time_edit_enable": state
+            }
+
+            with open("/home/decas/ui/DecasUI_New/date_time_settings.json", "w") as f:
+                json.dump(set_state, f)
 
         elif state == 0:
 
             self.dateEdit.setEnabled(True)
             self.timeEdit.setEnabled(True)
 
-    def update_shared_data(self, shared_data):
+            set_state = {
+                "date_time_edit_enable": state
+            }
+
+            with open("/home/decas/ui/DecasUI_New/date_time_settings.json", "w") as f:
+                json.dump(set_state, f)
+
+    def update_shared_data_from_ntp(self, shared_data):
         ntp_time = self.get_ntp_time()
         ntp_datetime = datetime.fromtimestamp(ntp_time)
         ntp_date = QDate(ntp_datetime.year, ntp_datetime.month, ntp_datetime.day)
         ntp_time = QTime(ntp_datetime.hour, ntp_datetime.minute, ntp_datetime.second)
         shared_data.set_rtc_datetime(ntp_date, ntp_time)
+
+    def update_shared_data_from_user(self, shared_data):
+        user_date = self.dateEdit.date()
+        user_time = self.timeEdit.time()
+        shared_data.set_rtc_datetime(user_date, user_time)
 
     def get_ntp_time(self, host="pool.ntp.org"):
         client = NTPClient()
