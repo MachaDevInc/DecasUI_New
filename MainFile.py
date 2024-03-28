@@ -2146,7 +2146,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 )  # optional: set its parent to None so it gets deleted
 
             self.DataSentWindow_window = DataSentWindow(
-                self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened
+                self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened, self.shared_data
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
@@ -2246,7 +2246,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             print(self.code)
 
             self.PrintRetrievalCode_window = PrintRetrievalCode(
-                self.file_path, self.stacked_widget, self.code, self.process_manager, self.is_scanning_opened
+                self.file_path, self.stacked_widget, self.code, self.process_manager, self.is_scanning_opened, self.shared_data
             )
             self.stacked_widget.addWidget(self.PrintRetrievalCode_window)
             self.stacked_widget.setCurrentWidget(self.PrintRetrievalCode_window)
@@ -2407,12 +2407,12 @@ class NumericKeyboard(QMainWindow):
 
 
 class DataSentWindow(QMainWindow):
-    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened):
+    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened, shared_data):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w6.ui", self)
 
         # Create an instance of ProcessManager
-        # self.shared_data = shared_data
+        self.shared_data = shared_data
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
@@ -2444,12 +2444,12 @@ class DataSentWindow(QMainWindow):
 
 
 class PrintRetrievalCode(QMainWindow):
-    def __init__(self, file_path, stacked_widget, code, process_manager, is_scanning_opened):
+    def __init__(self, file_path, stacked_widget, code, process_manager, is_scanning_opened, shared_data):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w5.ui", self)
 
         # Create an instance of ProcessManager
-        # self.shared_data = shared_data
+        self.shared_data = shared_data
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
