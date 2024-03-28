@@ -2407,12 +2407,12 @@ class NumericKeyboard(QMainWindow):
 
 
 class DataSentWindow(QMainWindow):
-    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened, shared_data):
+    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w6.ui", self)
 
         # Create an instance of ProcessManager
-        self.shared_data = shared_data
+        # self.shared_data = shared_data
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
@@ -2444,12 +2444,12 @@ class DataSentWindow(QMainWindow):
 
 
 class PrintRetrievalCode(QMainWindow):
-    def __init__(self, file_path, stacked_widget, code, process_manager, is_scanning_opened, shared_data):
+    def __init__(self, file_path, stacked_widget, code, process_manager, is_scanning_opened):
         super().__init__()
         loadUi("/home/decas/ui/DecasUI_New/w5.ui", self)
 
         # Create an instance of ProcessManager
-        self.shared_data = shared_data
+        # self.shared_data = shared_data
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
