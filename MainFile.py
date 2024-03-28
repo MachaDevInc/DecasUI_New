@@ -2347,7 +2347,8 @@ class NumericKeyboard(QMainWindow):
 
     def check_number_api(self):
         self.myText = ""
-        self.url = "http://filesharing.n2rtech.com/api/mobile-verify"
+        # self.url = "http://filesharing.n2rtech.com/api/mobile-verify"
+        self.url = "http://staging.repslips.com/api/mobile-verify"
         self.payload = {"mobile": self.number}
         self.files = []
         self.headers = {}
