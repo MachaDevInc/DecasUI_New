@@ -2052,7 +2052,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.scanThread.start()
 
         self.numeric_keyboard = NumericKeyboard(
-            self, self.stacked_widget, self, self.scanThread, self.file_path
+            self, self.stacked_widget, self, self.scanThread, self.file_path, self.shared_data
         )
         self.stacked_widget.addWidget(self.numeric_keyboard)
     
@@ -2268,7 +2268,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 class NumericKeyboard(QMainWindow):
     userID_signal = pyqtSignal(str)  # Define signal, payload is str (userID)
 
-    def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path):
+    def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path, shared_data):
         super(NumericKeyboard, self).__init__()
         loadUi("/home/decas/ui/DecasUI_New/W4.ui", self)
 
@@ -2276,6 +2276,7 @@ class NumericKeyboard(QMainWindow):
         self.resize(1024, 600)
 
         self.parent = parent
+        self.shared_data = shared_data
         self.stacked_widget = stacked_widget
         self.file_path = file_path
         self.numeric_keyboard = numeric_keyboard
@@ -2664,7 +2665,7 @@ def run_main_app(app):
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pyqt5-tools adafruit-circuitpython-pn532 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil
+# pip3 install pyqt5-tools adafruit-circuitpython-pn532 adafruit-circuitpython-ds3231 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil
 
 # sudo apt-get update
 # sudo apt-get upgrade
