@@ -797,6 +797,7 @@ class SettingsWindow(QMainWindow):
         if state == 2:
             self.dateEdit.setEnabled(False)
             self.timeEdit.setEnabled(False)
+            self.timezone.setEnabled(False)
 
             set_state = {
                 "date_time_edit_enable": state
@@ -809,6 +810,7 @@ class SettingsWindow(QMainWindow):
 
             self.dateEdit.setEnabled(True)
             self.timeEdit.setEnabled(True)
+            self.timezone.setEnabled(True)
 
             set_state = {
                 "date_time_edit_enable": state
