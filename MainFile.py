@@ -743,7 +743,6 @@ class SettingsWindow(QMainWindow):
 
         self.my_timezone = self.timezone.itemText(0)
 
-        self.refresh.clicked.connect(self.refresh_wifi_scan)
         # Connect the combo box's activated signal to a slot function
         self.timezone.activated[str].connect(self.on_combobox_activated)
 
