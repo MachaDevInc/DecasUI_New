@@ -752,6 +752,7 @@ class SettingsWindow(QMainWindow):
 
     def on_combobox_activated(self, text):
         self.timezone = text
+        self.my_timezone = self.timezone
         print(f"Selected timezone: {text}")
 
     def update_timezone_list(self):
@@ -787,7 +788,7 @@ class SettingsWindow(QMainWindow):
     def save_date_time(self):
         state = self.read_date_time_edit_enable_in_json()
         if state == 2:
-            self.update_shared_data_from_ntp(self.shared_data)
+            self.update_shared_data_from_ntp(self.shared_data, self.my_timezone)
 
         elif state == 0:
             self.update_shared_data_from_user(self.shared_data)
@@ -816,11 +817,21 @@ class SettingsWindow(QMainWindow):
             with open("/home/decas/ui/DecasUI_New/date_time_settings.json", "w") as f:
                 json.dump(set_state, f)
 
-    def update_shared_data_from_ntp(self, shared_data):
+    def update_shared_data_from_ntp(self, shared_data, mytimezone):
         ntp_time = self.get_ntp_time()
-        ntp_datetime = datetime.fromtimestamp(ntp_time)
-        ntp_date = QDate(ntp_datetime.year, ntp_datetime.month, ntp_datetime.day)
-        ntp_time = QTime(ntp_datetime.hour, ntp_datetime.minute, ntp_datetime.second)
+        # Assuming the NTP time is in UTC, make the datetime timezone-aware
+        utc_datetime = datetime.fromtimestamp(ntp_time, pytz.utc)
+        
+        self.desired_timezone = mytimezone
+        # Convert to desired timezone
+        desired_timezone = pytz.timezone(self.desired_timezone)
+        timezone_aware_datetime = utc_datetime.astimezone(desired_timezone)
+        
+        # Extract date and time in the desired timezone
+        ntp_date = QDate(timezone_aware_datetime.year, timezone_aware_datetime.month, timezone_aware_datetime.day)
+        ntp_time = QTime(timezone_aware_datetime.hour, timezone_aware_datetime.minute, timezone_aware_datetime.second)
+        
+        # Update the shared data with the timezone-corrected date and time
         shared_data.set_rtc_datetime(ntp_date, ntp_time)
 
     def update_shared_data_from_user(self, shared_data):
