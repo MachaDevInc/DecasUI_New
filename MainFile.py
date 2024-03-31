@@ -28,6 +28,7 @@ import board
 import busio
 import serial
 import adafruit_ds3231
+import pytz
 from adafruit_pn532.i2c import PN532_I2C
 from escpos.printer import Serial
 # except (ModuleNotFoundError, NotImplementedError):
@@ -717,6 +718,8 @@ class SettingsWindow(QMainWindow):
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
 
+        self.my_timezone = ""
+
         # Set the window size
         self.resize(1024, 600)
         self.stacked_widget = stacked_widget
@@ -738,9 +741,25 @@ class SettingsWindow(QMainWindow):
         self.checkBox.stateChanged.connect(self.enable_edit_date_time)
         self.savedatetime.clicked.connect(self.save_date_time)
 
+        self.my_timezone = self.timezone.itemText(0)
+
+        self.refresh.clicked.connect(self.refresh_wifi_scan)
+        # Connect the combo box's activated signal to a slot function
+        self.timezone.activated[str].connect(self.on_combobox_activated)
+
         self.update_state_checkBox()
+        self.update_timezone_list()
         
 
+    def on_combobox_activated(self, text):
+        self.timezone = text
+        print(f"Selected timezone: {text}")
+
+    def update_timezone_list(self):
+        for time_zone in sorted(pytz.all_timezones):
+            print(time_zone)
+            self.timezone.addItem(time_zone)
+        
     def update_state_checkBox(self):
         state = self.read_date_time_edit_enable_in_json()
         if state == 2:
@@ -2666,12 +2685,12 @@ def run_main_app(app):
 
 # Instructions/Commands
 # sudo chmod 777 /tmp
-# pip3 install pyqt5-tools adafruit-circuitpython-pn532 adafruit-circuitpython-ds3231 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil
+# pip3 install pyqt5-tools adafruit-circuitpython-pn532 adafruit-circuitpython-ds3231 board pyserial escpos cryptography==36.0.0 pdfplumber ntplib requests python-dateutil pytz
 
 # sudo apt-get update
 # sudo apt-get upgrade
 # sudo apt-get install python3-pyqt5 python3-tk python3-requests python3-bluez mono-complete
 # sudo apt-get install -y libjpeg-dev libtiff-dev zlib1g-dev libfreetype6-dev liblcms2-dev libopenjp2-7 libharfbuzz-dev libfribidi-dev tcl8.6-dev tk8.6-dev python3-tk
-# sudo pip3 install adafruit-circuitpython-pn532 pyserial escpos pdfplumber ntplib python-dateutil
+# sudo pip3 install adafruit-circuitpython-pn532 pyserial escpos pdfplumber ntplib python-dateutil pytz
 # sudo mkdir ui
 # sudo chmod 777 /home/decas/output/
