@@ -757,7 +757,7 @@ class SettingsWindow(QMainWindow):
 
     def update_timezone_list(self):
         for time_zone in sorted(pytz.all_timezones):
-            print(time_zone)
+            # print(time_zone)
             self.timezone.addItem(time_zone)
         
     def update_state_checkBox(self):
@@ -797,7 +797,7 @@ class SettingsWindow(QMainWindow):
         if state == 2:
             self.dateEdit.setEnabled(False)
             self.timeEdit.setEnabled(False)
-            self.timezone.setEnabled(False)
+            self.timezone.setEnabled(True)
 
             set_state = {
                 "date_time_edit_enable": state
@@ -810,7 +810,7 @@ class SettingsWindow(QMainWindow):
 
             self.dateEdit.setEnabled(True)
             self.timeEdit.setEnabled(True)
-            self.timezone.setEnabled(True)
+            self.timezone.setEnabled(False)
 
             set_state = {
                 "date_time_edit_enable": state
