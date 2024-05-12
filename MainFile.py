@@ -683,15 +683,60 @@ class workWindow(JobsMainWindow):
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
 
-        if self.jobs[text]["payload"]["status"] == "Failed. Reciever Data not Found!!":
-            print("Yesssssssssss")
+        if self.jobs[text]["job_title"]["status"] == "Failed. Reciever Data not Found!!":
+            print("isko ab dobara scanning screen pe bhaij do")
 
-        # date_time = str(shared_data.date) + str(shared_data.time)
-        # self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, text)
-        # self.processingThread.finished_signal.connect(self.onProcessingFinished)
-        # self.processingThread.progress_signal.connect(self.onProgress)
-        # self.processingThread.start()
+            self.file_path = self.jobs[text]["file_path"]
+            self.new_file_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
+            self.jobs[text]["file_path"] = self.new_file_path
+
+            self.file_path = self.new_file_path
+
+            # print(jobs)
+            # Write the updated dictionary back to the file
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
+                json.dump(self.jobs, f)
+            
+            self.open_scanning_window()
+
+        else:
+            # date_time = str(shared_data.date) + str(shared_data.time)
+            self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, text)
+            self.processingThread.finished_signal.connect(self.onProcessingFinished)
+            self.processingThread.progress_signal.connect(self.onProgress)
+            self.processingThread.start()
+
+    def simulate_touch(self):
+        command = ["xdotool", "mousemove", "0", "0", "click", "1"]
+        subprocess.run(command)
+
+    def open_scanning_window(self):
+        if self.is_scanning_opened:
+            print("\nPreventing to open another instance of scanning window\n")
+            return
+        print("\is_scanning_opened True\n")
+        self.is_scanning_opened = True
+        self.simulate_touch()
+        
+        file_path = self.directory_checker.path_data
+        try:
+            print("\nOpening Scanning Screen\n")
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager, self.is_scanning_opened, self.shared_data)
+            self.stacked_widget.addWidget(self.ScanningWindow_window)
+            self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
+            self.timer.stop()
+            self.hide()
+        except (OSError, ValueError) as e:
+            print(f"Error: {e}")
+            self.process_manager.terminate_process()
+            time_module.sleep(1)
+            if "[Errno 2]" in str(e):
+                print("SerialException error with Errno 2 caught. Restarting Raspberry Pi.")
+                os.system('sudo reboot')
+            else:
+                print(f"An error occurred: {e}")
+    
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
         self.notification.setText(
