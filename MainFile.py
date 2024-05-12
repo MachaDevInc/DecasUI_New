@@ -1858,6 +1858,8 @@ class ProcessingThread(QThread):
 
                         self.update_jobs_dict()
 
+                        self.is_scanning_opened = False
+
                         self.progress_signal.emit("")
                         # Emit signal when processing is done
                         self.finished_signal.emit(
