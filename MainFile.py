@@ -2215,6 +2215,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
     def processUserID(self, scanned_data):
         self.userID = scanned_data
+        self.update_jobs_dict()
         print("Found a User ID:", scanned_data)
 
         if self.retry is not True:
