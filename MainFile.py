@@ -2301,11 +2301,11 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.timer.start(3000)
             time_module.sleep(3)
 
-        try:
-            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        # try:
+        #     subprocess.run(["sudo", "rm", self.file_path], check=True)
 
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred: {e}")
+        # except subprocess.CalledProcessError as e:
+        #     print(f"An error occurred: {e}")
         print("\nself.is_scanning_opened: ")
         print(self.is_scanning_opened)
         print("\n")
