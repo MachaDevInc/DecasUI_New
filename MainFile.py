@@ -1971,6 +1971,9 @@ class ProcessingThread(QThread):
             print(f"Error: {error}")
             print(f"Response: {self.response_message}")
 
+            if self.response_message == "Reciever Data not Found!!":
+                print("Dobara Scanning Screen pe jao")
+
         else:
             print("Unexpected response format.")
 
