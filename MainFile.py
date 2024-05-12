@@ -1844,9 +1844,24 @@ class ProcessingThread(QThread):
 
                         self.decode_response(response.text)
 
+                        if self.data_sent is True:
+                            status = "Success"
+                        else:
+                            status = "Failed. " + str(self.parsed_data["response"])
+
+                        current_time = self.shared_data.time
+                        current_date = self.shared_data.date
+
+                        self.job_title["invoice"] = info["Invoice Number"]
+                        self.job_title["user_id"] = self.userID
+                        self.job_title["date_time"] = current_date + " " + current_time
+                        self.job_title["status"] = status
+                        print("\n\n")
+                        print(self.job_title)
+                        print("\n\n")
+
                         # self.data_sent
-                        self.job_title = jobs[self.retry_text]["job_title"]
-                        self.receiver = jobs[self.retry_text]["receiver"]
+                        self.receiver = self.userID
                         self.company_name = jobs[self.retry_text]["company_name"]
                         self.company_address = jobs[self.retry_text]["company_address"]
                         self.company_phone = jobs[self.retry_text]["company_phone"]
