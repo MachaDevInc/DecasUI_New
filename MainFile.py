@@ -1642,7 +1642,7 @@ class ProcessingThread(QThread):
             print(self.retry)
             print("\n")
 
-            if self.retry is not True:
+            if self.retry != "1":
                 self.progress_signal.emit("Please wait!  Processing receipt...")
                 print("\nPlease wait!  Processing receipt...\n")
 
