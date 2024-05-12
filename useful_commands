@@ -56,6 +56,10 @@ sudo chown decas:decas /home/decas/ui/DecasUI_New/my_jobs.json
 sudo chmod u+rw /home/decas/ui/DecasUI_New/my_jobs.json
 sudo chmod 777 /home/decas/ui/DecasUI_New/my_jobs.json
 
+sudo chown decas:decas /home/decas/ui/DecasUI_New/date_time_settings.json
+sudo chmod u+rw /home/decas/ui/DecasUI_New/date_time_settings.json
+sudo chmod 777 /home/decas/ui/DecasUI_New/date_time_settings.json
+
 sudo chown decas:decas /etc/wpa_supplicant/wpa_supplicant.conf
 sudo chmod u+rw /etc/wpa_supplicant/wpa_supplicant.conf
 sudo chmod 777 /etc/wpa_supplicant/wpa_supplicant.conf

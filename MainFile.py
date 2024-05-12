@@ -788,7 +788,8 @@ class SettingsWindow(QMainWindow):
     def save_date_time(self):
         state = self.read_date_time_edit_enable_in_json()
         if state == 2:
-            self.update_shared_data_from_ntp(self.shared_data, self.my_timezone)
+            if self.my_timezone != "":
+                self.update_shared_data_from_ntp(self.shared_data, self.my_timezone)
 
         elif state == 0:
             self.update_shared_data_from_user(self.shared_data)
