@@ -2068,19 +2068,19 @@ class ProcessingThread(QThread):
         i += 1
 
         if i != 0:
-            jobs[i] = {}
-            jobs[i]["data_sent"] = self.data_sent
-            jobs[i]["job_title"] = self.job_title
-            jobs[i]["receiver"] = self.receiver
-            jobs[i]["company_name"] = self.company_name
-            jobs[i]["company_address"] = self.company_address
-            jobs[i]["company_phone"] = self.company_phone
-            jobs[i]["date"] = self.date
-            jobs[i]["receipt_number"] = self.receipt_number
-            jobs[i]["payload"] = self.payload
-            jobs[i]["response"] = self.response
-            jobs[i]["response_code"] = self.response_code
-            jobs[i]["file_path"] = self.file_path
+            jobs[self.retry_text] = {}
+            jobs[self.retry_text]["data_sent"] = self.data_sent
+            jobs[self.retry_text]["job_title"] = self.job_title
+            jobs[self.retry_text]["receiver"] = self.receiver
+            jobs[self.retry_text]["company_name"] = self.company_name
+            jobs[self.retry_text]["company_address"] = self.company_address
+            jobs[self.retry_text]["company_phone"] = self.company_phone
+            jobs[self.retry_text]["date"] = self.date
+            jobs[self.retry_text]["receipt_number"] = self.receipt_number
+            jobs[self.retry_text]["payload"] = self.payload
+            jobs[self.retry_text]["response"] = self.response
+            jobs[self.retry_text]["response_code"] = self.response_code
+            jobs[self.retry_text]["file_path"] = self.file_path
 
         # print(jobs)
         # Write the updated dictionary back to the file
