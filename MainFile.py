@@ -1699,8 +1699,6 @@ class ProcessingThread(QThread):
                     print(address)
 
                     api_data = self.items_to_api_format(result)
-                    # print(api_data)
-                    print("\n\n")
 
                     print("\nUser ID: ")
                     print(self.userID)
