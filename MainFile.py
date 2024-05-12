@@ -1640,13 +1640,14 @@ class ProcessingThread(QThread):
 
             if self.retry is not True:
                 self.progress_signal.emit("Please wait!  Processing receipt...")
+                print("\nPlease wait!  Processing receipt...\n")
 
                 self.retrieval_code = ""
 
                 try:
                     result = self.pdf_to_table_data(self.file_path)
                     print("\n\n")
-                    print(result)
+                    # print(result)
                     print("\n\n")
 
                     receipt_text = ""
@@ -1656,13 +1657,13 @@ class ProcessingThread(QThread):
                         row['tax'] = row['tax'].replace(",", "")
                         row['discount'] = row['discount'].replace(",", "")
                         row['total'] = row['total'].replace(",", "")
-                        print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
+                        # print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
 
                         receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
 
                     receipt_info = self.pdf_to_text(self.file_path)
                     print("\n\n")
-                    print(receipt_info)
+                    # print(receipt_info)
                     print("\n\n")
 
                     info = self.extract_info(receipt_info)
@@ -1698,7 +1699,7 @@ class ProcessingThread(QThread):
                     print(address)
 
                     api_data = self.items_to_api_format(result)
-                    print(api_data)
+                    # print(api_data)
                     print("\n\n")
 
                     print("\nUser ID: ")
@@ -1710,6 +1711,8 @@ class ProcessingThread(QThread):
                     print("\n")
 
                     self.progress_signal.emit("Sending data to REPSLIPS server...")
+                    print("\nSending data to REPSLIPS server...\n")
+                    
 
                     # (data, receiver, company_name, company_address, company_phone, date, device_id, receipt_number)
                     get_response = self.send_api_data(
