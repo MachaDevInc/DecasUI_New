@@ -1971,29 +1971,6 @@ class ProcessingThread(QThread):
             print(f"Error: {error}")
             print(f"Response: {self.response_message}")
 
-            if self.response_message == "Reciever Data not Found!!":
-                print("Dobara Scanning Screen pe jao")
-
-                # Define the source and destination paths
-                self.file_path = "/home/decas/output/20240512142510577.pdf"
-
-                # Create destination path by replacing part of the source path
-                self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
-
-                print("\n destination_path: ")
-                print(self.destination_path)
-                print("\n")
-
-                # Bash command to copy the file
-                command = ['cp', self.file_path, self.destination_path]
-
-                # Execute the command
-                try:
-                    subprocess.run(command, check=True)
-                    print("File copied successfully!")
-                except subprocess.CalledProcessError:
-                    print("Error occurred while copying the file.")
-
 
         else:
             print("Unexpected response format.")
@@ -2181,16 +2158,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.data_sent = data_sent
         self.is_scanning_opened = is_scanning_opened
 
-        try:
-            subprocess.run(["sudo", "rm", self.file_path], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred: {e}")
-        print("\nself.is_scanning_opened: ")
-        print(self.is_scanning_opened)
-        print("\n")
-        print("Processing finished!")
-        print(retrieval_code)
-
         if self.data_sent and error != "error_PDF":
             print("Opening DataSentWindow")
 
@@ -2208,22 +2175,55 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
-        else:
-            _translate = QtCore.QCoreApplication.translate
-            self.notification.setText(
-                _translate(
-                    "stacked_widget",
-                    '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
-                    + error
-                    + "</span></p></body></html>",
-                )
-            )
-            print("\nGoing back to home screen\n")
+        elif error == "Reciever Data not Found!!":
+                print("Dobara Scanning Screen pe jao")
 
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.go_home)
-            self.timer.start(3000)
-            time_module.sleep(3)
+                # Define the source and destination paths
+                self.file_path = "/home/decas/output/20240512142510577.pdf"
+
+                # Create destination path by replacing part of the source path
+                self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
+
+                print("\n destination_path: ")
+                print(self.destination_path)
+                print("\n")
+
+                # Bash command to copy the file
+                command = ['cp', self.file_path, self.destination_path]
+
+                # Execute the command
+                try:
+                    subprocess.run(command, check=True)
+                    print("File copied successfully!")
+                except subprocess.CalledProcessError:
+                    print("Error occurred while copying the file.")
+        
+        else:
+                _translate = QtCore.QCoreApplication.translate
+                self.notification.setText(
+                    _translate(
+                        "stacked_widget",
+                        '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                        + error
+                        + "</span></p></body></html>",
+                    )
+                )
+                print("\nGoing back to home screen\n")
+
+                self.timer = QTimer()
+                self.timer.timeout.connect(self.go_home)
+                self.timer.start(3000)
+                time_module.sleep(3)
+
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
+        print("\nself.is_scanning_opened: ")
+        print(self.is_scanning_opened)
+        print("\n")
+        print("Processing finished!")
+        print(retrieval_code)
 
     def go_home(self):
         self.timer.stop()
