@@ -2065,22 +2065,22 @@ class ProcessingThread(QThread):
             # Removing an item using del
             del jobs[self.retry_text]
 
-        i += 1
+        # i += 1
 
-        if i != 0:
-            jobs[self.retry_text] = {}
-            jobs[self.retry_text]["data_sent"] = self.data_sent
-            jobs[self.retry_text]["job_title"] = self.job_title
-            jobs[self.retry_text]["receiver"] = self.receiver
-            jobs[self.retry_text]["company_name"] = self.company_name
-            jobs[self.retry_text]["company_address"] = self.company_address
-            jobs[self.retry_text]["company_phone"] = self.company_phone
-            jobs[self.retry_text]["date"] = self.date
-            jobs[self.retry_text]["receipt_number"] = self.receipt_number
-            jobs[self.retry_text]["payload"] = self.payload
-            jobs[self.retry_text]["response"] = self.response
-            jobs[self.retry_text]["response_code"] = self.response_code
-            jobs[self.retry_text]["file_path"] = self.file_path
+        # if i != 0:
+        jobs[self.retry_text] = {}
+        jobs[self.retry_text]["data_sent"] = self.data_sent
+        jobs[self.retry_text]["job_title"] = self.job_title
+        jobs[self.retry_text]["receiver"] = self.receiver
+        jobs[self.retry_text]["company_name"] = self.company_name
+        jobs[self.retry_text]["company_address"] = self.company_address
+        jobs[self.retry_text]["company_phone"] = self.company_phone
+        jobs[self.retry_text]["date"] = self.date
+        jobs[self.retry_text]["receipt_number"] = self.receipt_number
+        jobs[self.retry_text]["payload"] = self.payload
+        jobs[self.retry_text]["response"] = self.response
+        jobs[self.retry_text]["response_code"] = self.response_code
+        jobs[self.retry_text]["file_path"] = self.file_path
 
         # print(jobs)
         # Write the updated dictionary back to the file
