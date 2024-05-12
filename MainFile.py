@@ -688,11 +688,17 @@ class workWindow(JobsMainWindow):
             print("isko ab dobara scanning screen pe bhaij do")
 
             self.file_path = self.jobs[self.text]["file_path"]
+            print("\nself.file_path: ")
+            print(self.file_path)
+            print("\n")
             self.new_file_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
             self.jobs[self.text]["file_path"] = self.new_file_path
 
             self.file_path = self.new_file_path
+            print("\nself.file_path: ")
+            print(self.file_path)
+            print("\n")
 
             # print(jobs)
             # Write the updated dictionary back to the file
