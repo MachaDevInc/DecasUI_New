@@ -721,7 +721,7 @@ class workWindow(JobsMainWindow):
         
         try:
             print("\nOpening Scanning Screen\n")
-            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data)
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data, True)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
             self.hide()
@@ -2086,7 +2086,7 @@ class ProcessingThread(QThread):
 
 
 class ScanningWindow(QMainWindow, Ui_MainWindow3):
-    def __init__(self, stacked_widget, file_path, process_manager, is_scanning_opened, shared_data):
+    def __init__(self, stacked_widget, file_path, process_manager, is_scanning_opened, shared_data, retry = False, retry_text = ""):
         super().__init__()
         self.setupUi(self)
 
@@ -2094,6 +2094,8 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.shared_data = shared_data
         self.process_manager = process_manager
         self.is_scanning_opened = is_scanning_opened
+        self.retry = retry
+        self.retry_text = retry_text
 
         # Set the window size
         self.resize(1024, 600)
@@ -2183,14 +2185,77 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
     def processUserID(self, scanned_data):
         self.userID = scanned_data
         print("Found a User ID:", scanned_data)
-        # date_time = str(shared_data.date) + str(shared_data.time)
-        print("\nOpening ProcessingThread after scan is done\n")
-        # print("\nself.file_path: " + self.file_path + "\n")
-        self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data)
-        self.processingThread.finished_signal.connect(self.onProcessingFinished)
-        self.processingThread.progress_signal.connect(self.onProgress)
-        self.processingThread.start()
 
+        if self.retry is not True:
+            # date_time = str(shared_data.date) + str(shared_data.time)
+            print("\nOpening ProcessingThread after scan is done\n")
+            # print("\nself.file_path: " + self.file_path + "\n")
+            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data)
+            self.processingThread.finished_signal.connect(self.onProcessingFinished)
+            self.processingThread.progress_signal.connect(self.onProgress)
+            self.processingThread.start()
+        else:
+            try:
+                # Read the file
+                with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
+                    self.progress_signal.emit("Retrying your job...")
+                    time_module.sleep(3)
+                    jobs = json.load(f)  # This will give you a dictionary
+                    # Get the size of the dictionary
+                    size = len(jobs)
+                    print(f"The dictionary contains {size} key-value pairs. Reading this else condition of 'if self.retry' in ProcessingThread")
+                    print(f"Dictionary: '{jobs[self.retry_text]}'")
+
+                    self.receiver = jobs[self.retry_text]["receiver"]
+
+                    self.update_jobs_dict()
+
+            except json.JSONDecodeError:
+                print("File is not valid JSON")
+            except FileNotFoundError:
+                print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
+            self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, self.retry_text)
+            self.processingThread.finished_signal.connect(self.onProcessingFinished)
+            self.processingThread.progress_signal.connect(self.onProgress)
+            self.processingThread.start()
+
+    def update_jobs_dict(self):
+        jobs = {}
+        i = 0
+
+        try:
+            # Read the file
+            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
+                jobs = json.load(f)  # This will give you a dictionary
+                # Get the size of the dictionary
+                size = len(jobs)
+                print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
+        except json.JSONDecodeError:
+            print("File is not valid JSON")
+        except FileNotFoundError:
+            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
+
+        if jobs:
+            # Get the last key-value pair added
+            last_key, last_value = next(reversed(jobs.items()))
+            # print(f"Last key: {last_key}, last value: {last_value}")
+            i = int(last_key)
+
+        if self.retry is True:
+            # Removing an item using del
+            del jobs[self.retry_text]
+
+        i += 1
+
+        if i != 0:
+            jobs[i] = {}
+            jobs[i]["receiver"] = self.userID
+
+        # print(jobs)
+        # Write the updated dictionary back to the file
+        with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
+            json.dump(jobs, f)
+    
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
         self.notification.setText(
