@@ -1638,6 +1638,10 @@ class ProcessingThread(QThread):
             self._isRunning = True
             self.deviceID = self.get_mac_address()
 
+            print("\nself.retry: ")
+            print(self.retry)
+            print("\n")
+
             if self.retry is not True:
                 self.progress_signal.emit("Please wait!  Processing receipt...")
                 print("\nPlease wait!  Processing receipt...\n")
@@ -2181,7 +2185,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
-            
+
         elif error == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
 
