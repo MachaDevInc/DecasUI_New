@@ -634,22 +634,22 @@ class workWindow(JobsMainWindow):
     def show_jobs(self):
         self.clear_layout(self.scroll_layout)
 
-        jobs = {}
+        self.jobs = {}
 
         try:
             # Read the file
             with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
-                jobs = json.load(f)  # This will give you a dictionary
+                self.jobs = json.load(f)  # This will give you a dictionary
                 # Get the size of the dictionary
-                size = len(jobs)
+                size = len(self.jobs)
                 print(f"The dictionary contains {size} key-value pairs. Reading this from show_jobs function in workWindow")
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
             print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
 
-        if jobs:
-            for key, value in jobs.items():
+        if self.jobs:
+            for key, value in self.jobs.items():
                 print(value["job_title"])
                 print("\n\n")
                 print(value)
@@ -682,11 +682,15 @@ class workWindow(JobsMainWindow):
 
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
+
+        if self.jobs[text]["payload"]["status"] == "Failed. Reciever Data not Found!!":
+            print("Yesssssssssss")
+
         # date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, text)
-        self.processingThread.finished_signal.connect(self.onProcessingFinished)
-        self.processingThread.progress_signal.connect(self.onProgress)
-        self.processingThread.start()
+        # self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, text)
+        # self.processingThread.finished_signal.connect(self.onProcessingFinished)
+        # self.processingThread.progress_signal.connect(self.onProgress)
+        # self.processingThread.start()
 
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
@@ -1777,6 +1781,8 @@ class ProcessingThread(QThread):
                 try:
                     # Read the file
                     with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
+                        self.progress_signal.emit("Retrying your job...")
+                        time_module.sleep(3)
                         jobs = json.load(f)  # This will give you a dictionary
                         # Get the size of the dictionary
                         size = len(jobs)
@@ -1808,6 +1814,7 @@ class ProcessingThread(QThread):
 
                         self.update_jobs_dict()
 
+                        self.progress_signal.emit("")
                         # Emit signal when processing is done
                         self.finished_signal.emit(
                             "", self.data_sent, self.response_message, self.is_scanning_opened
