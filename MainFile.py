@@ -1852,7 +1852,7 @@ class ProcessingThread(QThread):
                         current_time = self.shared_data.time
                         current_date = self.shared_data.date
 
-                        self.job_title["invoice"] = info["Invoice Number"]
+                        self.job_title["invoice"] = jobs[self.retry_text]["jobs_title"]["invoice"]
                         self.job_title["user_id"] = self.userID
                         self.job_title["date_time"] = current_date + " " + current_time
                         self.job_title["status"] = status
