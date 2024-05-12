@@ -688,17 +688,11 @@ class workWindow(JobsMainWindow):
             print("isko ab dobara scanning screen pe bhaij do")
 
             self.file_path = self.jobs[self.text]["file_path"]
-            print("\nself.file_path: ")
-            print(self.file_path)
-            print("\n")
             self.new_file_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
             self.jobs[self.text]["file_path"] = self.new_file_path
 
             self.file_path = self.new_file_path
-            print("\nself.file_path: ")
-            print(self.file_path)
-            print("\n")
 
             # print(jobs)
             # Write the updated dictionary back to the file
@@ -2233,7 +2227,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 print("File is not valid JSON")
             except FileNotFoundError:
                 print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
-            self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, self.retry_text)
+            self.processingThread = ProcessingThread(self.file_path, "", self.is_scanning_opened, self.shared_data, True, self.retry_text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
