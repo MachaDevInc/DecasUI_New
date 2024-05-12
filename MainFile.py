@@ -2159,6 +2159,12 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.is_scanning_opened = is_scanning_opened
 
         if self.data_sent and error != "error_PDF":
+            try:
+                subprocess.run(["sudo", "rm", self.file_path], check=True)
+
+            except subprocess.CalledProcessError as e:
+                print(f"An error occurred: {e}")
+        
             print("Opening DataSentWindow")
 
             while self.stacked_widget.count() > 0:
@@ -2175,8 +2181,15 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             )
             self.stacked_widget.addWidget(self.DataSentWindow_window)
             self.stacked_widget.setCurrentWidget(self.DataSentWindow_window)
+            
         elif error == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
+
+                try:
+                    subprocess.run(["sudo", "rm", self.file_path], check=True)
+
+                except subprocess.CalledProcessError as e:
+                    print(f"An error occurred: {e}")
 
                 # Create destination path by replacing part of the source path
                 self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
@@ -2201,27 +2214,33 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 time_module.sleep(3)
         
         else:
-                _translate = QtCore.QCoreApplication.translate
-                self.notification.setText(
-                    _translate(
-                        "stacked_widget",
-                        '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
-                        + error
-                        + "</span></p></body></html>",
-                    )
+            try:
+                subprocess.run(["sudo", "rm", self.file_path], check=True)
+
+            except subprocess.CalledProcessError as e:
+                print(f"An error occurred: {e}")
+
+            _translate = QtCore.QCoreApplication.translate
+            self.notification.setText(
+                _translate(
+                    "stacked_widget",
+                    '<html><head/><body><p align="center"><span style=" background-color: black; color: white; font-size:22pt; font-weight:600;">'
+                    + error
+                    + "</span></p></body></html>",
                 )
-                print("\nGoing back to home screen\n")
+            )
+            print("\nGoing back to home screen\n")
 
-                self.timer = QTimer()
-                self.timer.timeout.connect(self.go_home)
-                self.timer.start(3000)
-                time_module.sleep(3)
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.go_home)
+            self.timer.start(3000)
+            time_module.sleep(3)
 
-        # try:
-        #     subprocess.run(["sudo", "rm", self.file_path], check=True)
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
 
-        # except subprocess.CalledProcessError as e:
-        #     print(f"An error occurred: {e}")
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
         print("\nself.is_scanning_opened: ")
         print(self.is_scanning_opened)
         print("\n")
