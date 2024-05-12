@@ -2020,6 +2020,7 @@ class ProcessingThread(QThread):
             jobs[i]["payload"] = self.payload
             jobs[i]["response"] = self.response
             jobs[i]["response_code"] = self.response_code
+            jobs[i]["file_path"] = self.file_path
 
         # print(jobs)
         # Write the updated dictionary back to the file
