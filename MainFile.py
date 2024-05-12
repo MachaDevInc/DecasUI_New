@@ -1810,7 +1810,7 @@ class ProcessingThread(QThread):
 
                         # Emit signal when processing is done
                         self.finished_signal.emit(
-                            "", self.data_sent, self.response_message
+                            "", self.data_sent, self.response_message, self.is_scanning_opened
                         )
 
                 except json.JSONDecodeError:
