@@ -719,10 +719,9 @@ class workWindow(JobsMainWindow):
         self.is_scanning_opened = True
         self.simulate_touch()
         
-        file_path = self.directory_checker.path_data
         try:
             print("\nOpening Scanning Screen\n")
-            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, file_path, self.process_manager, self.is_scanning_opened, self.shared_data)
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
             self.timer.stop()
