@@ -2220,7 +2220,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
     def update_jobs_dict(self):
         jobs = {}
-        i = 0
 
         try:
             # Read the file
@@ -2229,31 +2228,16 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 # Get the size of the dictionary
                 size = len(jobs)
                 print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
+                jobs[self.retry_text]["receiver"] = self.userID
+
+                # print(jobs)
+                # Write the updated dictionary back to the file
+                with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
+                    json.dump(jobs, f)
         except json.JSONDecodeError:
             print("File is not valid JSON")
         except FileNotFoundError:
             print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
-
-        if jobs:
-            # Get the last key-value pair added
-            last_key, last_value = next(reversed(jobs.items()))
-            # print(f"Last key: {last_key}, last value: {last_value}")
-            i = int(last_key)
-
-        if self.retry is True:
-            # Removing an item using del
-            del jobs[self.retry_text]
-
-        i += 1
-
-        if i != 0:
-            jobs[i] = {}
-            jobs[i]["receiver"] = self.userID
-
-        # print(jobs)
-        # Write the updated dictionary back to the file
-        with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
-            json.dump(jobs, f)
     
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
