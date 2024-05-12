@@ -2239,12 +2239,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         elif error == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
 
-                try:
-                    subprocess.run(["sudo", "rm", self.file_path], check=True)
-
-                except subprocess.CalledProcessError as e:
-                    print(f"An error occurred: {e}")
-
                 # Create destination path by replacing part of the source path
                 self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
@@ -2261,6 +2255,12 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                     print("File copied successfully!")
                 except subprocess.CalledProcessError:
                     print("Error occurred while copying the file.")
+
+                try:
+                    subprocess.run(["sudo", "rm", self.file_path], check=True)
+
+                except subprocess.CalledProcessError as e:
+                    print(f"An error occurred: {e}")
 
                 self.timer = QTimer()
                 self.timer.timeout.connect(self.go_home)
