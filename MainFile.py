@@ -681,15 +681,16 @@ class workWindow(JobsMainWindow):
                 child.widget().deleteLater()
 
     def on_button_clicked(self, text):
-        print(f"Button for '{text}' clicked")
+        self.text = text
+        print(f"Button for '{self.text}' clicked")
 
-        if self.jobs[text]["job_title"]["status"] == "Failed. Reciever Data not Found!!":
+        if self.jobs[self.text]["job_title"]["status"] == "Failed. Reciever Data not Found!!":
             print("isko ab dobara scanning screen pe bhaij do")
 
-            self.file_path = self.jobs[text]["file_path"]
+            self.file_path = self.jobs[self.text]["file_path"]
             self.new_file_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
-            self.jobs[text]["file_path"] = self.new_file_path
+            self.jobs[self.text]["file_path"] = self.new_file_path
 
             self.file_path = self.new_file_path
 
@@ -702,7 +703,7 @@ class workWindow(JobsMainWindow):
 
         else:
             # date_time = str(shared_data.date) + str(shared_data.time)
-            self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, text)
+            self.processingThread = ProcessingThread("", "", self.is_scanning_opened, self.shared_data, True, self.text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -721,7 +722,7 @@ class workWindow(JobsMainWindow):
         
         try:
             print("\nOpening Scanning Screen\n")
-            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data, True)
+            self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data, True, self.text)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
             self.hide()
@@ -2198,8 +2199,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             try:
                 # Read the file
                 with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
-                    self.progress_signal.emit("Retrying your job...")
-                    time_module.sleep(3)
                     jobs = json.load(f)  # This will give you a dictionary
                     # Get the size of the dictionary
                     size = len(jobs)
