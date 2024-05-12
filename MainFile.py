@@ -2212,6 +2212,10 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.data_sent = data_sent
         self.is_scanning_opened = is_scanning_opened
 
+        print("\nerror: ")
+        print(error)
+        print("\n")
+
         if self.data_sent and error != "error_PDF":
             try:
                 subprocess.run(["sudo", "rm", self.file_path], check=True)
