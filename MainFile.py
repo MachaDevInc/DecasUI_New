@@ -683,7 +683,7 @@ class workWindow(JobsMainWindow):
     def on_button_clicked(self, text):
         print(f"Button for '{text}' clicked")
         # date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread("", "", self.is_scanning_opened, True, text)
+        self.processingThread = ProcessingThread("", "", self.is_scanning_opened, False, text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished)
         self.processingThread.progress_signal.connect(self.onProgress)
         self.processingThread.start()
