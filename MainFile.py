@@ -2178,9 +2178,6 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         elif error == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
 
-                # Define the source and destination paths
-                self.file_path = "/home/decas/output/20240512142510577.pdf"
-
                 # Create destination path by replacing part of the source path
                 self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
@@ -2215,10 +2212,11 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 self.timer.start(3000)
                 time_module.sleep(3)
 
-        # try:
-        #     subprocess.run(["sudo", "rm", self.file_path], check=True)
-        # except subprocess.CalledProcessError as e:
-        #     print(f"An error occurred: {e}")
+        try:
+            subprocess.run(["sudo", "rm", self.file_path], check=True)
+            
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}")
         print("\nself.is_scanning_opened: ")
         print(self.is_scanning_opened)
         print("\n")
