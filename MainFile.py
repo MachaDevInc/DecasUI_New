@@ -1645,9 +1645,9 @@ class ProcessingThread(QThread):
 
                 try:
                     result = self.pdf_to_table_data(self.file_path)
-                    # print("\n\n")
-                    # print(result)
-                    # print("\n\n")
+                    print("\n\n")
+                    print(result)
+                    print("\n\n")
 
                     receipt_text = ""
                     for i, row in enumerate(result):
@@ -1656,14 +1656,14 @@ class ProcessingThread(QThread):
                         row['tax'] = row['tax'].replace(",", "")
                         row['discount'] = row['discount'].replace(",", "")
                         row['total'] = row['total'].replace(",", "")
-                        # print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
+                        print(f"item: {row['item']}, quantity: {row['quantity']}, price: {row['price']}, tax: {row['tax']}, discount: {row['discount']}, total: {row['total']}")
 
                         receipt_text += row['#'] + " " + row['item'] + " " + row['quantity'] + " " + row['price'] + " " + row['total'] + "\n"
 
                     receipt_info = self.pdf_to_text(self.file_path)
-                    # print("\n\n")
-                    # print(receipt_info)
-                    # print("\n\n")
+                    print("\n\n")
+                    print(receipt_info)
+                    print("\n\n")
 
                     info = self.extract_info(receipt_info)
                     if "Tax Number" in info:
@@ -1698,8 +1698,8 @@ class ProcessingThread(QThread):
                     print(address)
 
                     api_data = self.items_to_api_format(result)
-                    # print(api_data)
-                    # print("\n\n")
+                    print(api_data)
+                    print("\n\n")
 
                     print("\nUser ID: ")
                     print(self.userID)
