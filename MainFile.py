@@ -2190,6 +2190,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
     def update_user_id(self, user_id=""):
         if user_id != "":
             self.userID = user_id
+            self.update_jobs_dict()
             # date_time = str(shared_data.date) + str(shared_data.time)
             print("\nOpening ProcessingThread after getting phone number\n")
             self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
@@ -2415,6 +2416,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         self.ser.write(self.stop_scan_command_bytes)
 
         self.userID = ""
+        self.update_jobs_dict()
         # date_time = str(shared_data.date) + str(shared_data.time)
         self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
