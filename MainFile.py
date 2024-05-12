@@ -2244,7 +2244,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 print("File is not valid JSON")
             except FileNotFoundError:
                 print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
-            self.processingThread = ProcessingThread(self.file_path, "", self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
