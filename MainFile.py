@@ -724,7 +724,6 @@ class workWindow(JobsMainWindow):
             self.ScanningWindow_window = ScanningWindow(self.stacked_widget, self.file_path, self.process_manager, self.is_scanning_opened, self.shared_data)
             self.stacked_widget.addWidget(self.ScanningWindow_window)
             self.stacked_widget.setCurrentWidget(self.ScanningWindow_window)
-            self.timer.stop()
             self.hide()
         except (OSError, ValueError) as e:
             print(f"Error: {e}")
