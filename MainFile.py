@@ -2244,6 +2244,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 size = len(jobs)
                 print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
                 jobs[self.retry_text]["receiver"] = self.userID
+                jobs[self.retry_text]["job_title"]["user_id"] = self.userID
 
                 # print(jobs)
                 # Write the updated dictionary back to the file
