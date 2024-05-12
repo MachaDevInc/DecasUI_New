@@ -1974,6 +1974,27 @@ class ProcessingThread(QThread):
             if self.response_message == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
 
+                # Define the source and destination paths
+                self.file_path = "/home/decas/output/20240512142510577.pdf"
+
+                # Create destination path by replacing part of the source path
+                self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
+
+                print("\n destination_path: ")
+                print(self.destination_path)
+                print("\n")
+
+                # Bash command to copy the file
+                command = ['cp', self.file_path, self.destination_path]
+
+                # Execute the command
+                try:
+                    subprocess.run(command, check=True)
+                    print("File copied successfully!")
+                except subprocess.CalledProcessError:
+                    print("Error occurred while copying the file.")
+
+
         else:
             print("Unexpected response format.")
 

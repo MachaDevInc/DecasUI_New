@@ -48,6 +48,10 @@ sudo chown decas:decas /home/decas/output/
 sudo chmod u+rw /home/decas/output/
 sudo chmod 777 /home/decas/output/
 
+sudo chown decas:decas /home/decas/receiver_failed_output/
+sudo chmod u+rw /home/decas/receiver_failed_output/
+sudo chmod 777 /home/decas/receiver_failed_output/
+
 sudo chown decas:decas /home/decas/ui/DecasUI_New/connection_cmd.json
 sudo chmod u+rw /home/decas/ui/DecasUI_New/connection_cmd.json
 sudo chmod 777 /home/decas/ui/DecasUI_New/connection_cmd.json
