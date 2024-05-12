@@ -233,7 +233,7 @@ class JobsMainWindow(QMainWindow):
         self.search1.setFlat(True)
         self.search1.setObjectName("search1")
         self.notification = QLabel(self.centralwidget)
-        self.notification.setGeometry(QRect(110, 340, 831, 50))
+        self.notification.setGeometry(QRect(110, 490, 831, 50))
         self.notification.setObjectName("notification")
         self.notification.raise_()
         self.setCentralWidget(self.centralwidget)
