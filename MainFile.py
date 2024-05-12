@@ -2192,7 +2192,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.userID = user_id
             # date_time = str(shared_data.date) + str(shared_data.time)
             print("\nOpening ProcessingThread after getting phone number\n")
-            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -2205,7 +2205,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             # date_time = str(shared_data.date) + str(shared_data.time)
             print("\nOpening ProcessingThread after scan is done\n")
             # print("\nself.file_path: " + self.file_path + "\n")
-            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data)
+            self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -2227,7 +2227,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 print("File is not valid JSON")
             except FileNotFoundError:
                 print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
-            self.processingThread = ProcessingThread(self.file_path, "", self.is_scanning_opened, self.shared_data, True, self.retry_text)
+            self.processingThread = ProcessingThread(self.file_path, "", self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
             self.processingThread.finished_signal.connect(self.onProcessingFinished)
             self.processingThread.progress_signal.connect(self.onProgress)
             self.processingThread.start()
@@ -2416,7 +2416,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 
         self.userID = ""
         # date_time = str(shared_data.date) + str(shared_data.time)
-        self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data)
+        self.processingThread = ProcessingThread(self.file_path, self.userID, self.is_scanning_opened, self.shared_data, self.retry, self.retry_text)
         self.processingThread.finished_signal.connect(self.onProcessingFinished_Print)
         self.processingThread.progress_signal.connect(self.onProgress_Print)
         self.processingThread.start()
@@ -2475,7 +2475,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
 class NumericKeyboard(QMainWindow):
     userID_signal = pyqtSignal(str)  # Define signal, payload is str (userID)
 
-    def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path, shared_data):
+    def __init__(self, parent, stacked_widget, numeric_keyboard, scanThread, file_path, shared_data, retry = False, retry_text = ""):
         super(NumericKeyboard, self).__init__()
         loadUi("/home/decas/ui/DecasUI_New/W4.ui", self)
 
