@@ -2216,7 +2216,7 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         print(error)
         print("\n")
 
-        if self.data_sent and error != "error_PDF":
+        if self.data_sent and error == "Data Inserted Successfully":
             try:
                 subprocess.run(["sudo", "rm", self.file_path], check=True)
 
@@ -2243,33 +2243,40 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
         elif error == "Reciever Data not Found!!":
                 print("Dobara Scanning Screen pe jao")
 
-                # Create destination path by replacing part of the source path
-                self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
+                if "receiver_failed_output" in self.file_path:
+                    self.timer = QTimer()
+                    self.timer.timeout.connect(self.go_home)
+                    self.timer.start(3000)
+                    time_module.sleep(3)
 
-                print("\n destination_path: ")
-                print(self.destination_path)
-                print("\n")
+                else:
+                    # Create destination path by replacing part of the source path
+                    self.destination_path = self.file_path.replace("/home/decas/output/", "/home/decas/receiver_failed_output/")
 
-                # Bash command to copy the file
-                command = ['cp', self.file_path, self.destination_path]
+                    print("\n destination_path: ")
+                    print(self.destination_path)
+                    print("\n")
 
-                # Execute the command
-                try:
-                    subprocess.run(command, check=True)
-                    print("File copied successfully!")
-                except subprocess.CalledProcessError:
-                    print("Error occurred while copying the file.")
+                    # Bash command to copy the file
+                    command = ['cp', self.file_path, self.destination_path]
 
-                try:
-                    subprocess.run(["sudo", "rm", self.file_path], check=True)
+                    # Execute the command
+                    try:
+                        subprocess.run(command, check=True)
+                        print("File copied successfully!")
+                    except subprocess.CalledProcessError:
+                        print("Error occurred while copying the file.")
 
-                except subprocess.CalledProcessError as e:
-                    print(f"An error occurred: {e}")
+                    try:
+                        subprocess.run(["sudo", "rm", self.file_path], check=True)
 
-                self.timer = QTimer()
-                self.timer.timeout.connect(self.go_home)
-                self.timer.start(3000)
-                time_module.sleep(3)
+                    except subprocess.CalledProcessError as e:
+                        print(f"An error occurred: {e}")
+
+                    self.timer = QTimer()
+                    self.timer.timeout.connect(self.go_home)
+                    self.timer.start(3000)
+                    time_module.sleep(3)
         
         else:
             try:
