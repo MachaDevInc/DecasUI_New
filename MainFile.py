@@ -2250,30 +2250,31 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
             self.processingThread.start()
 
     def update_jobs_dict(self):
-        jobs = {}
+        if self.retry is True:
+            jobs = {}
 
-        try:
-            # Read the file
-            with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
-                jobs = json.load(f)  # This will give you a dictionary
-                # Get the size of the dictionary
-                size = len(jobs)
-                print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
-                jobs[self.retry_text]["receiver"] = self.userID
-                jobs[self.retry_text]["job_title"]["user_id"] = self.userID
-                jobs[self.retry_text]["payload"]["receiver"] = self.userID
-                current_time = self.shared_data.time
-                current_date = self.shared_data.date
-                jobs[self.retry_text]["job_title"]["date_time"] = current_date + " " + current_time
+            try:
+                # Read the file
+                with open("/home/decas/ui/DecasUI_New/my_jobs.json", "r") as f:
+                    jobs = json.load(f)  # This will give you a dictionary
+                    # Get the size of the dictionary
+                    size = len(jobs)
+                    print(f"The dictionary contains {size} key-value pairs. Reading this from update_jobs_dict function in ProcessingThread")
+                    jobs[self.retry_text]["receiver"] = self.userID
+                    jobs[self.retry_text]["job_title"]["user_id"] = self.userID
+                    jobs[self.retry_text]["payload"]["receiver"] = self.userID
+                    current_time = self.shared_data.time
+                    current_date = self.shared_data.date
+                    jobs[self.retry_text]["job_title"]["date_time"] = current_date + " " + current_time
 
-                # print(jobs)
-                # Write the updated dictionary back to the file
-                with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
-                    json.dump(jobs, f)
-        except json.JSONDecodeError:
-            print("File is not valid JSON")
-        except FileNotFoundError:
-            print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
+                    # print(jobs)
+                    # Write the updated dictionary back to the file
+                    with open("/home/decas/ui/DecasUI_New/my_jobs.json", "w") as f:
+                        json.dump(jobs, f)
+            except json.JSONDecodeError:
+                print("File is not valid JSON")
+            except FileNotFoundError:
+                print("File '/home/decas/ui/DecasUI_New/my_jobs.json' not found.")
     
     def onProgress(self, notification):
         _translate = QtCore.QCoreApplication.translate
