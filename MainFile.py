@@ -2330,10 +2330,22 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                 print("Dobara Scanning Screen pe jao")
 
                 if "receiver_failed_output" in self.file_path:
-                    self.timer = QTimer()
-                    self.timer.timeout.connect(self.go_home)
-                    self.timer.start(3000)
-                    time_module.sleep(3)
+                    print("Opening ReceiverDataNotFoundWindow")
+
+                    while self.stacked_widget.count() > 0:
+                        widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+                        self.stacked_widget.removeWidget(
+                            widget_to_remove
+                        )  # remove it from stacked_widget
+                        widget_to_remove.setParent(
+                            None
+                        )  # optional: set its parent to None so it gets deleted
+
+                    self.ReceiverDataNotFoundWindow_window = ReceiverDataNotFoundWindow(
+                        self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened, self.shared_data
+                    )
+                    self.stacked_widget.addWidget(self.ReceiverDataNotFoundWindow_window)
+                    self.stacked_widget.setCurrentWidget(self.ReceiverDataNotFoundWindow_window)
 
                 else:
                     # Create destination path by replacing part of the source path
@@ -2359,10 +2371,22 @@ class ScanningWindow(QMainWindow, Ui_MainWindow3):
                     except subprocess.CalledProcessError as e:
                         print(f"An error occurred: {e}")
 
-                    self.timer = QTimer()
-                    self.timer.timeout.connect(self.go_home)
-                    self.timer.start(3000)
-                    time_module.sleep(3)
+                    print("Opening ReceiverDataNotFoundWindow")
+
+                    while self.stacked_widget.count() > 0:
+                        widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+                        self.stacked_widget.removeWidget(
+                            widget_to_remove
+                        )  # remove it from stacked_widget
+                        widget_to_remove.setParent(
+                            None
+                        )  # optional: set its parent to None so it gets deleted
+
+                    self.ReceiverDataNotFoundWindow_window = ReceiverDataNotFoundWindow(
+                        self.file_path, self.stacked_widget, self.process_manager, self.is_scanning_opened, self.shared_data
+                    )
+                    self.stacked_widget.addWidget(self.ReceiverDataNotFoundWindow_window)
+                    self.stacked_widget.setCurrentWidget(self.ReceiverDataNotFoundWindow_window)
         
         else:
             try:
@@ -2636,6 +2660,43 @@ class NumericKeyboard(QMainWindow):
                 + "</span></p></body></html>",
             )
         )
+
+
+class ReceiverDataNotFoundWindow(QMainWindow):
+    def __init__(self, file_path, stacked_widget, process_manager, is_scanning_opened, shared_data):
+        super().__init__()
+        loadUi("/home/decas/ui/DecasUI_New/w7.ui", self)
+
+        # Create an instance of ProcessManager
+        self.shared_data = shared_data
+        self.process_manager = process_manager
+        self.is_scanning_opened = is_scanning_opened
+
+        # Set the window size
+        self.resize(1024, 600)
+
+        self.file_path = file_path
+        self.stacked_widget = stacked_widget
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.go_home)
+        self.timer.start(3000)
+
+    def go_home(self):
+        self.timer.stop()
+
+        while self.stacked_widget.count() > 0:
+            widget_to_remove = self.stacked_widget.widget(0)  # get the widget
+            self.stacked_widget.removeWidget(
+                widget_to_remove
+            )  # remove it from stacked_widget
+            widget_to_remove.setParent(
+                None
+            )  # optional: set its parent to None so it gets deleted
+
+        self.ReadyWindow_window = ReadyWindow(self.stacked_widget, self.process_manager, self.is_scanning_opened, self.shared_data)
+        self.stacked_widget.addWidget(self.ReadyWindow_window)
+        self.stacked_widget.setCurrentWidget(self.ReadyWindow_window)
 
 
 class DataSentWindow(QMainWindow):
