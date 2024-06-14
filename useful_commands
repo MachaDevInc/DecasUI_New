@@ -1,24 +1,3 @@
-cd /home/decas/ui/DecasUI/
-cd ..
-sudo rm -r DecasUI
-sudo git clone https://github.com/MachaDevInc/DecasUI.git
-cd /home/decas/ui/DecasUI/
-sudo python3 MainFile.py
-
-
-cd /home/decas/ui/DecasUI/
-cd ..
-sudo rm -r DecasUI_New
-sudo git clone https://github.com/MachaDevInc/DecasUI_New.git
-cd /home/decas/ui/DecasUI_New/
-sudo python3 MainFile.py
-
-cd ..
-sudo rm -r DecasUI_New
-sudo git clone https://github.com/MachaDevInc/DecasUI_New.git
-cd /home/decas/DecasUI/DecasUI_New
-sudo python3 MainFile.py
-
 sudo ifconfig wlan0 down
 sudo ifconfig wlan0 up
 
